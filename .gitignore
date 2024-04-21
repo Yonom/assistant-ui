@@ -1,0 +1,36 @@
+# npm
+node_modules/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+ui-debug.log*
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# vercel
+.vercel
+
+# testing
+coverage
+
+# next.js
+.next/
+out/
+
+# production
+build
+
+# turbo
+.turbo
+
+.env
