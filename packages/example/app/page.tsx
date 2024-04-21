@@ -27,7 +27,7 @@ export default function Home() {
   return (
     <ChatPrimitive chat={chat}>
       <div className="flex h-full flex-col items-stretch bg-[#212121] px-16 pt-4">
-        <div className="flex flex-grow overflow-y-scroll">
+        <div className="flex flex-grow flex-col overflow-y-scroll">
           <ChatList components={{ Message: ChatMessage, Empty: ChatEmpty }} />
         </div>
         <Composer />

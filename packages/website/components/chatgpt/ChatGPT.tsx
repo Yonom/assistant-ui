@@ -4,7 +4,7 @@ import { ChatPrimitive } from "assistant-ui/src/primitives/ChatPrimitive";
 import { MessageActionBarPrimitive } from "assistant-ui/src/primitives/MessageActionBarPrimitive";
 import { MessageContentValue } from "assistant-ui/src/primitives/MessageValues";
 import { useIsEditingContext } from "assistant-ui/src/utils/Context";
-import React, { FC } from "react";
+import React, { FC, useCallback } from "react";
 import { Composer } from "@/components/chatgpt/Composer";
 import {
   ChatMessageAvatar,
@@ -36,6 +36,7 @@ export const ChatGPT: FC<AssistantProps> = ({ chat }) => {
     </ChatPrimitive>
   );
 };
+
 const ChatMessage: FC = () => {
   const [isEditing] = useIsEditingContext();
 
@@ -46,13 +47,19 @@ const ChatMessage: FC = () => {
         <MessageRoleLabel />
         <MessageContentOrEditing
           components={{
-            MessageContent: () => (
-              <p className="text-[#eee]">
-                <MessageContentValue />
-              </p>
+            MessageContent: useCallback(
+              () => (
+                <p className="text-[#eee]">
+                  <MessageContentValue />
+                </p>
+              ),
+              [],
             ),
-            MessageEditing: () => (
-              <MessageEditingPrimitive className="mb-2 flex w-full bg-transparent text-white outline-none" />
+            MessageEditing: useCallback(
+              () => (
+                <MessageEditingPrimitive className="mb-2 flex w-full bg-transparent text-white outline-none" />
+              ),
+              [],
             ),
           }}
         />
