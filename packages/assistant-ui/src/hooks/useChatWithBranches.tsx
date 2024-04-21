@@ -14,8 +14,6 @@ const ensureLastMessageIsInBranches = (
   data: ChatBranchData,
   messages: Message[],
 ) => {
-  console.log(messages);
-
   const childId = messages.at(-1)?.id;
   if (!childId) return;
 
