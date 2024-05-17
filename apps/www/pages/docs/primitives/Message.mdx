@@ -6,22 +6,30 @@ description: A single message in a conversation. Messages may consist of multipl
 ## Anatomy
 
 ```tsx
-import { Message } from "assistant-ui";
+import { MessagePrimitive, ActionBarPrimitive } from "assistant-ui";
 
-export default () => (
-  <Message.Root>
-    <Message.If user>You</Message.If>
-    <Message.If assistant>Assistant</Message.If>
+const UserMessage = () => (
+  <MessagePrimitive.Root>
+    User: <MessagePrimitive.Content />
+    
+    <ActionBarPrimitive.Root>
+      <BranchPicker />
 
-    <Message.If editing={false}>
-      <Message.Content />
-      <ActionBar />
-    </Message.If>
+      <ActionBarPrimitive.Edit />
+    </ActionBarPrimitive.Root>
+  </Message.Root>
+);
 
-    <Message.If editing>
-      <Message.EditableContent />
-      <EditBar />
-    </Message.If>
+const AssistantMessage = () => (
+  <MessagePrimitive.Root>
+    Assistant: <MessagePrimitive.Content />
+    
+    <ActionBarPrimitive.Root>
+      <BranchPicker />
+
+      <ActionBarPrimitive.Copy />
+      <ActionBarPrimitive.Reload />
+    </ActionBarPrimitive.Root>
   </Message.Root>
 );
 ```
@@ -39,10 +47,6 @@ Containts all parts of the Composer.
 ### Content
 
 The content of the message in plain text.
-
-### EditableContent
-
-The content of the message in an editable plain text field.
 
 ### If
 

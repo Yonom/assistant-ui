@@ -1,11 +1,14 @@
 "use client";
 
-import { type KeyboardEvent, forwardRef } from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { useThreadContext } from "../../utils/context/ThreadContext";
 import { composeEventHandlers } from "@radix-ui/primitive";
+import { Slot } from "@radix-ui/react-slot";
+import { type KeyboardEvent, forwardRef } from "react";
+import TextareaAutosize, {
+  type TextareaAutosizeProps,
+} from "react-textarea-autosize";
+import { useAssistantContext } from "../../utils/context/AssistantContext";
+import { useUseComposer } from "../../utils/context/ComposerState";
 import { useComposerContext } from "./ComposerRoot";
-import TextareaAutosize, { type TextareaAutosizeProps } from "react-textarea-autosize";
 
 type ComposerInputProps = TextareaAutosizeProps & {
   asChild?: boolean;
@@ -15,21 +18,20 @@ export const ComposerInput = forwardRef<
   HTMLTextAreaElement,
   ComposerInputProps
 >(({ asChild, onChange, onKeyDown, ...rest }, forwardedRef) => {
-  const chat = useThreadContext(
-    "Composer.Input",
-    ({ chat: { input, handleInputChange, isLoading } }) => ({
-      input,
-      handleInputChange,
-      isLoading,
-    }),
-  );
+  const { useThread } = useAssistantContext();
+  const isLoading = useThread((t) => t.isLoading);
+  const useComposer = useUseComposer();
+  const value = useComposer((c) => {
+    if (!c.isEditing) return "";
+    return c.value;
+  });
 
   const Component = asChild ? Slot : TextareaAutosize;
 
   const composer = useComposerContext();
 
   const handleKeyPress = (e: KeyboardEvent) => {
-    if (chat.isLoading || rest.disabled) return;
+    if (isLoading || rest.disabled) return;
 
     if (e.key === "Enter" && e.shiftKey === false) {
       e.preventDefault();
@@ -39,10 +41,14 @@ export const ComposerInput = forwardRef<
 
   return (
     <Component
-      value={chat.input}
+      value={value}
       {...rest}
       ref={forwardedRef}
-      onChange={composeEventHandlers(onChange, chat.handleInputChange)}
+      onChange={composeEventHandlers(onChange, (e) => {
+        const composerState = useComposer.getState();
+        if (!composerState.isEditing) return;
+        return composerState.setValue(e.target.value);
+      })}
       onKeyDown={composeEventHandlers(onKeyDown, handleKeyPress)}
     />
   );

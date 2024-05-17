@@ -1,19 +1,28 @@
 ---
 title: Composer
-description: The user interface to add new messages.
+description: The user interface to add new messages or edit existing ones.
 ---
 
 ## Anatomy
 
 ```tsx
-import { Composer } from "assistant-ui";
+import { ComposerPrimitive } from "assistant-ui";
 
-export default () => (
-  <Composer.Root>
-    <Composer.Input />
-    <Composer.Send />
-    <Composer.Stop />
-  </Composer.Root>
+// creating a new message
+const Composer = () => (
+  <ComposerPrimitive.Root>
+    <ComposerPrimitive.Input />
+    <ComposerPrimitive.Send />
+  </ComposerPrimitive.Root>
+);
+
+// editing an existing message
+const EditComposer = () => (
+  <ComposerPrimitive.Root>
+    <ComposerPrimitive.Input />
+    <ComposerPrimitive.Send />
+    <ComposerPrimitive.Cancel />
+  </ComposerPrimitive.Root>
 );
 ```
 
@@ -31,6 +40,6 @@ The text input field for the user to type a new message.
 
 The button to send the message.
 
-### Stop
+### Cancel
 
-The button to stop the generation. Already generated tokens will be kept.
+Cancel the composer. Only available when editing a message.

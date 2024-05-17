@@ -5,7 +5,6 @@ import {
   ActionBarPrimitive,
   BranchPickerPrimitive,
   ComposerPrimitive,
-  EditBarPrimitive,
   MessagePrimitive,
   ThreadPrimitive,
 } from "@assistant-ui/react";
@@ -37,7 +36,11 @@ export const ChatGPT: FC = () => {
         </ThreadPrimitive.Empty>
 
         <ThreadPrimitive.Messages
-          components={{ UserMessage, EditingUserMessage, AssistantMessage }}
+          components={{
+            UserMessage,
+            EditComposer,
+            AssistantMessage,
+          }}
         />
       </ThreadPrimitive.Viewport>
 
@@ -52,9 +55,9 @@ export const ChatGPT: FC = () => {
           </ComposerPrimitive.Send>
         </ThreadPrimitive.If>
         <ThreadPrimitive.If busy>
-          <ComposerPrimitive.Stop className="m-2 flex size-8 items-center justify-center rounded-full bg-white">
+          <ThreadPrimitive.Stop className="m-2 flex size-8 items-center justify-center rounded-full bg-white">
             <div className="size-2.5 bg-black" />
-          </ComposerPrimitive.Stop>
+          </ThreadPrimitive.Stop>
         </ThreadPrimitive.If>
       </ComposerPrimitive.Root>
       <p className="p-2 text-center text-[#cdcdcd] text-xs">
@@ -90,20 +93,20 @@ const UserMessage: FC = () => {
   );
 };
 
-const EditingUserMessage: FC = () => {
+const EditComposer: FC = () => {
   return (
-    <MessagePrimitive.Root className="mx-auto flex w-full max-w-screen-md flex-col justify-end gap-1 rounded-3xl bg-white/15">
-      <MessagePrimitive.EditableContent className="flex h-8 w-full resize-none bg-transparent p-5 pb-0 text-white outline-none" />
+    <ComposerPrimitive.Root className="mx-auto flex w-full max-w-screen-md flex-col justify-end gap-1 rounded-3xl bg-white/15">
+      <ComposerPrimitive.Input className="flex h-8 w-full resize-none bg-transparent p-5 pb-0 text-white outline-none" />
 
-      <EditBarPrimitive.Root className="m-3 mt-2 flex items-center justify-center gap-2 self-end">
-        <EditBarPrimitive.Cancel className="rounded-full bg-zinc-900 px-3 py-2 font-semibold text-sm text-white hover:bg-zinc-800">
+      <div className="m-3 mt-2 flex items-center justify-center gap-2 self-end">
+        {/* <ComposerPrimitive.Cancel className="rounded-full bg-zinc-900 px-3 py-2 font-semibold text-sm text-white hover:bg-zinc-800">
           Cancel
-        </EditBarPrimitive.Cancel>
-        <EditBarPrimitive.Save className="rounded-full bg-white px-3 py-2 font-semibold text-black text-sm hover:bg-white/90">
+        </ComposerPrimitive.Cancel> */}
+        <ComposerPrimitive.Send className="rounded-full bg-white px-3 py-2 font-semibold text-black text-sm hover:bg-white/90">
           Send
-        </EditBarPrimitive.Save>
-      </EditBarPrimitive.Root>
-    </MessagePrimitive.Root>
+        </ComposerPrimitive.Send>
+      </div>
+    </ComposerPrimitive.Root>
   );
 };
 
@@ -196,7 +199,6 @@ const ActionBarButton: FC<ActionBarButtonProps> = ({
           <span className="sr-only">{tooltip}</span>
         </Button>
       </TooltipTrigger>
-
       <TooltipContent side="bottom">{tooltip}</TooltipContent>
     </Tooltip>
   );

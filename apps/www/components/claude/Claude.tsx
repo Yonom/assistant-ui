@@ -50,7 +50,8 @@ export const Claude: FC = () => {
 };
 
 const ChatMessage: FC = () => {
-  const message = unstable_useMessageContext("ChatMessage", (s) => s.message);
+  const { useMessage } = unstable_useMessageContext();
+  const { message } = useMessage();
 
   return (
     <MessagePrimitive.Root className="mx-auto mb-4 flex w-full max-w-screen-md flex-col gap-3">

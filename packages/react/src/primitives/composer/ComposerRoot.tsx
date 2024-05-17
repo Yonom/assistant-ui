@@ -1,13 +1,20 @@
 "use client";
 
-import { createContext, forwardRef, useContext, useMemo, useRef } from "react";
+import { composeEventHandlers } from "@radix-ui/primitive";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import {
   type ComponentPropsWithoutRef,
   Primitive,
 } from "@radix-ui/react-primitive";
-import { useThreadContext } from "../../utils/context/ThreadContext";
-import { composeEventHandlers } from "@radix-ui/primitive";
-import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import {
+  type FormEvent,
+  createContext,
+  forwardRef,
+  useContext,
+  useMemo,
+  useRef,
+} from "react";
+import { useUseComposer } from "../../utils/context/ComposerState";
 
 type ComposerRootElement = React.ElementRef<typeof Primitive.form>;
 type PrimitiveFormProps = ComponentPropsWithoutRef<typeof Primitive.form>;
@@ -31,10 +38,8 @@ export const useComposerContext = () => {
 
 export const ComposerRoot = forwardRef<ComposerRootElement, ComposerRootProps>(
   ({ onSubmit, ...rest }, forwardedRef) => {
-    const handleSubmit = useThreadContext(
-      "Composer.Root",
-      (s) => s.chat.handleSubmit,
-    );
+    const composer = useUseComposer();
+
     const formRef = useRef<HTMLFormElement>(null);
     const ref = useComposedRefs(forwardedRef, formRef);
 
@@ -47,6 +52,14 @@ export const ComposerRoot = forwardRef<ComposerRootElement, ComposerRootProps>(
       }),
       [],
     );
+
+    const handleSubmit = (e: FormEvent) => {
+      const composerState = composer.getState();
+      if (!composerState.isEditing) return;
+
+      e.preventDefault();
+      composerState.send();
+    };
 
     return (
       <ComposerContext.Provider value={composerContextValue}>
