@@ -7,8 +7,8 @@ import TextareaAutosize, {
   type TextareaAutosizeProps,
 } from "react-textarea-autosize";
 import { useAssistantContext } from "../../utils/context/AssistantContext";
-import { useUseComposer } from "../../utils/context/ComposerState";
-import { useComposerContext } from "./ComposerRoot";
+import { useComposerContext } from "../../utils/context/ComposerState";
+import { useComposerFormContext } from "./ComposerRoot";
 
 type ComposerInputProps = TextareaAutosizeProps & {
   asChild?: boolean;
@@ -20,7 +20,7 @@ export const ComposerInput = forwardRef<
 >(({ asChild, onChange, onKeyDown, ...rest }, forwardedRef) => {
   const { useThread } = useAssistantContext();
   const isLoading = useThread((t) => t.isLoading);
-  const useComposer = useUseComposer();
+  const { useComposer } = useComposerContext();
   const value = useComposer((c) => {
     if (!c.isEditing) return "";
     return c.value;
@@ -28,14 +28,14 @@ export const ComposerInput = forwardRef<
 
   const Component = asChild ? Slot : TextareaAutosize;
 
-  const composer = useComposerContext();
+  const composerForm = useComposerFormContext();
 
   const handleKeyPress = (e: KeyboardEvent) => {
     if (isLoading || rest.disabled) return;
 
     if (e.key === "Enter" && e.shiftKey === false) {
       e.preventDefault();
-      composer.submit();
+      composerForm.submit();
     }
   };
 

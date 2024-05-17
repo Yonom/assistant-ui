@@ -14,7 +14,7 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { useUseComposer } from "../../utils/context/ComposerState";
+import { useComposerContext } from "../../utils/context/ComposerState";
 
 type ComposerRootElement = React.ElementRef<typeof Primitive.form>;
 type PrimitiveFormProps = ComponentPropsWithoutRef<typeof Primitive.form>;
@@ -24,10 +24,10 @@ type ComposerRootProps = PrimitiveFormProps;
 type ComposerContextValue = {
   submit: () => void;
 };
-const ComposerContext = createContext<ComposerContextValue | null>(null);
+const ComposerFormContext = createContext<ComposerContextValue | null>(null);
 
-export const useComposerContext = () => {
-  const context = useContext(ComposerContext);
+export const useComposerFormContext = () => {
+  const context = useContext(ComposerFormContext);
   if (!context) {
     throw new Error(
       "Composer compound components cannot be rendered outside the Composer component",
@@ -38,7 +38,7 @@ export const useComposerContext = () => {
 
 export const ComposerRoot = forwardRef<ComposerRootElement, ComposerRootProps>(
   ({ onSubmit, ...rest }, forwardedRef) => {
-    const composer = useUseComposer();
+    const { useComposer } = useComposerContext();
 
     const formRef = useRef<HTMLFormElement>(null);
     const ref = useComposedRefs(forwardedRef, formRef);
@@ -54,7 +54,7 @@ export const ComposerRoot = forwardRef<ComposerRootElement, ComposerRootProps>(
     );
 
     const handleSubmit = (e: FormEvent) => {
-      const composerState = composer.getState();
+      const composerState = useComposer.getState();
       if (!composerState.isEditing) return;
 
       e.preventDefault();
@@ -62,13 +62,13 @@ export const ComposerRoot = forwardRef<ComposerRootElement, ComposerRootProps>(
     };
 
     return (
-      <ComposerContext.Provider value={composerContextValue}>
+      <ComposerFormContext.Provider value={composerContextValue}>
         <Primitive.form
           {...rest}
           ref={ref}
           onSubmit={composeEventHandlers(onSubmit, handleSubmit)}
         />
-      </ComposerContext.Provider>
+      </ComposerFormContext.Provider>
     );
   },
 );

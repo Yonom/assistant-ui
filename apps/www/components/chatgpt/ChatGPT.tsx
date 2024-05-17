@@ -99,9 +99,9 @@ const EditComposer: FC = () => {
       <ComposerPrimitive.Input className="flex h-8 w-full resize-none bg-transparent p-5 pb-0 text-white outline-none" />
 
       <div className="m-3 mt-2 flex items-center justify-center gap-2 self-end">
-        {/* <ComposerPrimitive.Cancel className="rounded-full bg-zinc-900 px-3 py-2 font-semibold text-sm text-white hover:bg-zinc-800">
+        <ComposerPrimitive.Cancel className="rounded-full bg-zinc-900 px-3 py-2 font-semibold text-sm text-white hover:bg-zinc-800">
           Cancel
-        </ComposerPrimitive.Cancel> */}
+        </ComposerPrimitive.Cancel>
         <ComposerPrimitive.Send className="rounded-full bg-white px-3 py-2 font-semibold text-black text-sm hover:bg-white/90">
           Send
         </ComposerPrimitive.Send>

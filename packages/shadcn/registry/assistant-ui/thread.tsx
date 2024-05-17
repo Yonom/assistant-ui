@@ -127,9 +127,9 @@ const EditComposer: FC = () => {
             <ComposerPrimitive.Send asChild>
               <Button>Save & Submit</Button>
             </ComposerPrimitive.Send>
-            {/* <ComposerPrimitive.Cancel asChild>
+            <ComposerPrimitive.Cancel asChild>
               <Button variant="outline">Cancel</Button>
-            </ComposerPrimitive.Cancel> */}
+            </ComposerPrimitive.Cancel>
           </div>
         </ComposerPrimitive.Root>
       </div>

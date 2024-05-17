@@ -19,8 +19,8 @@ export type ComposerStore = {
   useComposer: UseBoundStore<StoreApi<ComposerState>>;
 };
 
-export const useUseComposer = () => {
+export const useComposerContext = () => {
   const { useComposer: useAssisstantComposer } = useAssistantContext();
   const { useComposer: useMessageComposer } = useContext(MessageContext) ?? {};
-  return useMessageComposer ?? useAssisstantComposer;
+  return { useComposer: useMessageComposer ?? useAssisstantComposer };
 };

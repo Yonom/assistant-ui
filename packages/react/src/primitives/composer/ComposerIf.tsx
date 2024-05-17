@@ -2,7 +2,7 @@
 
 import type { FC, PropsWithChildren } from "react";
 import type { RequireAtLeastOne } from "../../utils/RequireAtLeastOne";
-import { useUseComposer } from "../../utils/context/ComposerState";
+import { useComposerContext } from "../../utils/context/ComposerState";
 
 type ComposerIfFilters = {
   editing: boolean | undefined;
@@ -11,7 +11,7 @@ type ComposerIfFilters = {
 type ComposerIfProps = PropsWithChildren<RequireAtLeastOne<ComposerIfFilters>>;
 
 const useComposerIf = (props: RequireAtLeastOne<ComposerIfFilters>) => {
-  const useComposer = useUseComposer();
+  const { useComposer } = useComposerContext();
   return useComposer((composer) => {
     if (props.editing === true && !composer.isEditing) return false;
     if (props.editing === false && composer.isEditing) return false;
