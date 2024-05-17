@@ -18,7 +18,7 @@ const Thread = () => {
         ...
         <ThreadPrimitive.Messages components={{
           ...,
-          UserMessageEditor, // <-- Show our new component during edit mode
+          EditComposer, // <-- Show our new component during edit mode
         }} />
       </ThreadPrimitive.Viewport>
       ...
@@ -39,9 +39,10 @@ const UserMessage = () => {
 };
 
 // define a new component
-const UserMessageEditor = () => {
+const EditComposer = () => {
   return (
-    <MessagePrimitive.Root>
+    // you can return a MessagePrimitive including a ComposerPrimitive, or only a ComposerPrimitive
+    <MessagePrimitive.Root> 
       ...
       <ComposerPrimitive.Root>
         <ComposerPrimitive.Input />

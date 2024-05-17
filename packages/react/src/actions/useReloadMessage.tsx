@@ -5,6 +5,7 @@ export const useReloadMessage = () => {
   const { useThread, useBranchObserver } = useAssistantContext();
   const { useMessage } = useMessageContext();
 
+  // TODO compose into one hook call
   const isLoading = useThread((s) => s.isLoading);
   const isAssistant = useMessage((s) => s.message.role === "assistant");
 
