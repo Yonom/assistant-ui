@@ -93,18 +93,24 @@ const UserMessage: FC = () => {
           <MessagePrimitive.Content />
         </p>
 
-        <ActionBarPrimitive.Root
-          hideWhenNotLastOrHover
-          className="absolute flex w-full items-center gap-1 py-2"
-        >
+        <div className="flex pt-2">
           <BranchPicker />
 
-          <ActionBarPrimitive.Edit asChild>
-            <IconButton tooltip="Edit">
-              <PencilIcon className="size-4" />
-            </IconButton>
-          </ActionBarPrimitive.Edit>
-        </ActionBarPrimitive.Root>
+          <ActionBarPrimitive.Root
+            hideWhenBusy
+            autohide="not-last"
+            autohideFloat="single-branch"
+            className="flex items-center gap-1 rounded-lg data-[floating=true]:absolute data-[floating=true]:border data-[floating=true]:p-1"
+          >
+            <MessagePrimitive.If lastOrHover>
+              <ActionBarPrimitive.Edit asChild>
+                <IconButton tooltip="Edit">
+                  <PencilIcon className="size-4" />
+                </IconButton>
+              </ActionBarPrimitive.Edit>
+            </MessagePrimitive.If>
+          </ActionBarPrimitive.Root>
+        </div>
       </div>
     </MessagePrimitive.Root>
   );
@@ -151,29 +157,34 @@ const AssistantMessage: FC = () => {
           <MessagePrimitive.Content />
         </p>
 
-        <ActionBarPrimitive.Root
-          hideWhenNotLastOrHover
-          hideWhenBusy
-          className="absolute flex w-full items-center gap-1 py-2"
-        >
+        <div className="flex pt-2">
           <BranchPicker />
 
-          <ActionBarPrimitive.Copy asChild>
-            <IconButton tooltip="Copy">
-              <MessagePrimitive.If copied>
-                <CheckIcon className="size-4" />
-              </MessagePrimitive.If>
-              <MessagePrimitive.If copied={false}>
-                <CopyIcon className="size-4" />
-              </MessagePrimitive.If>
-            </IconButton>
-          </ActionBarPrimitive.Copy>
-          <ActionBarPrimitive.Reload asChild>
-            <IconButton tooltip="Refresh">
-              <RefreshCwIcon className="size-4" />
-            </IconButton>
-          </ActionBarPrimitive.Reload>
-        </ActionBarPrimitive.Root>
+          <ActionBarPrimitive.Root
+            hideWhenBusy
+            autohide="not-last"
+            autohideFloat="single-branch"
+            className="flex items-center gap-1 rounded-lg data-[floating=true]:absolute data-[floating=true]:border data-[floating=true]:p-1"
+          >
+            <MessagePrimitive.If lastOrHover>
+              <ActionBarPrimitive.Copy asChild>
+                <IconButton tooltip="Copy">
+                  <MessagePrimitive.If copied>
+                    <CheckIcon className="size-4" />
+                  </MessagePrimitive.If>
+                  <MessagePrimitive.If copied={false}>
+                    <CopyIcon className="size-4" />
+                  </MessagePrimitive.If>
+                </IconButton>
+              </ActionBarPrimitive.Copy>
+              <ActionBarPrimitive.Reload asChild>
+                <IconButton tooltip="Refresh">
+                  <RefreshCwIcon className="size-4" />
+                </IconButton>
+              </ActionBarPrimitive.Reload>
+            </MessagePrimitive.If>
+          </ActionBarPrimitive.Root>
+        </div>
       </div>
     </MessagePrimitive.Root>
   );

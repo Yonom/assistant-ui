@@ -1,5 +1,5 @@
 ---
-title: BranchPicker
+title: BranchPickerPrimitive
 description: View and switch between branches.
 ---
 
@@ -8,14 +8,14 @@ description: View and switch between branches.
 ```tsx
 import { BranchPickerPrimitive } from "assistant-ui";
 
-export default () => (
-  <BranchPicker.Root>
-    <BranchPicker.Previous />
+const BranchPicker = () => (
+  <BranchPickerPrimitive.Root>
+    <BranchPickerPrimitive.Previous />
 
-    <BranchPicker.Number /> / <BranchPicker.Count />
+    <BranchPickerPrimitive.Number /> / <BranchPickerPrimitive.Count />
 
-    <BranchPicker.Next />
-  </BranchPicker.Root>
+    <BranchPickerPrimitive.Next />
+  </BranchPickerPrimitive.Root>
 );
 ```
 
@@ -23,7 +23,7 @@ export default () => (
 
 ### Root
 
-Containts all parts of the BranchPicker.
+Containts all parts of the branch picker.
 
 ### Previous
 

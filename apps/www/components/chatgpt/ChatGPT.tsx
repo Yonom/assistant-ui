@@ -18,7 +18,7 @@ import {
   Pencil1Icon,
   ReloadIcon,
 } from "@radix-ui/react-icons";
-import React, { type PropsWithChildren, type FC } from "react";
+import React, { type FC } from "react";
 import { Button, type ButtonProps } from "../ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
@@ -73,13 +73,14 @@ const UserMessage: FC = () => {
       <div className="flex items-start gap-4">
         <ActionBarPrimitive.Root
           hideWhenBusy
-          hideWhenNotLastOrHover
+          autohide="not-last"
+          autohideFloat="single-branch"
           className="mt-2"
         >
           <ActionBarPrimitive.Edit asChild>
-            <ActionBarButton tooltip="Edit">
+            <ActionButton tooltip="Edit">
               <Pencil1Icon />
-            </ActionBarButton>
+            </ActionButton>
           </ActionBarPrimitive.Edit>
         </ActionBarPrimitive.Root>
 
@@ -88,7 +89,7 @@ const UserMessage: FC = () => {
         </p>
       </div>
 
-      <BranchPicker className="mt-2 mr-4" />
+      <BranchPicker className="mt-2 mr-3" />
     </MessagePrimitive.Root>
   );
 };
@@ -124,29 +125,32 @@ const AssistantMessage: FC = () => {
           <MessagePrimitive.Content />
         </p>
 
-        <ActionBarPrimitive.Root
-          hideWhenBusy
-          hideWhenNotLastOrHover
-          className="absolute flex w-full items-center gap-1 py-2"
-        >
+        <div className="flex pt-2">
           <BranchPicker />
 
-          <ActionBarPrimitive.Reload asChild>
-            <ActionBarButton tooltip="Reload">
-              <ReloadIcon />
-            </ActionBarButton>
-          </ActionBarPrimitive.Reload>
-          <ActionBarPrimitive.Copy asChild>
-            <ActionBarButton tooltip="Copy">
-              <MessagePrimitive.If copied>
-                <CheckIcon />
-              </MessagePrimitive.If>
-              <MessagePrimitive.If copied={false}>
-                <CopyIcon />
-              </MessagePrimitive.If>
-            </ActionBarButton>
-          </ActionBarPrimitive.Copy>
-        </ActionBarPrimitive.Root>
+          <ActionBarPrimitive.Root
+            hideWhenBusy
+            autohide="not-last"
+            autohideFloat="single-branch"
+            className="flex items-center gap-1 rounded-lg data-[floating=true]:absolute data-[floating=true]:border-2 data-[floating=true]:p-1"
+          >
+            <ActionBarPrimitive.Reload asChild>
+              <ActionButton tooltip="Reload">
+                <ReloadIcon />
+              </ActionButton>
+            </ActionBarPrimitive.Reload>
+            <ActionBarPrimitive.Copy asChild>
+              <ActionButton tooltip="Copy">
+                <MessagePrimitive.If copied>
+                  <CheckIcon />
+                </MessagePrimitive.If>
+                <MessagePrimitive.If copied={false}>
+                  <CopyIcon />
+                </MessagePrimitive.If>
+              </ActionButton>
+            </ActionBarPrimitive.Copy>
+          </ActionBarPrimitive.Root>
+        </div>
       </div>
     </MessagePrimitive.Root>
   );
@@ -162,25 +166,23 @@ const BranchPicker: FC<{ className?: string }> = ({ className }) => {
       )}
     >
       <BranchPickerPrimitive.Previous asChild>
-        <ActionBarButton tooltip="Previous">
+        <ActionButton tooltip="Previous">
           <ChevronLeftIcon />
-        </ActionBarButton>
+        </ActionButton>
       </BranchPickerPrimitive.Previous>
       <BranchPickerPrimitive.Number />/<BranchPickerPrimitive.Count />
       <BranchPickerPrimitive.Next asChild>
-        <ActionBarButton tooltip="Next">
+        <ActionButton tooltip="Next">
           <ChevronRightIcon />
-        </ActionBarButton>
+        </ActionButton>
       </BranchPickerPrimitive.Next>
     </BranchPickerPrimitive.Root>
   );
 };
 
-type ActionBarButtonProps = PropsWithChildren<
-  ButtonProps & { tooltip: string }
->;
+type ActionButtonProps = ButtonProps & { tooltip: string };
 
-const ActionBarButton: FC<ActionBarButtonProps> = ({
+const ActionButton: FC<ActionButtonProps> = ({
   tooltip,
   className,
   children,

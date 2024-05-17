@@ -16,7 +16,7 @@ type MessageIfProps = RequireAtLeastOne<MessageIfFilters> & {
   children: React.ReactNode;
 };
 
-const useMessageIf = (props: RequireAtLeastOne<MessageIfFilters>) => {
+export const useMessageIf = (props: RequireAtLeastOne<MessageIfFilters>) => {
   const { useMessage } = useMessageContext();
 
   return useMessage(
