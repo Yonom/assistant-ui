@@ -55,9 +55,9 @@ export const ChatGPT: FC = () => {
           </ComposerPrimitive.Send>
         </ThreadPrimitive.If>
         <ThreadPrimitive.If busy>
-          <ThreadPrimitive.Stop className="m-2 flex size-8 items-center justify-center rounded-full bg-white">
+          <ComposerPrimitive.Cancel className="m-2 flex size-8 items-center justify-center rounded-full bg-white">
             <div className="size-2.5 bg-black" />
-          </ThreadPrimitive.Stop>
+          </ComposerPrimitive.Cancel>
         </ThreadPrimitive.If>
       </ComposerPrimitive.Root>
       <p className="p-2 text-center text-[#cdcdcd] text-xs">

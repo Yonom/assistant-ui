@@ -40,7 +40,7 @@ const useAIAssistantContext = () => {
         useComposer.getState().setValue("");
       },
       cancel: () => {
-        throw new Error("Not implemented");
+        useThread.getState().stop();
       },
     }));
 
@@ -86,29 +86,26 @@ export const VercelAIAssistantProvider: FC<VercelAIAssistantProviderProps> = ({
           await chat.append(message);
         },
         stop: () => {
+          const lastMessage = chat.messages.at(-1);
           chat.stop();
+
+          if (lastMessage?.role === "user") {
+            chat.setInput(lastMessage.content);
+          }
         },
       },
       true,
     );
-  }, [
-    context,
-    chat.isLoading,
-    chat.reload,
-    chat.append,
-    chat.messages,
-    chat.setMessages,
-    chat.stop,
-  ]);
+  }, [context, chat]);
 
   // sync with vercel
   useMemo(() => {
     context.useComposer.setState({
-      isEditing: true,
+      canCancel: chat.isLoading,
       value: chat.input,
       setValue: chat.setInput,
     });
-  }, [context, chat.input, chat.setInput]);
+  }, [context, chat.isLoading, chat.input, chat.setInput]);
 
   const branches = useChatWithBranches(chat);
 

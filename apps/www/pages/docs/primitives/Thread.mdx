@@ -14,7 +14,6 @@ const Thread = () => (
       <ThreadPrimitive.Empty>...</ThreadPrimitive.Empty>
       <ThreadPrimitive.Messages components={...} />
     </ThreadPrimitive.Viewport>
-    <ThreadPrimitive.Stop />
     <Composer />
   </ThreadPrimitive.Root>
 );
@@ -37,10 +36,6 @@ Renders all messages.
 ### Empty
 
 Renders children only when there are no messages.
-
-### Stop
-
-The button to stop the generation. Already generated tokens will be kept.
 
 ### If
 

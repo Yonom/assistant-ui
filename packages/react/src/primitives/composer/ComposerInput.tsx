@@ -17,7 +17,7 @@ type ComposerInputProps = TextareaAutosizeProps & {
 export const ComposerInput = forwardRef<
   HTMLTextAreaElement,
   ComposerInputProps
->(({ asChild, onChange, onKeyDown, ...rest }, forwardedRef) => {
+>(({ asChild, disabled, onChange, onKeyDown, ...rest }, forwardedRef) => {
   const { useThread } = useAssistantContext();
   const isLoading = useThread((t) => t.isLoading);
   const { useComposer } = useComposerContext();
@@ -31,7 +31,13 @@ export const ComposerInput = forwardRef<
   const composerForm = useComposerFormContext();
 
   const handleKeyPress = (e: KeyboardEvent) => {
-    if (isLoading || rest.disabled) return;
+    if (disabled) return;
+
+    if (e.key === "Escape") {
+      useComposer.getState().cancel();
+    }
+
+    if (isLoading) return;
 
     if (e.key === "Enter" && e.shiftKey === false) {
       e.preventDefault();
@@ -44,6 +50,7 @@ export const ComposerInput = forwardRef<
       value={value}
       {...rest}
       ref={forwardedRef}
+      disabled={disabled}
       onChange={composeEventHandlers(onChange, (e) => {
         const composerState = useComposer.getState();
         if (!composerState.isEditing) return;

@@ -71,9 +71,9 @@ const Composer: FC = () => {
         </ComposerPrimitive.Send>
       </ThreadPrimitive.If>
       <ThreadPrimitive.If busy>
-        <ThreadPrimitive.Stop className="m-3.5 flex size-5 items-center justify-center rounded-full border-2 border-foreground">
+        <ComposerPrimitive.Cancel className="m-3.5 flex size-5 items-center justify-center rounded-full border-2 border-foreground">
           <div className="size-2 rounded-[1px] bg-foreground" />
-        </ThreadPrimitive.Stop>
+        </ComposerPrimitive.Cancel>
       </ThreadPrimitive.If>
     </ComposerPrimitive.Root>
   );
