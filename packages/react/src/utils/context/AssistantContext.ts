@@ -1,20 +1,36 @@
-import { createContext, useContext } from "react";
+import { type ReactNode, createContext, useContext } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
 import type { BranchState } from "../../vercel/useVercelAIBranches";
 import type { ComposerStore } from "./ComposerState";
 
-export type TextContent = {
+export type TextPart = {
   type: "text";
   text: string;
 };
 
-export type ImageContent = {
+export type ImagePart = {
   type: "image";
   image: string;
 };
 
-export type ThreadUserMessageContent = TextContent | ImageContent;
-export type ThreadAssistantMessageContent = TextContent | ImageContent;
+export type UIPart = {
+  type: "ui";
+  node: ReactNode;
+};
+
+export type ToolCallPart = {
+  type: "tool-call";
+  name: string;
+  args: object;
+  result?: object;
+};
+
+export type ThreadUserMessageContent = TextPart | ImagePart;
+export type ThreadAssistantMessageContent =
+  | TextPart
+  | ImagePart
+  | UIPart
+  | ToolCallPart;
 
 export type ThreadUserMessage = {
   id: string;
