@@ -3,34 +3,39 @@ import type { StoreApi, UseBoundStore } from "zustand";
 import type { BranchState } from "../../vercel/useVercelAIBranches";
 import type { ComposerStore } from "./ComposerState";
 
-export type TextPart = {
+// TODO metadata field
+
+export type ThreadMessageTextPart = {
   type: "text";
   text: string;
 };
 
-export type ImagePart = {
+export type ThreadMessageImagePart = {
   type: "image";
   image: string;
 };
 
-export type UIPart = {
+export type ThreadMessageUIPart = {
   type: "ui";
-  node: ReactNode;
+  display: ReactNode;
 };
 
-export type ToolCallPart = {
+export type ThreadMessageToolCallPart = {
   type: "tool-call";
   name: string;
   args: object;
   result?: object;
 };
 
-export type ThreadUserMessageContent = TextPart | ImagePart;
+export type ThreadUserMessageContent =
+  | ThreadMessageTextPart
+  | ThreadMessageImagePart
+  | ThreadMessageUIPart;
 export type ThreadAssistantMessageContent =
-  | TextPart
-  | ImagePart
-  | UIPart
-  | ToolCallPart;
+  | ThreadMessageTextPart
+  | ThreadMessageImagePart
+  | ThreadMessageUIPart
+  | ThreadMessageToolCallPart;
 
 export type ThreadUserMessage = {
   id: string;

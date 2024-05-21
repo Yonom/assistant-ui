@@ -2,69 +2,14 @@
 
 import type { Message } from "ai";
 import type { UseAssistantHelpers, UseChatHelpers } from "ai/react";
-import {
-  type FC,
-  type PropsWithChildren,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
-import { create } from "zustand";
+import { type FC, type PropsWithChildren, useCallback, useMemo } from "react";
 import {
   AssistantContext,
-  type AssistantStore,
-  type BranchObserver,
   type CreateThreadMessage,
   type ThreadMessage,
-  type ThreadState,
 } from "../utils/context/AssistantContext";
-import type { ComposerState } from "../utils/context/ComposerState";
+import { useDummyAIAssistantContext } from "./useDummyAIAssistantContext";
 import { useVercelAIBranches } from "./useVercelAIBranches";
-
-const useAIAssistantContext = () => {
-  const [context] = useState<AssistantStore>(() => {
-    const useThread = create<ThreadState>()(() => ({
-      messages: [],
-      isLoading: false,
-      reload: async () => {},
-      append: async () => {},
-      stop: () => {},
-    }));
-
-    const useComposer = create<ComposerState>()(() => ({
-      isEditing: true,
-      canCancel: false,
-      value: "",
-      setValue: () => {},
-      edit: () => {
-        throw new Error("Not implemented");
-      },
-      send: () => {
-        useThread.getState().append({
-          role: "user",
-          content: [{ type: "text", text: useComposer.getState().value }],
-        });
-        useComposer.getState().setValue("");
-      },
-      cancel: () => {
-        useThread.getState().stop();
-      },
-    }));
-
-    const useBranchObserver = create<BranchObserver>()(() => ({
-      getBranchState: () => ({
-        branchId: 0,
-        branchCount: 0,
-      }),
-      switchToBranch: () => {},
-      editAt: async () => {},
-      reloadAt: async () => {},
-    }));
-
-    return { useThread, useComposer, useBranchObserver };
-  });
-  return context;
-};
 
 const ThreadMessageCache = new WeakMap<Message, ThreadMessage>();
 const vercelToThreadMessage = (message: Message): ThreadMessage => {
@@ -101,7 +46,7 @@ export const VercelAIAssistantProvider: FC<VercelAIAssistantProviderProps> = ({
   children,
   ...rest
 }) => {
-  const context = useAIAssistantContext();
+  const context = useDummyAIAssistantContext();
 
   const vercel = "chat" in rest ? rest.chat : rest.assistant;
 

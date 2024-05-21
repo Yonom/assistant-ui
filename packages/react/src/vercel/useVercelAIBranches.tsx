@@ -178,6 +178,7 @@ export const useVercelAIBranches = (
       const newMessages = sliceMessagesUntil(chat.messages, message);
       chat.setMessages(newMessages);
 
+      // TODO image/ui support
       if (newMessage.content[0]?.type !== "text")
         throw new Error("Only text content is currently supported");
 

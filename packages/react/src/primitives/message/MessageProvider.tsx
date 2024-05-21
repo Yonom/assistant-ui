@@ -54,6 +54,8 @@ const useMessageContext = () => {
         const message = useMessage.getState().message;
         if (message.role !== "user")
           throw new Error("Editing is only supported for user messages");
+
+        // TODO image/ui support
         if (message.content[0]?.type !== "text")
           throw new Error("Editing is only supported for text-only messages");
 
