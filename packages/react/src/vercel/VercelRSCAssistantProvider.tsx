@@ -7,11 +7,11 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import {
-  AssistantContext,
-  type CreateThreadMessage,
-  type ThreadMessage,
-} from "../utils/context/AssistantContext";
+import { AssistantContext } from "../utils/context/AssistantContext";
+import type {
+  CreateThreadMessage,
+  ThreadMessage,
+} from "../utils/context/AssistantTypes";
 import { useDummyAIAssistantContext } from "./useDummyAIAssistantContext";
 
 type RSCMessage = {

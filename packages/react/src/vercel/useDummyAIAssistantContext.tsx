@@ -5,8 +5,8 @@ import type {
   AssistantStore,
   BranchObserver,
   ThreadState,
-} from "../utils/context/AssistantContext";
-import type { ComposerState } from "../utils/context/ComposerState";
+} from "../utils/context/AssistantTypes";
+import type { ComposerState } from "../utils/context/ComposerTypes";
 
 export const useDummyAIAssistantContext = () => {
   const [context] = useState<AssistantStore>(() => {
@@ -28,8 +28,8 @@ export const useDummyAIAssistantContext = () => {
       isEditing: true,
       canCancel: false,
       value: "",
-      setValue: (newValue) => {
-        useComposer.getState().setValue(newValue);
+      setValue: (value) => {
+        useComposer.setState({ value });
       },
       edit: () => {
         throw new Error("Not implemented");
@@ -47,9 +47,10 @@ export const useDummyAIAssistantContext = () => {
     }));
 
     const useBranchObserver = create<BranchObserver>()(() => ({
-      getBranchState: () => {
-        throw new Error("Not implemented");
-      },
+      getBranchState: () => ({
+        branchId: 0,
+        branchCount: 1,
+      }),
       switchToBranch: () => {
         throw new Error("Not implemented");
       },

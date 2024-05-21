@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+"@ai-sdk/openai@^0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@ai-sdk/openai/-/openai-0.0.13.tgz#a16f16e0e0f669d757bfc4c4d9933f7b1ca8e325"
+  integrity sha512-V5Jjem+83sVxFNzhNUV25c7uXC33VKIhoo1qN098EMqTriEp9oNCRAaNXf95eVFbFs2bDLVZtkoACv++Go0BUA==
+  dependencies:
+    "@ai-sdk/provider" "0.0.5"
+    "@ai-sdk/provider-utils" "0.0.8"
+
 "@ai-sdk/provider-utils@0.0.8":
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/@ai-sdk/provider-utils/-/provider-utils-0.0.8.tgz#fcfff6263a0ac4e3868380af2a12262d836f28ee"
@@ -1699,6 +1707,25 @@ agentkeepalive@^4.2.1:
   integrity sha512-5GG/5IbQQpC9FpkRGsSvZI5QYeSCzlJHdpBQntCsuTOxhKD8lqKhrleg2Yi7yvMIf82Ycmmqln9U8V9qwEiJew==
   dependencies:
     humanize-ms "^1.2.1"
+
+ai@3.1.10:
+  version "3.1.10"
+  resolved "https://registry.yarnpkg.com/ai/-/ai-3.1.10.tgz#960674d24e72e089c3ce80a5385d66409fb97eff"
+  integrity sha512-X0ZiSBodObRmaeq4AUn7WOc6sau2qYLz6SbAv8+JP1WI1qBlmdgTuC1NE2rw2f8FDamsQIu6dvhiv5h5WuLkTQ==
+  dependencies:
+    "@ai-sdk/provider" "0.0.5"
+    "@ai-sdk/provider-utils" "0.0.8"
+    eventsource-parser "1.1.2"
+    json-schema "0.4.0"
+    jsondiffpatch "0.6.0"
+    nanoid "3.3.6"
+    secure-json-parse "2.7.0"
+    solid-swr-store "0.10.7"
+    sswr "2.0.0"
+    swr "2.2.0"
+    swr-store "0.10.6"
+    swrv "1.0.4"
+    zod-to-json-schema "3.22.5"
 
 ai@^3.1.12:
   version "3.1.12"

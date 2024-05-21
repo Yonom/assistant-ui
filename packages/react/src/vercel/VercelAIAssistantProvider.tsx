@@ -3,11 +3,11 @@
 import type { Message } from "ai";
 import type { UseAssistantHelpers, UseChatHelpers } from "ai/react";
 import { type FC, type PropsWithChildren, useCallback, useMemo } from "react";
-import {
-  AssistantContext,
-  type CreateThreadMessage,
-  type ThreadMessage,
-} from "../utils/context/AssistantContext";
+import { AssistantContext } from "../utils/context/AssistantContext";
+import type {
+  CreateThreadMessage,
+  ThreadMessage,
+} from "../utils/context/AssistantTypes";
 import { useDummyAIAssistantContext } from "./useDummyAIAssistantContext";
 import { useVercelAIBranches } from "./useVercelAIBranches";
 

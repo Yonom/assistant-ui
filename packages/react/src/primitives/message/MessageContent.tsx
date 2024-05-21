@@ -6,11 +6,11 @@ import type {
   ThreadMessageTextPart,
   ThreadMessageToolCallPart,
   ThreadMessageUIPart,
-} from "../../utils/context/AssistantContext";
+} from "../../utils/context/AssistantTypes";
 import { useMessageContext } from "../../utils/context/MessageContext";
 
 type MessageContentProps = {
-  components: {
+  components?: {
     Text?: ComponentType<{ part: ThreadMessageTextPart }>;
     Image?: ComponentType<{ part: ThreadMessageImagePart }>;
     UI?: ComponentType<{ part: ThreadMessageUIPart }>;
@@ -39,7 +39,7 @@ export const MessageContent: FC<MessageContentProps> = ({
     Image = defaultComponents.Image,
     UI = defaultComponents.UI,
     tools: { by_name = {}, Fallback = defaultComponents.tools.Fallback } = {},
-  },
+  } = {},
 }) => {
   const { useMessage } = useMessageContext();
   const content = useMessage((s) => s.message.content);

@@ -3,12 +3,12 @@
 import { type FC, useMemo, useState } from "react";
 import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
-import {
-  type ThreadMessage,
-  type ThreadState,
-  useAssistantContext,
-} from "../../utils/context/AssistantContext";
-import type { ComposerState } from "../../utils/context/ComposerState";
+import { useAssistantContext } from "../../utils/context/AssistantContext";
+import type {
+  ThreadMessage,
+  ThreadState,
+} from "../../utils/context/AssistantTypes";
+import type { ComposerState } from "../../utils/context/ComposerTypes";
 import {
   MessageContext,
   type MessageState,
