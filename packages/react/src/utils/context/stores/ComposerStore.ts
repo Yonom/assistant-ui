@@ -39,7 +39,7 @@ export const makeMessageComposerStore = ({
   onSend,
 }: {
   onEdit: () => string;
-  onSend: (value: string) => Promise<void>;
+  onSend: (value: string) => void;
 }): UseBoundStore<StoreApi<MessageComposerState>> =>
   create<MessageComposerState>()((set, get, store) => ({
     ...makeBaseComposer(set, get, store),
@@ -53,7 +53,7 @@ export const makeMessageComposerStore = ({
     send: () => {
       const value = get().value;
       set({ isEditing: false });
-      return onSend(value);
+      onSend(value);
     },
     cancel: () => {
       if (!get().isEditing) return false;
