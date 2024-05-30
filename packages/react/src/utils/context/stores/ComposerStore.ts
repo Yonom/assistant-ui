@@ -72,7 +72,7 @@ export const makeThreadComposerStore = ({
 }: {
   onSend: (value: string) => Promise<void>;
   onCancel: () => void;
-}): StoreApi<ThreadComposerState> =>
+}): UseBoundStore<StoreApi<ThreadComposerState>> =>
   create<ThreadComposerState>()((set, get, store) => ({
     ...makeBaseComposer(set, get, store),
 
