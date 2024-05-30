@@ -6,7 +6,7 @@ import {
   ROOT_PARENT_ID,
   type ThreadState,
 } from "../../utils/context/stores/AssistantTypes";
-import { makeThreadComposer } from "../../utils/context/stores/ComposerTypes";
+import { makeThreadComposer } from "../../utils/context/stores/ComposerStore";
 
 export const useDummyAIAssistantContext = () => {
   const [context] = useState<AssistantStore>(() => {

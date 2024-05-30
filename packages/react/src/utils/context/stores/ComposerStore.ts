@@ -1,26 +1,38 @@
-import { type StoreApi, type UseBoundStore, create } from "zustand";
+import {
+  type StateCreator,
+  type StoreApi,
+  type UseBoundStore,
+  create,
+} from "zustand";
 
-export type ComposerState = {
-  isEditing: boolean;
-  canCancel: boolean;
-
-  send: () => void;
-  cancel: () => void;
-
+type BaseComposerState = {
   value: string;
   setValue: (value: string) => void;
 };
 
-export type MessageComposerState = ComposerState & {
+const makeBaseComposer: StateCreator<
+  BaseComposerState,
+  [],
+  [],
+  BaseComposerState
+> = (set) => ({
+  value: "",
+  setValue: (value) => {
+    set({ value });
+  },
+});
+
+type MessageComposerState = BaseComposerState & {
+  isEditing: boolean;
+  canCancel: true;
+
   edit: () => void;
+  send: () => void;
+  cancel: () => void;
 };
 
 export type MessageComposerStore = {
   useComposer: UseBoundStore<StoreApi<MessageComposerState>>;
-};
-
-export type ComposerStore = {
-  useComposer: UseBoundStore<StoreApi<ComposerState>>;
 };
 
 export const makeMessageComposer = ({
@@ -30,15 +42,11 @@ export const makeMessageComposer = ({
   onEdit: () => string;
   onSend: (value: string) => Promise<void>;
 }) =>
-  create<MessageComposerState>()((set, get) => ({
+  create<MessageComposerState>()((set, get, store) => ({
+    ...makeBaseComposer(set, get, store),
+
     canCancel: true,
-
     isEditing: false,
-
-    value: "",
-    setValue: (value) => {
-      set({ value });
-    },
 
     edit: () => {
       const value = onEdit();
@@ -54,6 +62,18 @@ export const makeMessageComposer = ({
     },
   }));
 
+type ThreadComposerState = BaseComposerState & {
+  isEditing: true;
+  canCancel: boolean;
+
+  send: () => void;
+  cancel: () => void;
+};
+
+export type ThreadComposerStore = {
+  useComposer: UseBoundStore<StoreApi<ThreadComposerState>>;
+};
+
 export const makeThreadComposer = ({
   onSend,
   onCancel,
@@ -61,15 +81,11 @@ export const makeThreadComposer = ({
   onSend: (value: string) => Promise<void>;
   onCancel: () => void;
 }) =>
-  create<ComposerState>()((set, get) => ({
+  create<ThreadComposerState>()((set, get, store) => ({
+    ...makeBaseComposer(set, get, store),
+
     isEditing: true,
-
     canCancel: false,
-
-    value: "",
-    setValue: (value) => {
-      set({ value });
-    },
 
     send: () => {
       const value = get().value;

@@ -11,7 +11,7 @@ import type {
   ThreadMessage,
   ThreadState,
 } from "../../utils/context/stores/AssistantTypes";
-import { makeMessageComposer } from "../../utils/context/stores/ComposerTypes";
+import { makeMessageComposer } from "../../utils/context/stores/ComposerStore";
 import type {
   MessageState,
   MessageStore,

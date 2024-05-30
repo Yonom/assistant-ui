@@ -1,6 +1,6 @@
 import type { StoreApi, UseBoundStore } from "zustand";
 import type { ThreadMessage } from "./AssistantTypes";
-import type { MessageComposerStore } from "./ComposerTypes";
+import type { MessageComposerStore } from "./ComposerStore";
 
 export type MessageState = {
   message: ThreadMessage;
