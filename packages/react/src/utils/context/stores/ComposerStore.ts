@@ -22,7 +22,7 @@ const makeBaseComposer: StateCreator<
   },
 });
 
-type MessageComposerState = BaseComposerState & {
+export type MessageComposerState = BaseComposerState & {
   isEditing: boolean;
   canCancel: true;
 
@@ -31,17 +31,13 @@ type MessageComposerState = BaseComposerState & {
   cancel: () => void;
 };
 
-export type MessageComposerStore = {
-  useComposer: UseBoundStore<StoreApi<MessageComposerState>>;
-};
-
-export const makeMessageComposer = ({
+export const makeMessageComposerStore = ({
   onEdit,
   onSend,
 }: {
   onEdit: () => string;
   onSend: (value: string) => Promise<void>;
-}) =>
+}): UseBoundStore<StoreApi<MessageComposerState>> =>
   create<MessageComposerState>()((set, get, store) => ({
     ...makeBaseComposer(set, get, store),
 
@@ -62,7 +58,7 @@ export const makeMessageComposer = ({
     },
   }));
 
-type ThreadComposerState = BaseComposerState & {
+export type ThreadComposerState = BaseComposerState & {
   isEditing: true;
   canCancel: boolean;
 
@@ -70,17 +66,13 @@ type ThreadComposerState = BaseComposerState & {
   cancel: () => void;
 };
 
-export type ThreadComposerStore = {
-  useComposer: UseBoundStore<StoreApi<ThreadComposerState>>;
-};
-
-export const makeThreadComposer = ({
+export const makeThreadComposerStore = ({
   onSend,
   onCancel,
 }: {
   onSend: (value: string) => Promise<void>;
   onCancel: () => void;
-}) =>
+}): StoreApi<ThreadComposerState> =>
   create<ThreadComposerState>()((set, get, store) => ({
     ...makeBaseComposer(set, get, store),
 

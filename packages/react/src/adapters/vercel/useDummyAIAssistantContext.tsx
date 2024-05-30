@@ -41,7 +41,7 @@ export const useDummyAIAssistantContext = () => {
       },
     }));
 
-    const useComposer = makeThreadComposer({
+    const useComposer = makeThreadComposerStore({
       onSend: async (text) => {
         await useThread.getState().append({
           parentId: useThread.getState().messages.at(-1)?.id ?? ROOT_PARENT_ID,
