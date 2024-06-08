@@ -10,7 +10,10 @@ import type {
   ToolCallContentPart,
 } from "../../utils/context/stores/AssistantTypes";
 import { MessageRepository } from "../MessageRepository";
-import { ThreadMessageConverter } from "../ThreadMessageConverter";
+import {
+  type ConverterCallback,
+  ThreadMessageConverter,
+} from "../ThreadMessageConverter";
 import {
   type VercelThreadMessage,
   getVercelMessage,
