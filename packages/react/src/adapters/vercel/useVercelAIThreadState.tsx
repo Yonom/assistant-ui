@@ -98,17 +98,15 @@ export const useVercelAIThreadState = (
 
   const messages = useMemo(() => {
     const lastMessageId = vercel.messages.at(-1)?.id;
-    const convertCallback: ConverterCallback<Message> = useCallbackRef(
-      (message, cache) => {
-        const status =
-          lastMessageId === message.id && isRunning ? "in_progress" : "done";
+    const convertCallback: ConverterCallback<Message> = (message, cache) => {
+      const status =
+        lastMessageId === message.id && isRunning ? "in_progress" : "done";
 
-        if (cache && (cache.role === "user" || cache.status === status))
-          return cache;
+      if (cache && (cache.role === "user" || cache.status === status))
+        return cache;
 
-        return vercelToThreadMessage(message, status);
-      },
-    );
+      return vercelToThreadMessage(message, status);
+    };
 
     const vm = converter.convertMessages(convertCallback, vercel.messages);
     for (let i = 0; i < vm.length; i++) {
