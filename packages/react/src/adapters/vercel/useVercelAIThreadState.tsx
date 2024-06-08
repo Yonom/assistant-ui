@@ -92,24 +92,25 @@ export const useVercelAIThreadState = (
 
   const isRunning = getIsRunning(vercel);
 
-  const lastMessageId = vercel.messages.at(-1)?.id;
-  const convertCallback: ConverterCallback<Message> = useCallbackRef(
-    (message, cache) => {
-      const status =
-        lastMessageId === message.id && isRunning ? "in_progress" : "done";
-
-      if (cache && (cache.role === "user" || cache.status === status))
-        return cache;
-
-      return vercelToThreadMessage(message, status);
-    },
-  );
-
-  const converter = new ThreadMessageConverter(convertCallback);
+  const converter = useMemo(() => new ThreadMessageConverter(), []);
 
   const assistantOptimisticIdRef = useRef<string | null>(null);
+
   const messages = useMemo(() => {
-    const vm = converter.convertMessages(vercel.messages);
+    const lastMessageId = vercel.messages.at(-1)?.id;
+    const convertCallback: ConverterCallback<Message> = useCallbackRef(
+      (message, cache) => {
+        const status =
+          lastMessageId === message.id && isRunning ? "in_progress" : "done";
+
+        if (cache && (cache.role === "user" || cache.status === status))
+          return cache;
+
+        return vercelToThreadMessage(message, status);
+      },
+    );
+
+    const vm = converter.convertMessages(convertCallback, vercel.messages);
     for (let i = 0; i < vm.length; i++) {
       const message = vm[i]!;
       const parent = vm[i - 1];
