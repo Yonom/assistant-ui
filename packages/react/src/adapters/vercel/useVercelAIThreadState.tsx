@@ -89,12 +89,18 @@ export const useVercelAIThreadState = (
 
   const isRunning = getIsRunning(vercel);
 
-  const convertCallback = useCallbackRef((message: Message) => {
-    return vercelToThreadMessage(
-      message,
-      vercel.messages.at(-1) === message && isRunning ? "in_progress" : "done",
-    );
-  });
+  const lastMessageId = vercel.messages.at(-1)?.id;
+  const convertCallback: ConverterCallback<Message> = useCallbackRef(
+    (message, cache) => {
+      const status =
+        lastMessageId === message.id && isRunning ? "in_progress" : "done";
+
+      if (cache && (cache.role === "user" || cache.status === status))
+        return cache;
+
+      return vercelToThreadMessage(message, status);
+    },
+  );
 
   const converter = new ThreadMessageConverter(convertCallback);
 
