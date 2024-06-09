@@ -38,7 +38,23 @@ export { VercelModelAdapter as unstable_VercelModelAdapter } from "./adapters/co
 
 export { getVercelMessage as unstable_getVercelMessage } from "./adapters/vercel/VercelThreadMessage";
 export { getVercelRSCMessage as unstable_getVercelRSCMessage } from "./adapters/vercel/VercelThreadMessage";
-export { useMessageContext as unstable_useMessageContext } from "./utils/context/useMessageContext";
+
+export {
+  useAssistantContext as unstable_useAssistantContext,
+  type AssistantContextValue as unstable_AssistantContextValue,
+} from "./utils/context/AssistantContext";
+export {
+  useComposerContext as unstable_useComposerContext,
+  type ComposerContextValue as unstable_ComposerContextValue,
+} from "./utils/context/ComposerContext";
+export {
+  useMessageContext as unstable_useMessageContext,
+  type MessageContextValue as unstable_MessageContextValue,
+} from "./utils/context/MessageContext";
+export {
+  useContentPartContext as unstable_useContentPartContext,
+  type ContentPartContextValue as unstable_ContentPartContextValue,
+} from "./utils/context/ContentPartContext";
 
 export {
   useCopyMessage,

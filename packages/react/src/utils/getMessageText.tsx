@@ -1,5 +1,8 @@
 "use client";
-import type { TextContentPart, ThreadMessage } from "./stores/AssistantTypes";
+import type {
+  TextContentPart,
+  ThreadMessage,
+} from "./context/stores/AssistantTypes";
 
 export const getMessageText = (message: ThreadMessage) => {
   const textParts = message.content.filter(

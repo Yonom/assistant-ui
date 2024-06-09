@@ -1,7 +1,4 @@
 import type { ReactNode } from "react";
-import type { StoreApi, UseBoundStore } from "zustand";
-import type { ThreadComposerState } from "./ComposerStore";
-import type { ThreadViewportState } from "./ViewportStore";
 
 // TODO metadata field
 
@@ -73,10 +70,4 @@ export type ThreadState = {
   append: (message: AppendMessage) => void;
   startRun: (parentId: string | null) => void;
   cancelRun: () => void;
-};
-
-export type AssistantStore = {
-  useViewport: UseBoundStore<StoreApi<ThreadViewportState>>;
-  useThread: UseBoundStore<StoreApi<ThreadState>>;
-  useComposer: UseBoundStore<StoreApi<ThreadComposerState>>;
 };

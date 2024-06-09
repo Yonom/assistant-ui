@@ -3,18 +3,16 @@
 import { type FC, type PropsWithChildren, useMemo, useState } from "react";
 import { create } from "zustand";
 import { useAssistantContext } from "../../utils/context/AssistantContext";
-import { getMessageText } from "../../utils/context/getMessageText";
+import { MessageContext } from "../../utils/context/MessageContext";
+import type { MessageContextValue } from "../../utils/context/MessageContext";
 import type {
   AppendContentPart,
   ThreadMessage,
   ThreadState,
 } from "../../utils/context/stores/AssistantTypes";
 import { makeMessageComposerStore } from "../../utils/context/stores/ComposerStore";
-import type {
-  MessageState,
-  MessageStore,
-} from "../../utils/context/stores/MessageTypes";
-import { MessageContext } from "../../utils/context/useMessageContext";
+import type { MessageState } from "../../utils/context/stores/MessageTypes";
+import { getMessageText } from "../../utils/getMessageText";
 
 type MessageProviderProps = PropsWithChildren<{
   message: ThreadMessage;
@@ -27,7 +25,7 @@ const getIsLast = (thread: ThreadState, message: ThreadMessage) => {
 
 const useMessageContext = () => {
   const { useThread } = useAssistantContext();
-  const [context] = useState<MessageStore>(() => {
+  const [context] = useState<MessageContextValue>(() => {
     const useMessage = create<MessageState>((set) => ({
       message: null as unknown as ThreadMessage,
       parentId: null,

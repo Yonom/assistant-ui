@@ -2,7 +2,7 @@
 
 import type { FC, ReactNode } from "react";
 import type { RequireAtLeastOne } from "../../utils/RequireAtLeastOne";
-import { useMessageContext } from "../../utils/context/useMessageContext";
+import { useMessageContext } from "../../utils/context/MessageContext";
 
 type MessageIfFilters = {
   user: boolean | undefined;

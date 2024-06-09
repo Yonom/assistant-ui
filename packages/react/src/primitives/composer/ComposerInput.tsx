@@ -14,7 +14,7 @@ import TextareaAutosize, {
   type TextareaAutosizeProps,
 } from "react-textarea-autosize";
 import { useAssistantContext } from "../../utils/context/AssistantContext";
-import { useComposerContext } from "../../utils/context/useComposerContext";
+import { useComposerContext } from "../../utils/context/ComposerContext";
 import { useOnScrollToBottom } from "../../utils/hooks/useOnScrollToBottom";
 
 type ComposerInputProps = TextareaAutosizeProps & {

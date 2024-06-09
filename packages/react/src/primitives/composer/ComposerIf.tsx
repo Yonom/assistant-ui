@@ -2,7 +2,7 @@
 
 import type { FC, PropsWithChildren } from "react";
 import type { RequireAtLeastOne } from "../../utils/RequireAtLeastOne";
-import { useComposerContext } from "../../utils/context/useComposerContext";
+import { useComposerContext } from "../../utils/context/ComposerContext";
 
 type ComposerIfFilters = {
   editing: boolean | undefined;

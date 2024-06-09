@@ -7,11 +7,9 @@ import {
   useState,
 } from "react";
 import { create } from "zustand";
+import type { AssistantContextValue } from "../../utils/context/AssistantContext";
 import { AssistantContext } from "../../utils/context/AssistantContext";
-import type {
-  AssistantStore,
-  ThreadState,
-} from "../../utils/context/stores/AssistantTypes";
+import type { ThreadState } from "../../utils/context/stores/AssistantTypes";
 import { makeThreadComposerStore } from "../../utils/context/stores/ComposerStore";
 import { makeViewportStore } from "../../utils/context/stores/ViewportStore";
 import type { AssistantRuntime } from "./AssistantRuntime";
@@ -61,7 +59,7 @@ export const AssistantProvider: FC<PropsWithChildren<AssistantProviderProps>> =
           useViewport,
           useThread,
           useComposer,
-        } satisfies AssistantStore,
+        } satisfies AssistantContextValue,
         onRuntimeUpdate,
       };
     });
