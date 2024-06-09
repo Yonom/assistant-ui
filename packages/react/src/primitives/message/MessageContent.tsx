@@ -1,13 +1,13 @@
 "use client";
 
 import type { ComponentType, FC, ReactNode } from "react";
-import { useMessageContext } from "../../utils/context/MessageContext";
+import { useMessageContext } from "../../context/MessageContext";
 import type {
   ImageContentPart,
   TextContentPart,
   ToolCallContentPart,
   UIContentPart,
-} from "../../utils/context/stores/AssistantTypes";
+} from "../../utils/AssistantTypes";
 import { ContentPartInProgressIndicator } from "../contentPart/ContentPartInProgressIndicator";
 import { ContentPartProvider } from "../contentPart/ContentPartProvider";
 

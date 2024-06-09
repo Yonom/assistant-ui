@@ -1,8 +1,8 @@
 import { createContext, useContext } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
-import type { ThreadState } from "./stores/AssistantTypes";
-import type { ThreadComposerState } from "./stores/ComposerStore";
-import type { ThreadViewportState } from "./stores/ViewportStore";
+import type { ThreadState } from "./stores/Thread";
+import type { ThreadComposerState } from "./stores/ThreadComposer";
+import type { ThreadViewportState } from "./stores/ThreadViewport";
 
 export type AssistantContextValue = {
   useViewport: UseBoundStore<StoreApi<ThreadViewportState>>;

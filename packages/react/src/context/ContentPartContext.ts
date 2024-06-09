@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
-import type { ContentPartState } from "./stores/ContentPartTypes";
+import type { ContentPartState } from "./stores/ContentPart";
 
 export type ContentPartContextValue = {
   useContentPart: UseBoundStore<StoreApi<ContentPartState>>;

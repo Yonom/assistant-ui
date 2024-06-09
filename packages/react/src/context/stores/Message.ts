@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { ThreadMessage } from "./AssistantTypes";
+import type { ThreadMessage } from "../../utils/AssistantTypes";
 
 export type MessageState = Readonly<{
   message: Readonly<ThreadMessage>;

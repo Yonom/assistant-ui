@@ -1,7 +1,7 @@
 import type { FC } from "react";
-import { useContentPartContext } from "../../utils/context/ContentPartContext";
-import { useMessageContext } from "../../utils/context/MessageContext";
-import { useCombinedStore } from "../../utils/context/combined/useCombinedStore";
+import { useContentPartContext } from "../../context/ContentPartContext";
+import { useMessageContext } from "../../context/MessageContext";
+import { useCombinedStore } from "../../utils/combined/useCombinedStore";
 
 export const ContentPartInProgressIndicator: FC = () => {
   const { useMessage } = useMessageContext();

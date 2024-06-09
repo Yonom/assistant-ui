@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
-import type { MessageComposerState } from "./stores/ComposerStore";
-import type { MessageState } from "./stores/MessageTypes";
+import type { MessageState } from "./stores/Message";
+import type { MessageComposerState } from "./stores/MessageComposer";
 
 export type MessageContextValue = {
   useMessage: UseBoundStore<StoreApi<MessageState>>;

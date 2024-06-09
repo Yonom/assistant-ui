@@ -2,10 +2,10 @@
 
 import { type FC, type PropsWithChildren, useMemo, useState } from "react";
 import { create } from "zustand";
-import { ContentPartContext } from "../../utils/context/ContentPartContext";
-import type { ContentPartContextValue } from "../../utils/context/ContentPartContext";
-import type { ThreadMessage } from "../../utils/context/stores/AssistantTypes";
-import type { ContentPartState } from "../../utils/context/stores/ContentPartTypes";
+import { ContentPartContext } from "../../context/ContentPartContext";
+import type { ContentPartContextValue } from "../../context/ContentPartContext";
+import type { ContentPartState } from "../../context/stores/ContentPart";
+import type { ThreadMessage } from "../../utils/AssistantTypes";
 
 type ContentPartProviderProps = PropsWithChildren<{
   part: ThreadMessage["content"][number];

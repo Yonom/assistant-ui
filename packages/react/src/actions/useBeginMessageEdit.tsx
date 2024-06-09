@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { useMessageContext } from "../utils/context/MessageContext";
-import { useCombinedStore } from "../utils/context/combined/useCombinedStore";
+import { useMessageContext } from "../context/MessageContext";
+import { useCombinedStore } from "../utils/combined/useCombinedStore";
 
 export const useBeginMessageEdit = () => {
   const { useMessage, useComposer } = useMessageContext();

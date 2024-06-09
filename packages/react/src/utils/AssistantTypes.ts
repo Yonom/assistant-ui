@@ -59,15 +59,3 @@ export type AppendMessage = {
 };
 
 export type ThreadMessage = UserMessage | AssistantMessage;
-
-export type ThreadState = {
-  messages: ThreadMessage[];
-  isRunning: boolean;
-
-  getBranches: (messageId: string) => readonly string[];
-  switchToBranch: (branchId: string) => void;
-
-  append: (message: AppendMessage) => void;
-  startRun: (parentId: string | null) => void;
-  cancelRun: () => void;
-};

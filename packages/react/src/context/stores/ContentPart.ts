@@ -1,4 +1,4 @@
-import type { ThreadMessage } from "./AssistantTypes";
+import type { ThreadMessage } from "../../utils/AssistantTypes";
 
 export type ContentPartState = Readonly<{
   status: "in_progress" | "done" | "error";

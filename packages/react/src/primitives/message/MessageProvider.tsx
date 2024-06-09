@@ -2,16 +2,16 @@
 
 import { type FC, type PropsWithChildren, useMemo, useState } from "react";
 import { create } from "zustand";
-import { useAssistantContext } from "../../utils/context/AssistantContext";
-import { MessageContext } from "../../utils/context/MessageContext";
-import type { MessageContextValue } from "../../utils/context/MessageContext";
+import { useAssistantContext } from "../../context/AssistantContext";
+import { MessageContext } from "../../context/MessageContext";
+import type { MessageContextValue } from "../../context/MessageContext";
+import type { MessageState } from "../../context/stores/Message";
+import { makeMessageComposerStore } from "../../context/stores/MessageComposer";
+import type { ThreadState } from "../../context/stores/Thread";
 import type {
   AppendContentPart,
   ThreadMessage,
-  ThreadState,
-} from "../../utils/context/stores/AssistantTypes";
-import { makeMessageComposerStore } from "../../utils/context/stores/ComposerStore";
-import type { MessageState } from "../../utils/context/stores/MessageTypes";
+} from "../../utils/AssistantTypes";
 import { getMessageText } from "../../utils/getMessageText";
 
 type MessageProviderProps = PropsWithChildren<{

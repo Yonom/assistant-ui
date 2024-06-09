@@ -2,10 +2,8 @@ import { useContext, useMemo } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useAssistantContext } from "./AssistantContext";
 import { MessageContext } from "./MessageContext";
-import type {
-  MessageComposerState,
-  ThreadComposerState,
-} from "./stores/ComposerStore";
+import type { MessageComposerState } from "./stores/MessageComposer";
+import type { ThreadComposerState } from "./stores/ThreadComposer";
 
 export type ComposerContextValue = {
   useComposer: UseBoundStore<
