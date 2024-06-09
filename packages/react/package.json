@@ -18,10 +18,7 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "files": ["dist", "README.md"],
   "sideEffects": false,
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts"
@@ -37,12 +34,15 @@
     "zustand": "^4.5.2"
   },
   "peerDependencies": {
-    "ai": "^3",
     "@types/react": "*",
+    "ai": "^3",
     "react": "^18"
   },
   "peerDependenciesMeta": {
     "@types/react": {
+      "optional": true
+    },
+    "ai": {
       "optional": true
     }
   },
