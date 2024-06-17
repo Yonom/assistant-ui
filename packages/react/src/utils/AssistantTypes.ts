@@ -10,27 +10,17 @@ export type ImageContentPart = {
   image: string;
 };
 
-export type UIContentPart = {
-  type: "ui";
-  display: ReactNode;
-};
-
 export type ToolCallContentPart = {
   type: "tool-call";
-  name: string;
+  toolCallId: string;
+  toolName: string;
   args: object;
   result?: object;
 };
 
-export type UserContentPart =
-  | TextContentPart
-  | ImageContentPart
-  | UIContentPart;
+export type UserContentPart = TextContentPart | ImageContentPart;
 
-export type AssistantContentPart =
-  | TextContentPart
-  | UIContentPart
-  | ToolCallContentPart;
+export type AssistantContentPart = TextContentPart | ToolCallContentPart;
 
 export type AppendContentPart = TextContentPart | ImageContentPart;
 
@@ -56,3 +46,9 @@ export type AppendMessage = {
 };
 
 export type ThreadMessage = UserMessage | AssistantMessage;
+
+// TODO types for ui content part
+export type UIContentPart = {
+  type: "ui";
+  display: ReactNode;
+};
