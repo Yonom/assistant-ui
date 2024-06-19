@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iframe Widget Test</title>
+  <!-- <style type="text/css">
+    .fixed-iframe {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      width: 70px;
+      height: 70px;
+      border: none;
+      z-index: 9999; /* Ensure it appears on top */
+    };
+  </style> -->
+  <script nonce="your-nonce-value" type="text/javascript">window.addEventListener('DOMContentLoaded',(event)=>{const iframe=document.createElement('iframe');iframe.src="http://localhost:3000?iframeId=666fc2181f6bb6fa20a4a9e7";iframe.style.position="fixed";iframe.style.bottom="10px";iframe.style.right="10px";iframe.style.width="70px";iframe.style.height="70px";iframe.style.border="none";iframe.style.zIndex="9999";document.body.appendChild(iframe);});window.addEventListener('message',(event)=>{if(event.data.type==='resize'){const iframe=document.querySelector('iframe');let newHeight=event.data.height;let newWidth=event.data.width;if(newHeight===0){newHeight=70;newWidth=70;}iframe.style.height=newHeight+'px';iframe.style.width=newWidth+'px';}});</script>
+  <!-- <script nonce="your-nonce-value" type="text/javascript">window.addEventListener('DOMContentLoaded',(event)=>{const iframe=document.createElement('iframe');iframe.src="http://localhost:3000?iframeId=666d2d30f360a7d1bdeebf4d";iframe.style.position="fixed";iframe.style.bottom="10px";iframe.style.right="10px";iframe.style.width="70px";iframe.style.height="70px";iframe.style.border="none";iframe.style.zIndex="9999";document.body.appendChild(iframe);});window.addEventListener('message',(event)=>{if(event.data.type==='resize'){const iframe=document.querySelector('iframe');let newHeight=event.data.height;let newWidth=event.data.width;if(newHeight===0){newHeight=70;newWidth=70;}iframe.style.height=newHeight+'px';iframe.style.width=newWidth+'px';}});</script> -->
+</head>
+<body>
+  <h1>Testing Iframe Widget</h1>
+  <Image
+    src="/unclereco.png"
+    width={1000}
+    height={1000}
+    alt="background"
+  />
+  <!-- <iframe src="transparent_page.html" width="100%" height="500px" style="border:none;" title="Transparent Page"></iframe> -->
+  <!-- <iframe src="http://localhost:3000?iframeId=666cc1502e928ba1bc429194" style="position: fixed; bottom: 10px; right: 10px; width: 70px; height: 70px; border: none; z-index: 9999;" ></iframe> -->
+</body>
+</html>
