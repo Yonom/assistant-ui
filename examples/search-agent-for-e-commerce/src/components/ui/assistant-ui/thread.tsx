@@ -108,6 +108,7 @@ const Composer: FC = () => {
 const UserMessage: FC = () => {
   return (
     <MessagePrimitive.Root className="relative flex w-full max-w-2xl gap-3 pb-6">
+      {/* OPTIONALLY YOU CAN ADD AVATARS OF THE ASSISTANT */}
       {/* <Avatar>
         <AvatarFallback>Y</AvatarFallback>
       </Avatar> */}
@@ -128,6 +129,7 @@ const UserMessage: FC = () => {
 const AssistantMessage: FC = () => {
   return (
     <MessagePrimitive.Root className="relative flex w-full max-w-2xl gap-3 pb-6">
+      {/* OPTIONALLY YOU CAN ADD AVATARS OF THE USER */}
       {/* <Avatar>
         <AvatarFallback>A</AvatarFallback>
       </Avatar> */}

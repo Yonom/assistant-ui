@@ -80,8 +80,8 @@ export async function continueConversation(
                 thumbnail: item.thumbnail,
                 title: item.title,
                 description: item.description,
-                metadata_3: item.price, // Assuming price is used as metadata_3
-                link: item.url, // Assuming url is the link to the product
+                metadata_3: item.price, 
+                link: item.url,
               }));
               return <CarouselPlugin products={products} />;
             } else {
@@ -177,96 +177,6 @@ export async function continueConversation(
 
         },
       },
-      // product_questions: {
-      //   description:
-      //     "Product specific questions",
-      //   parameters: z.object({
-      //     product_id: z.string().describe("A clear unique product code based of an given ID or extracted from a product link"),
-      //   }),
-      //   generate: async ({ product_id }) => {
-      //     history.done((messages: ServerMessage[]) => [
-      //       ...messages,
-      //       {
-      //         role: "assistant",
-      //         content: `Conversation about a specific product ${product_id}`,
-      //       },
-      //     ]);
-      //     return <p className="font-bold">Here are some details about product {product_id}</p>;
-      //   },
-      // },
-      // customer_support: {
-      //   description:
-      //     "Customer support questions (e.g. track purchase, payment issues, order issues)",
-      //   parameters: z.object({
-      //     order_id: z.string().describe("A clear order code if known to the user or if relevant to the prompt, otherwise leave it as NA"),
-      //     email: z.string().describe("User email address if they are registered  or if relevant to the prompt, otherwise leave it as NA"),
-      //     purchase_date: z.string().describe("Purchase date if known to the user  or if relevant to the prompt, otherwise leave it as NA"),
-      //     order_total: z.string().describe("Total order value if known to the user or if relevant to the prompt, otherwise leave"),
-      //     FAQ_query: z.string().describe("Extract a clear issue query to search within shop knowledge database")
-      //   }),
-      //   generate: async ({ order_id, email, purchase_date, order_total, FAQ_query }) => {
-      //     history.done((messages: ServerMessage[]) => [
-      //       ...messages,
-      //       {
-      //         role: "assistant",
-      //         content: `Analyzing the user prompt`,
-      //       },
-      //     ]);
-      //     return <p className="font-bold">Here the information I gathererd that will help me asnwer your prompt: {order_id}, {email}, {purchase_date}, {order_total}, {FAQ_query}</p>;
-      //   },
-      // },
-      // follow_up: {
-      //   description:
-      //     "Ask a clarification/follow up question",
-      //   parameters: z.object({
-      //     user_prompt: z.string().describe("Try to understand what is missing or unclear about user prompt, and ask a clarification or a follow up question"),
-      //   }),
-      //   generate: async ({ user_prompt }) => {
-      //     history.done((messages: ServerMessage[]) => [
-      //       ...messages,
-      //       {
-      //         role: "assistant",
-      //         content: `Trying to understand ${user_prompt}`,
-      //       },
-      //     ]);
-      //     return <p className="font-bold">Let me see if I understand your question correctly: {user_prompt}</p>;
-      //   },
-      // },
-      // comparison: {
-      //   description:
-      //     "Product comparison",
-      //   parameters: z.object({
-      //     product_1: z.string().describe("Identify first product to compare to second"),
-      //     product_2: z.string().describe("Identify second product to compare to first"),
-      //   }),
-      //   generate: async ({ product_1, product_2 }) => {
-      //     history.done((messages: ServerMessage[]) => [
-      //       ...messages,
-      //       {
-      //         role: "assistant",
-      //         content: `Comparing ${product_1} and ${product_2}`,
-      //       },
-      //     ]);
-      //     return <p className="font-bold">Here is comparison for products: {product_1}, {product_2}</p>;
-      //   },
-      // },
-      // promo: {
-      //   description:
-      //     "Product promotions, hot deals, trending products",
-      //   parameters: z.object({
-      //     type: z.string().describe("Understand type of the product the user is looking for to send to the relevant promotion page"),
-      //   }),
-      //   generate: async ({ type }) => {
-      //     history.done((messages: ServerMessage[]) => [
-      //       ...messages,
-      //       {
-      //         role: "assistant",
-      //         content: `Interested in ${type}`,
-      //       },
-      //     ]);
-      //     return <p className="font-bold">Here is a link to our trending products and promotions for: {type}</p>;
-      //   },
-      // },
     },
   });
 

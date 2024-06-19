@@ -31,35 +31,37 @@ function Home() {
 
   useEffect(() => {
     if (iframeId) {
+      // SAMPLE CODE TO VALIDATE REQUESTS FROM A WHITELISTED DOMAINS USING IFRAME_ID
+
       // console.log('Validating iframeId:', iframeId);
-      fetch(`${process.env.NEXT_PUBLIC_VITE_ADMIN_URL}/iframe/validate_iframe_request`, {
-        method: 'GET',
-        headers: { 
-          'accept': 'application/json',
-          'referer': document.referrer,
-          'customerId': iframeId // Add the customerId header
-        }
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        // console.log('Validation response:', data);
-        if (data.message === 'Valid user') {
-          setIsValid(true);
-          setIndexId(data.index_id); // Save index_id
-          window.parent.postMessage({ type: 'validation', status: 'success' }, '*');
-        } else {
-          setIsValid(false);
-          window.parent.postMessage({ type: 'validation', status: 'failure' }, '*');
-        }
-      })
-      .catch(error => {
-        console.error('Fetch error:', error);
-      });
+      // fetch(`${process.env.NEXT_PUBLIC_VITE_ADMIN_URL}/iframe/validate_iframe_request`, {
+      //   method: 'GET',
+      //   headers: { 
+      //     'accept': 'application/json',
+      //     'referer': document.referrer,
+      //     'customerId': iframeId // Add the customerId header
+      //   }
+      // })
+      // .then(response => {
+      //   if (!response.ok) {
+      //     throw new Error(`HTTP error! status: ${response.status}`);
+      //   }
+      //   return response.json();
+      // })
+      // .then(data => {
+      //   // console.log('Validation response:', data);
+      //   if (data.message === 'Valid user') {
+      //     setIsValid(true);
+      //     setIndexId(data.index_id); // Save index_id
+      //     window.parent.postMessage({ type: 'validation', status: 'success' }, '*');
+      //   } else {
+      //     setIsValid(false);
+      //     window.parent.postMessage({ type: 'validation', status: 'failure' }, '*');
+      //   }
+      // })
+      // .catch(error => {
+      //   console.error('Fetch error:', error);
+      // });
     }
   }, [iframeId]);
 
