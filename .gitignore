@@ -40,3 +40,6 @@ dist/
 apps/www/public/registry/
 packages/react/README.md
 packages/cli/README.md
+
+# Ignore package-lock.json
+package-lock.json
