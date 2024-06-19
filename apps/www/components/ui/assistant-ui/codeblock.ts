@@ -1,1 +1,1 @@
-export * from "assistant-ui/registry/assistant-ui/codeblock";
+export * from "assistant-ui/registry/assistant-ui/experimental/codeblock";
