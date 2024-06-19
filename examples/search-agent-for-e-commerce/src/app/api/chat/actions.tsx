@@ -79,7 +79,6 @@ export async function continueConversation(
               content: `Searcing for ${query}`,
             },
           ]);
-          // return <p className="font-bold">I found these products for query: {query}</p>;
           try {
             console.log('Fetching session ID...');
             console.log('NEXT_PUBLIC_VITE_CLIENT_URL=',process.env.NEXT_PUBLIC_VITE_CLIENT_URL)
