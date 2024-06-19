@@ -65,74 +65,31 @@ export async function continueConversation(
     // maxToolRoundtrips: 5, // allow up to 5 tool roundtrips
     tools: {
       product_search: {
-        description:
-          "Search for products on this website using pre-built indeces",
+        description: "Search for products on this website using pre-built indices",
         parameters: z.object({
           query: z.string().describe("A clear factual product query, potentially including type, name, qualities, characteristics of the product"),
         }),
         generate: async ({ query }) => {
-          const controller = new AbortController();
-          history.done((messages: ServerMessage[]) => [
-            ...messages,
-            {
-              role: "assistant",
-              content: `Searcing for ${query}`,
-            },
-          ]);
           try {
-            console.log('Fetching session ID...');
-            const controller = new AbortController();
-            const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_VITE_CLIENT_URL}/sessions/getSession?indexID=${indexId}`, {
-              method: 'GET',
-              headers: { 'accept': 'application/json' },
-              signal: controller.signal
-            });
-            console.log('Session response status:', sessionResponse.status);
-            if (!sessionResponse.ok) {
-              throw new Error(`Failed to fetch session ID: ${sessionResponse.statusText}`);
-            }
-            const sessionData = await sessionResponse.json();
-            const sessionID = sessionData.sessionID;
-            console.log('Session ID:', sessionID);
-
-            const timeout = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-            console.log('Starting product search, ID: ', indexId);
-            const searchResponse = await Promise.race([
-              fetch(`${process.env.NEXT_PUBLIC_VITE_CLIENT_URL}/search`, {
-                method: 'POST',
-                headers: { 
-                  'Content-Type': 'application/json',
-                  'accept': 'application/json'
-                },
-                body: JSON.stringify({
-                  query: query,
-                  indexID: indexId,
-                  sessionID: sessionID,
-                  top_k: 12,
-                  loc: 0
-                })
-              }),
-              timeout(25000)
-            ]);
-    
-            if (searchResponse instanceof Response) {
-              const data = await searchResponse.json();
-              console.log('Search results:', data);
-              if (data.results && data.results.length > 0) {
-                return <CarouselPlugin products={data.results} />;
-              } else {
-                return <p>No products found.</p>;
-              }
+            console.log("query=", query);
+            const response = await fetch(`https://dummyjson.com/products/search?q=${query}`);
+            const data = await response.json();
+            console.log('data=',data);
+            if (data.products && data.products.length > 0) {
+              const products = data.products.map((item: any) => ({
+                thumbnail: item.thumbnail,
+                title: item.title,
+                description: item.description,
+                metadata_3: item.price, // Assuming price is used as metadata_3
+                link: item.url, // Assuming url is the link to the product
+              }));
+              return <CarouselPlugin products={products} />;
             } else {
-              throw new Error('Unexpected response type');
+              return <p>No products found.</p>;
             }
-            } catch (error) {
-              if (error instanceof Error && error.message === 'Request timed out') {
-                return <p>Sorry, we are experiencing some technical difficulties, please try again later.</p>;
-              } else {
-                return <p>Sorry, we are experiencing some error. Please refresh the chat and try again.</p>;
-              }
-            }
+          } catch (error) {
+            return <p>Sorry, we are experiencing some error. Please refresh the chat and try again.</p>;
+          }
         },
       },
       general_question: {
