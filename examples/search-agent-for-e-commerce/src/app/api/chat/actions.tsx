@@ -81,11 +81,7 @@ export async function continueConversation(
           ]);
           try {
             console.log('Fetching session ID...');
-            console.log('NEXT_PUBLIC_VITE_CLIENT_URL=',process.env.NEXT_PUBLIC_VITE_CLIENT_URL)
             const controller = new AbortController();
-            // const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
-
-            // const sessionResponse = await fetch(`http://localhost:80/sessions/getSession?indexID=${indexId}`, {
             const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_VITE_CLIENT_URL}/sessions/getSession?indexID=${indexId}`, {
               method: 'GET',
               headers: { 'accept': 'application/json' },
@@ -102,7 +98,6 @@ export async function continueConversation(
             const timeout = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
             console.log('Starting product search, ID: ', indexId);
             const searchResponse = await Promise.race([
-              // fetch(`http://localhost:80/search`, {
               fetch(`${process.env.NEXT_PUBLIC_VITE_CLIENT_URL}/search`, {
                 method: 'POST',
                 headers: { 
