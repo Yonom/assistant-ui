@@ -50,9 +50,12 @@ export default function Home() {
     <AssistantSidebar>
       <div className="h-full overflow-y-scroll">
         <main className="container py-8">
-          <h1 className="mb-2 font-semibold text-2xl">Simon's Hackathon</h1>
+          <h1 className="mb-2 font-semibold text-2xl">
+            Simon&apos;s Hackathon
+          </h1>
           <p>
-            I'm hosting a Hackathon on AI UX. Be the first to get an invite!
+            I&apos;m hosting a Hackathon on AI UX. Be the first to get an
+            invite!
           </p>
 
           <div className="my-4 font-bold">
