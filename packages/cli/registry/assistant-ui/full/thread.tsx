@@ -119,7 +119,7 @@ const UserMessage: FC = () => {
           </ActionBarPrimitive.Edit>
         </ActionBarPrimitive.Root>
 
-        <p className="whitespace-pre-line rounded-3xl bg-foreground/5 px-5 py-2.5 text-foreground">
+        <p className="max-w-xl break-words whitespace-pre-line rounded-3xl bg-foreground/5 px-5 py-2.5 text-foreground">
           <MessagePrimitive.Content />
         </p>
       </div>
@@ -132,7 +132,7 @@ const UserMessage: FC = () => {
 const EditComposer: FC = () => {
   return (
     <ComposerPrimitive.Root className="mb-4 flex w-full max-w-2xl flex-col gap-2 rounded-xl bg-foreground/5">
-      <ComposerPrimitive.Input className="flex h-8 w-full resize-none bg-transparent p-5 pb-0 text-white outline-none" />
+      <ComposerPrimitive.Input className="flex h-8 w-full resize-none bg-transparent p-5 pb-0 text-foreground outline-none" />
 
       <div className="mx-3 mb-3 flex items-center justify-center gap-2 self-end">
         <ComposerPrimitive.Cancel asChild>
@@ -157,7 +157,7 @@ const AssistantMessage: FC = () => {
 
       <div className="mt-2 flex-grow">
         <MessagePrimitive.InProgress className="inline-block size-3 animate-pulse rounded-full bg-foreground" />
-        <p className="whitespace-pre-line text-foreground">
+        <p className="max-w-xl break-words whitespace-pre-line text-foreground">
           <MessagePrimitive.Content />
         </p>
 
