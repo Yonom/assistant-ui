@@ -51,7 +51,7 @@ const FloatingAssistantButton: FC<FloatingAssistantButtonProps> = ({
           <Button
             variant="default"
             size="icon"
-            className="absolute right-4 bottom-4 size-12 rounded-full shadow hover:scale-70"
+            className="hover:scale-70 absolute bottom-4 right-4 size-12 rounded-full shadow"
             {...rest}
           >
             <BotIcon

@@ -9,7 +9,7 @@ import Link from "next/link";
 
 const SetFormFieldTool = () => {
   return (
-    <p className="text-center font-bold font-mono text-blue-500 text-sm">
+    <p className="text-center font-mono text-sm font-bold text-blue-500">
       set_form_field(...)
     </p>
   );
@@ -17,7 +17,7 @@ const SetFormFieldTool = () => {
 
 const SubmitFormTool = () => {
   return (
-    <p className="text-center font-bold font-mono text-blue-500 text-sm">
+    <p className="text-center font-mono text-sm font-bold text-blue-500">
       submit_form(...)
     </p>
   );
@@ -50,7 +50,7 @@ export default function Home() {
     <AssistantSidebar>
       <div className="h-full overflow-y-scroll">
         <main className="container py-8">
-          <h1 className="mb-2 font-semibold text-2xl">
+          <h1 className="mb-2 text-2xl font-semibold">
             Simon&apos;s Hackathon
           </h1>
           <p>
