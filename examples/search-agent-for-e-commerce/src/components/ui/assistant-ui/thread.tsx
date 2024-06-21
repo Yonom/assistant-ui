@@ -14,7 +14,6 @@ import {
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { ArrowDownIcon, SendHorizonalIcon } from "lucide-react";
-import uncleRecoImage from "/Users/matthewdi/Desktop/Shardul/conversecart/plugin/assets/uncle-reco.png";
 
 export const Thread: FC = () => {
   return (
@@ -49,8 +48,8 @@ const ThreadEmpty: FC = () => {
         {" "}
         {/* Reduced margin-bottom */}
         <img
-          src="/uncle-reco.png"
-          alt="Uncle Reco"
+          src="/image.png"
+          alt="Your Logo"
           className="mb-4 w-1/2 max-w-xs"
         />{" "}
         {/* Smaller image */}
