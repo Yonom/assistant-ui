@@ -134,11 +134,11 @@ export async function continueConversation(
       },
       clothes_fitting: {
         description:
-          "Send to user link to guidelines for clothes fitting https://www.unclereco.com/catalog/size_chart.php",
+          "Send to user link to guidelines for clothes fitting https://images.app.goo.gl/LECaeXJfXa7gzYCC8 ",
         parameters: z.object({}),
         generate: async ({}) => {
           const fittingGuidelinesLink =
-            "https://www.unclereco.com/catalog/size_chart.php";
+            "https://images.app.goo.gl/LECaeXJfXa7gzYCC8 ";
           const formattedLink = `<a href="${fittingGuidelinesLink}" target="_blank">Guidelines for clothes fitting</a>`;
           const linkStyle = {
             color: "blue",

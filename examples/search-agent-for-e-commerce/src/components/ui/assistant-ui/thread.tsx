@@ -57,7 +57,7 @@ const ThreadEmpty: FC = () => {
           <Avatar className="mr-4" style={{ width: "20px", height: "20px" }}>
             {" "}
             {/* Adjusted size */}
-            <AvatarImage src="/unclereco-favicon.ico" alt="AI" />
+            <AvatarImage src="/favicon.ico" alt="AI" />
             <AvatarFallback>AI</AvatarFallback>
           </Avatar>
           <p className="mt-4">
