@@ -10,7 +10,7 @@
 
 - [Documentation](https://www.assistant-ui.com/docs/getting-started)
 
-## Minimal Example with Vercel AI SDK
+## Quick start
 
 ### PREREQUISITES:
 It is assumed that you have already installed and initialized node.js, tailwind, typescript, react, next.js. If not, follow the instructions:
