@@ -3,36 +3,51 @@ title: Getting Started
 description: React Components for AI Chat
 ---
 
-import Image from "next/image";
-import architecture from "../../assets/docs/architecture.png";
+import { Steps } from "nextra/components";
 
-## Architecture
+## Start with a new project
 
-`assistant-ui` consists of two parts, ***Runtime*** and ***UI Components***.  
+<Steps>
 
-<Image src={architecture} height={300} className="dark:invert dark:hue-rotate-180 my-2 mx-auto" />
+### Create a new project
+
+Create a new project with `assistant-ui` pre-configured:
+
+```sh
+npx assistant-ui@latest create my-app
+cd my-app
+```
+
+### Add API key
+
+Add a new `.env` file to your project with your OpenAI API key:
+
+```sh
+OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+### Start the app
+
+```sh
+npm run dev
+```
+</Steps>
+
+## Install in an existing app
 
 
-## Setup
+<Steps>
 
+### Setup Runtime
 
-The recommended way to get started is with the following stack:
-
-- NextJS
-- Vercel's `ai` package
-- `tailwindcss` for styling
-- `shadcn/ui` for UI components
-
-### Step 1: Setup Runtime
-
-You wrap your entire app in a `<AssistantRuntimeProvider runtime={runtime}>` component. 
+You wrap your entire app in a `<AssistantRuntimeProvider runtime={runtime}>` component.
 
 This component makes a `Runtime` available to the rest of your app.
 The `Runtime` takes care of LLM communication, tools, streaming, state management, branching, persistence, authentication and more.
 
 Refer to [Picking a Runtime](/docs/runtimes/pick-a-runtime) to pick the right runtime for your use case.
 
-### Step 2: Setup UI Components
+### Setup UI Components
 
 The easiest way to get started is with `shadcn/ui` + `tailwind` components.
 
@@ -41,3 +56,5 @@ Currently, two modes are supported:
 - [`<AssistantModal />`](/docs/ui/AssistantModal): a modal chat UI in the bottom right corner
 - [`<AssistantSidebar />`](/docs/ui/AssistantSidebar): a sidebar chat UI
 - [`<Thread />`](/docs/ui/Thread): the raw chat UI
+
+</Steps>

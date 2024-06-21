@@ -1,5 +1,26 @@
 # @assistant-ui/react
 
+## 0.1.7
+
+### Patch Changes
+
+- 36f3a1f: fix: add DisplayName to primitive components for better error logs
+- 36f3a1f: chore: upgrade to radix-ui 1.1
+- 36f3a1f: chore: update dependencies
+
+## 0.1.6
+
+### Patch Changes
+
+- a6769d5: feat: ContentPartComponent types
+- 52236ab: feat: new default chat bubble design
+
+## 0.1.5
+
+### Patch Changes
+
+- 671dc86: feat: Tool Render functions
+
 ## 0.1.4
 
 ### Patch Changes

@@ -6,8 +6,8 @@ const config = {
     "./app/**/*.{ts,tsx,mdx}",
     "./pages/**/*.{ts,tsx,mdx}",
     "./components/**/*.{ts,tsx,mdx}",
-    "../../packages/cli/components/**/*.{ts,tsx,mdx}",
-    "../../packages/cli/registry/**/*.{ts,tsx,mdx}",
+    "../../packages/shadcn-registry/components/**/*.{ts,tsx,mdx}",
+    "../../packages/shadcn-registry/registry/**/*.{ts,tsx,mdx}",
     "./theme.config.tsx",
   ],
   prefix: "",
@@ -76,7 +76,7 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
 } satisfies Config;
 
 export default config;

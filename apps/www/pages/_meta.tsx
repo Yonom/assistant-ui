@@ -1,4 +1,4 @@
-export default {
+const meta = {
   "*": {},
   index: {
     type: "page",
@@ -15,10 +15,26 @@ export default {
     },
   },
   docs: {
-    title: "Documentation",
+    title: "Docs",
+    type: "page",
+    theme: {
+      breadcrumb: false,
+    },
+  },
+  reference: {
+    title: "Reference",
+    type: "page",
+    theme: {
+      breadcrumb: false,
+    },
+  },
+  examples: {
+    title: "Examples",
     type: "page",
     theme: {
       breadcrumb: false,
     },
   },
 };
+
+export default meta;

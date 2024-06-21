@@ -7,6 +7,22 @@ import { useAssistantForm } from "@assistant-ui/react-hook-form";
 import { useAssistantInstructions } from "@assistant-ui/react/experimental";
 import Link from "next/link";
 
+const SetFormFieldTool = () => {
+  return (
+    <p className="text-center font-mono text-sm font-bold text-blue-500">
+      set_form_field(...)
+    </p>
+  );
+};
+
+const SubmitFormTool = () => {
+  return (
+    <p className="text-center font-mono text-sm font-bold text-blue-500">
+      submit_form(...)
+    </p>
+  );
+};
+
 export default function Home() {
   useAssistantInstructions("Help users sign up for Simon's hackathon.");
   const form = useAssistantForm({
@@ -18,15 +34,28 @@ export default function Home() {
       projectIdea: "",
       proficientTechnologies: "",
     },
+    assistant: {
+      tools: {
+        set_form_field: {
+          render: SetFormFieldTool,
+        },
+        submit_form: {
+          render: SubmitFormTool,
+        },
+      },
+    },
   });
 
   return (
     <AssistantSidebar>
       <div className="h-full overflow-y-scroll">
         <main className="container py-8">
-          <h1 className="mb-2 font-semibold text-2xl">Simon's Hackathon</h1>
+          <h1 className="mb-2 text-2xl font-semibold">
+            Simon&apos;s Hackathon
+          </h1>
           <p>
-            I'm hosting a Hackathon on AI UX. Be the first to get an invite!
+            I&apos;m hosting a Hackathon on AI UX. Be the first to get an
+            invite!
           </p>
 
           <div className="my-4 font-bold">

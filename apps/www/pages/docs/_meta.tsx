@@ -1,4 +1,4 @@
-export default {
+const meta = {
   index: "Introduction",
   "getting-started": "Getting Started",
   "-- runtime": {
@@ -14,14 +14,6 @@ export default {
     type: "separator",
   },
   ui: {
-    display: "children",
-  },
-
-  "-- primitives": {
-    title: "Primitives",
-    type: "separator",
-  },
-  primitives: {
     display: "children",
   },
 
@@ -41,3 +33,5 @@ export default {
     display: "children",
   },
 };
+
+export default meta;

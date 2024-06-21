@@ -1,10 +1,36 @@
 {
   "name": "@assistant-ui/react-hook-form",
-  "version": "0.0.3",
+  "version": "0.0.7",
   "license": "MIT",
-  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "source": "./src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --sourcemap"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
   "peerDependencies": {
-    "@assistant-ui/react": "^0.1.4",
+    "@assistant-ui/react": "^0.1.7",
     "react-hook-form": "^7.x.x",
     "@types/react": "*",
     "react": "^18"
@@ -14,16 +40,11 @@
       "optional": true
     }
   },
-  "dependencies": {
-    "zod": "^3.23.8"
-  },
   "devDependencies": {
     "@assistant-ui/react": "workspace:*",
     "@assistant-ui/tsconfig": "workspace:*",
+    "@types/node": "^20.14.7",
     "tsup": "^8.1.0"
-  },
-  "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --sourcemap"
   },
   "publishConfig": {
     "access": "public",
