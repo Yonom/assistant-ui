@@ -10,7 +10,13 @@
 
 - [Documentation](https://www.assistant-ui.com/docs/getting-started)
 
-## Quick start
+## Starter Template
+
+```
+npx assistant-ui@latest create
+```
+
+## Quick Start In Existing Project
 ![Demo of my project](demo.gif)
 
 ### PREREQUISITES:
