@@ -11,6 +11,7 @@
 - [Documentation](https://www.assistant-ui.com/docs/getting-started)
 
 ## Quick start
+![Demo of my project](demo.gif)
 
 ### PREREQUISITES:
 It is assumed that you have already installed and initialized node.js, tailwind, typescript, react, next.js. If not, follow the instructions:
