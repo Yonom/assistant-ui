@@ -29,7 +29,7 @@ export const useActionBarCopy = ({
     navigator.clipboard.writeText(valueToCopy);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), copiedDuration);
-  }, [useMessage, useMessageUtils, useComposer, copiedDuration]);
+  }, [useMessage, useMessageUtils, useEditComposer, copiedDuration]);
 
   if (!hasCopyableContent) return null;
   return callback;
