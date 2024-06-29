@@ -358,16 +358,10 @@ export const MessageUtilsState: ParametersTableProps = {
   type: "MessageUtilsState",
   parameters: [
     {
-      name: "inProgressIndicator",
-      type: "ReactNode | null",
+      name: "inProgressIndicatorNode",
+      type: "HTMLSpanElement",
       required: true,
-      description: "The in progress indicator to render.",
-    },
-    {
-      name: "setInProgressIndicator",
-      type: "(value: ReactNode | null) => void",
-      required: true,
-      description: "A function to set the in progress indicator.",
+      description: "The in-progress indicator node.",
     },
     {
       name: "isCopied",
