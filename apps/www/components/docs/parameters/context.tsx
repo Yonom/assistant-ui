@@ -358,10 +358,11 @@ export const MessageUtilsState: ParametersTableProps = {
   type: "MessageUtilsState",
   parameters: [
     {
-      name: "inProgressIndicatorNode",
+      name: "inProgressIndicator",
       type: "HTMLSpanElement",
       required: true,
-      description: "The in-progress indicator node.",
+      description:
+        "The in-progress indicator node. Used as a portal targetNode.",
     },
     {
       name: "isCopied",

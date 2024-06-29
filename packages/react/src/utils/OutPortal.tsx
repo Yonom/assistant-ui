@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, type FC } from "react";
 
 type OutPortalProps = {
-  node: HTMLElement;
+  node: HTMLElement | null;
 };
 
 export const OutPortal: FC<OutPortalProps> = ({ node }) => {

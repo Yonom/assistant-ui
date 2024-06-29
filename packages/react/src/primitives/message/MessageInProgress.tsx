@@ -16,7 +16,7 @@ export const MessagePrimitiveInProgress = forwardRef<
 >((props, ref) => {
   const { useMessageUtils } = useMessageContext();
 
-  const portalNode = useMessageUtils((s) => s.inProgressIndicatorNode);
+  const portalNode = useMessageUtils((s) => s.inProgressIndicator);
   return createPortal(<Primitive.span {...props} ref={ref} />, portalNode);
 });
 
