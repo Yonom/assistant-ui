@@ -1,5 +1,12 @@
 # @assistant-ui/react
 
+## 0.2.5
+
+### Patch Changes
+
+- 3dd7384: fix: better message hover state tracking
+- 23f474e: fix: remove warning about useLayoutEffect in SSR
+
 ## 0.2.4
 
 ### Patch Changes
