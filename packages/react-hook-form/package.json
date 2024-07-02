@@ -1,6 +1,6 @@
 {
   "name": "@assistant-ui/react-hook-form",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "license": "MIT",
   "exports": {
     ".": {
