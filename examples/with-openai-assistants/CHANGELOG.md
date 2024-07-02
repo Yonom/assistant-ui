@@ -1,5 +1,15 @@
 # assistant-ui-starter
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [3dd7384]
+- Updated dependencies [23f474e]
+- Updated dependencies [5b68f4a]
+  - @assistant-ui/react@0.3.0
+  - @assistant-ui/react-ai-sdk@1.0.0
+
 ## 0.1.3
 
 ### Patch Changes
