@@ -45,7 +45,7 @@
     "@radix-ui/react-tooltip": "^1.1.2",
     "autoprefixer": "^10.4.19",
     "class-variance-authority": "^0.7.0",
-    "lucide-react": "^0.399.0",
+    "lucide-react": "^0.400.0",
     "postcss": "^8.4.39",
     "remark-gfm": "^4.0.0"
   },
@@ -60,15 +60,14 @@
     }
   },
   "devDependencies": {
-    "@assistant-ui-tsup/tailwindcss-transformer": "workspace:*",
     "@assistant-ui/tsconfig": "workspace:*",
     "@types/node": "^20.14.9",
-    "esbuild": "^0.21.5",
+    "esbuild": "^0.23.0",
     "eslint-config-next": "14.2.4",
     "tailwindcss": "^3.4.4",
     "tailwindcss-animate": "^1.0.7",
     "tsup": "^8.1.0",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.3"
   },
   "publishConfig": {
     "access": "public",
