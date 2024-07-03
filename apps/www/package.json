@@ -15,7 +15,7 @@
     "@ai-sdk/react": "^0.0.15",
     "@assistant-ui/react": "workspace:*",
     "@assistant-ui/react-ai-sdk": "workspace:*",
-    "@assistant-ui/shadcn-registry": "workspace:*",
+    "@assistant-ui/react-ui": "workspace:*",
     "@calcom/embed-react": "^1.5.0",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
