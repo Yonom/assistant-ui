@@ -1,6 +1,6 @@
 {
   "name": "@assistant-ui/react-ui",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "license": "MIT",
   "exports": {
     ".": {
@@ -20,6 +20,10 @@
     "./markdown-styles.css": {
       "types": "./dist/markdown-styles.css.d.ts",
       "default": "./dist/markdown-styles.css"
+    },
+    "./reset.css": {
+      "types": "./dist/reset.css.d.ts",
+      "default": "./dist/reset.css"
     },
     "./themes/default.css": {
       "types": "./dist/themes/default.css.d.ts",
