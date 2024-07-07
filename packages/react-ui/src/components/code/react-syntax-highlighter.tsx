@@ -2,7 +2,7 @@
 
 import { type FC } from "react";
 import { Prism, SyntaxHighlighterProps as SHP } from "react-syntax-highlighter";
-import { SyntaxHighlighterProps } from "./syntax-highlighter";
+import type { SyntaxHighlighterProps } from "@assistant-ui/react-markdown";
 
 export const makePrismSyntaxHighlighter = (
   config: Omit<SHP, "language" | "children">,

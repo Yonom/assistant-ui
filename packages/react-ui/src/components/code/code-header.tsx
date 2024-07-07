@@ -3,11 +3,7 @@ import { useThreadConfig } from "../thread-config";
 import { useCopyToClipboard } from "../../utils/useCopyToClipboard";
 import { TooltipIconButton } from "../base";
 import { CheckIcon, CopyIcon } from "lucide-react";
-
-export type CodeHeaderProps = {
-  language: string | undefined;
-  code: string;
-};
+import type { CodeHeaderProps } from "@assistant-ui/react-markdown";
 
 export const CodeHeader: FC<CodeHeaderProps> = ({ language, code }) => {
   const {

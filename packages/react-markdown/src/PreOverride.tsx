@@ -6,6 +6,6 @@ export const PreContext = createContext<Omit<
   "children"
 > | null>(null);
 
-export const MarkdownPre: PreComponent = ({ children, ...rest }) => {
+export const PreOverride: PreComponent = ({ children, ...rest }) => {
   return <PreContext.Provider value={rest}>{children}</PreContext.Provider>;
 };

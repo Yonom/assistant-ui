@@ -9,7 +9,9 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/components/code/pre.tsx"
+    "../react-markdown/src/PreOverride.tsx",
+    "../react-markdown/src/CodeOverride.tsx",
+    "../react-markdown/src/syntax-highlighter.tsx"
   ],
   "exclude": ["node_modules"]
 }

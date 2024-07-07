@@ -1,50 +1,19 @@
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
-import { ComponentType, FC, memo } from "react";
-import { MarkdownTextPrimitiveProps } from "@assistant-ui/react-markdown";
 import { TextContentPartProps } from "@assistant-ui/react";
-import { PreComponent, CodeComponent } from "./code/types";
-import { makeMarkdownCode } from "./code/code";
-import { MarkdownPre } from "./code/pre";
-import {
-  DefaultSyntaxHighlighter,
-  SyntaxHighlighterProps,
-} from "./code/syntax-highlighter";
-import {
-  CodeHeaderProps,
-  CodeHeader as DefaultCodeHeader,
-} from "./code/code-header";
+import { CodeHeader } from "./code/code-header";
+import { MarkdownTextPrimitiveProps } from "@assistant-ui/react-markdown";
+import { FC, memo } from "react";
 
-type MakeMarkdownTextProps = Omit<
-  Partial<MarkdownTextPrimitiveProps>,
-  "components"
-> & {
-  components?: NonNullable<MarkdownTextPrimitiveProps["components"]> & {
-    SyntaxHighlighter?: ComponentType<SyntaxHighlighterProps>;
-    CodeHeader?: ComponentType<CodeHeaderProps>;
-  };
-};
-
-const DefaultPre: PreComponent = ({ node, ...rest }) => <pre {...rest} />;
-const DefaultCode: CodeComponent = ({ node, ...rest }) => <code {...rest} />;
+type MakeMarkdownTextProps = MarkdownTextPrimitiveProps;
 
 export const makeMarkdownText = ({
   className,
   components: userComponents,
   ...rest
 }: MakeMarkdownTextProps = {}) => {
-  const {
-    pre = DefaultPre,
-    code = DefaultCode,
-    SyntaxHighlighter = DefaultSyntaxHighlighter,
-    CodeHeader = DefaultCodeHeader,
-    ...componentsRest
-  } = userComponents ?? {};
-  const components: typeof userComponents = {
-    ...componentsRest,
-    pre: MarkdownPre,
-    code: makeMarkdownCode({
-      components: { pre, code, SyntaxHighlighter, CodeHeader },
-    }) as any,
+  const components = {
+    ...userComponents,
+    CodeHeader: userComponents?.CodeHeader ?? CodeHeader,
   };
 
   const MarkdownTextImpl: FC<TextContentPartProps> = ({ status }) => {
