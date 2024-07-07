@@ -8,12 +8,13 @@ export type MarkdownTextPrimitiveProps = Omit<Options, "children"> & {
   smooth?: boolean;
 };
 
-export const MarkdownTextPrimitive: FC<MarkdownTextPrimitiveProps> = (
-  options,
-) => {
+export const MarkdownTextPrimitive: FC<MarkdownTextPrimitiveProps> = ({
+  smooth = true,
+  ...rest
+}) => {
   const {
     part: { text },
   } = useContentPartText();
-  const smoothText = useSmooth(text, options.smooth);
-  return <ReactMarkdown {...options}>{smoothText}</ReactMarkdown>;
+  const smoothText = useSmooth(text, smooth);
+  return <ReactMarkdown {...rest}>{smoothText}</ReactMarkdown>;
 };
