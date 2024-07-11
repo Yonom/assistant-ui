@@ -1,5 +1,16 @@
 # @assistant-ui/react-hook-form
 
+## 1.0.0
+
+### Patch Changes
+
+- Updated dependencies [e0e51cf]
+- Updated dependencies [c7ba6a2]
+- Updated dependencies [e0e51cf]
+- Updated dependencies [e0e51cf]
+- Updated dependencies [679cd54]
+  - @assistant-ui/react@0.4.0
+
 ## 0.2.0
 
 ### Patch Changes
