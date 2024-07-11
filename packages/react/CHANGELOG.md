@@ -5,6 +5,7 @@
 ### Minor Changes
 
 - feat: scrolling to bottom during streaming is now instant
+- fix: useSmooth gets triggered during branch switch
 
 ## 0.4.2
 
