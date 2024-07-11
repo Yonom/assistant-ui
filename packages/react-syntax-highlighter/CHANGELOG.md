@@ -1,6 +1,6 @@
 # @assistant-ui/react-syntax-highlighter
 
-## 1.0.0
+## 0.0.3
 
 ### Patch Changes
 
