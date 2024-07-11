@@ -1,5 +1,11 @@
 # @assistant-ui/react
 
+## 0.4.3
+
+### Minor Changes
+
+- feat: scrolling to bottom during streaming is now instant
+
 ## 0.4.2
 
 ### Minor Changes
