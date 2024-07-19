@@ -4,3 +4,4 @@ export type {
 } from "./ExternalStoreAdapter";
 export { ExternalStoreRuntime } from "./ExternalStoreRuntime";
 export { useExternalStoreRuntime } from "./useExternalStoreRuntime";
+export { getExternalStoreMessage } from "./getExternalStoreMessage";

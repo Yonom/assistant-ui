@@ -5,6 +5,7 @@ import {
   ThreadMessageConverter,
 } from "./ThreadMessageConverter";
 import { ThreadMessage } from "../../types";
+import { symbolInnerMessage } from "./getExternalStoreMessage";
 
 type UpdateDataCallback = (
   isRunning: boolean,
@@ -20,7 +21,9 @@ export const useExternalStoreSync = <T extends WeakKey>(
     const converter = adapter.convertMessage ?? ((m: T) => m as ThreadMessage);
     const convertCallback: ConverterCallback<T> = (cache, m, idx) => {
       if (cache) return cache;
-      return converter(m, idx);
+      const newMessage = converter(m, idx);
+      (newMessage as any)[symbolInnerMessage] = m;
+      return newMessage;
     };
     return [new ThreadMessageConverter(), convertCallback];
   }, [adapter.convertMessage]);
