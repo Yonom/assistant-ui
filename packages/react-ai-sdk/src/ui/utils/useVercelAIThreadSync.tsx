@@ -43,6 +43,14 @@ const vercelToThreadMessage = (
         );
       }
 
+      if (Array.isArray(firstMessage.content)) {
+        return {
+          ...common,
+          role: "user",
+          content: firstMessage.content,
+        }
+      }
+
       return {
         ...common,
         role: "user",
@@ -78,8 +86,8 @@ const vercelToThreadMessage = (
                 }) satisfies ToolCallContentPart,
             ) ?? []),
             ...(typeof message.data === "object" &&
-            !Array.isArray(message.data) &&
-            message.data?.["type"] === "tool-call"
+              !Array.isArray(message.data) &&
+              message.data?.["type"] === "tool-call"
               ? [message.data as ToolCallContentPart]
               : []),
           ];
@@ -164,12 +172,12 @@ export const useVercelAIThreadSync = (
       const status: MessageStatus =
         lastMessageId === messages[0].id && isRunning
           ? {
-              type: "running",
-            }
+            type: "running",
+          }
           : {
-              type: "complete",
-              reason: "unknown",
-            };
+            type: "complete",
+            reason: "unknown",
+          };
 
       if (
         cache &&

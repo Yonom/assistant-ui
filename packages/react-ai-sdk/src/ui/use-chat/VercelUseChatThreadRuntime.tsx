@@ -68,11 +68,6 @@ export class VercelUseChatThreadRuntime implements ReactThreadRuntime {
         "Only appending user messages are supported in VercelUseChatRuntime. This is likely an internal bug in assistant-ui.",
       );
 
-    if (message.content.length !== 1 || message.content[0]?.type !== "text")
-      throw new Error(
-        "Only text content is supported by VercelUseChatRuntime.",
-      );
-
     const newMessages = sliceMessagesUntil(
       this.vercel.messages,
       message.parentId,
@@ -81,7 +76,7 @@ export class VercelUseChatThreadRuntime implements ReactThreadRuntime {
 
     await this.vercel.append({
       role: "user",
-      content: message.content[0].text,
+      content: message.content,
     });
   }
 
