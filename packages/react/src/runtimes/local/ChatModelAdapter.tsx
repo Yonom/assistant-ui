@@ -25,5 +25,5 @@ export type ChatModelRunOptions = {
 };
 
 export type ChatModelAdapter = {
-  run: (options: ChatModelRunOptions) => Promise<ChatModelRunResult>;
+  run: (options: ChatModelRunOptions) => Promise<ChatModelRunResult | AsyncGenerator<ChatModelRunResult>>;
 };

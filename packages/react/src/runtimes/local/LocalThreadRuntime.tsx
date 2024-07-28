@@ -152,16 +152,36 @@ export class LocalThreadRuntime implements ThreadRuntime {
         config: this.configProvider.getModelConfig(),
         onUpdate: updateMessage,
       });
-      if (result.status?.type === "running")
-        throw new Error(
-          "Unexpected running status returned from ChatModelAdapter",
-        );
 
-      this.abortController = null;
-      updateMessage({
-        status: { type: "complete", reason: "unknown" },
-        ...result,
-      });
+      // handle async iterator for streaming results
+      if (Symbol.asyncIterator in result) {
+        try {
+          for await (const r of result) {
+            updateMessage(r);
+          }
+
+          // end of stream
+          updateMessage({
+            status: { type: "complete", reason: "unknown" },
+          });
+        } catch (e) {
+          updateMessage({
+            status: { type: "incomplete", reason: "error", error: e },
+          });
+          throw e;
+        }
+      } else {
+        if (result.status?.type === "running")
+          throw new Error(
+            "Unexpected running status returned from ChatModelAdapter",
+          );
+
+        this.abortController = null;
+        updateMessage({
+          status: { type: "complete", reason: "unknown" },
+          ...result,
+        });
+      }
     } catch (e) {
       this.abortController = null;
 
