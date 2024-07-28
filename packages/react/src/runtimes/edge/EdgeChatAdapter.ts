@@ -63,9 +63,8 @@ export class EdgeChatAdapter implements ChatModelAdapter {
     for await (update of asAsyncIterable(stream)) {
       yield update;
     }
+
     if (update === undefined)
       throw new Error("No data received from Edge Runtime");
-
-    return update;
   }
 }
