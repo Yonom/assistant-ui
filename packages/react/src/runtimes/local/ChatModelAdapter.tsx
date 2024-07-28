@@ -21,6 +21,10 @@ export type ChatModelRunOptions = {
   messages: ThreadMessage[];
   abortSignal: AbortSignal;
   config: ModelConfig;
+
+  /**
+   * @deprecated Declare the run function as an AsyncGenerator instead. This method will be removed in v0.6
+   */
   onUpdate: (result: ChatModelRunUpdate) => void;
 };
 
