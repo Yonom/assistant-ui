@@ -169,6 +169,8 @@ export class LocalThreadRuntime implements ThreadRuntime {
             status: { type: "incomplete", reason: "error", error: e },
           });
           throw e;
+        } finally {
+          this.abortController = null;
         }
       } else {
         if (result.status?.type === "running")
