@@ -226,16 +226,29 @@ export class MessageRepository {
   }
 
   export() {
-    return {
-      messages: this.messages,
-      head: this.head,
-      root: this.root,
+    type ExportItem = { message: ThreadMessage; parentId: string | null };
+    const exportItems: ExportItem[] = [];
+
+    // hint: we are relying on the insertion order of the messages
+    // this is important for the import function to properly link the messages
+    for (const [, message] of this.messages) {
+      exportItems.push({
+        message: message.current,
+        parentId: message.prev?.current.id ?? null,
+      });
     }
+
+    return {
+      messages: exportItems,
+    };
   }
 
-  import(data: ReturnType<MessageRepository["export"]>) {
-    this.messages = data.messages;
-    this.head = data.head;
-    this.root = data.root;
+  import({ messages }: ReturnType<MessageRepository["export"]>) {
+    for (const { message, parentId } of messages) {
+      this.addOrUpdateMessage(parentId, message);
+    }
+
+    // switch to the most recent message
+    this.resetHead(messages.at(-1)?.message.id ?? null);
   }
 }
