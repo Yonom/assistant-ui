@@ -239,4 +239,13 @@ export class LocalThreadRuntime implements ThreadRuntime {
       this.performRoundtrip(parentId, message);
     }
   }
+
+  export() {
+    return this.repository.export();
+  }
+
+  import(data: ReturnType<this["export"]>) {
+    this.repository.import(data);
+    this.notifySubscribers()
+  }
 }

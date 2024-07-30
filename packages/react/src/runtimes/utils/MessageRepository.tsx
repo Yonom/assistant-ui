@@ -224,4 +224,18 @@ export class MessageRepository {
       }
     }
   }
+
+  export() {
+    return {
+      messages: this.messages,
+      head: this.head,
+      root: this.root,
+    }
+  }
+
+  import(data: ReturnType<MessageRepository["export"]>) {
+    this.messages = data.messages;
+    this.head = data.head;
+    this.root = data.root;
+  }
 }
