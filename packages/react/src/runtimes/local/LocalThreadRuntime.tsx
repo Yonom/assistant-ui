@@ -9,7 +9,7 @@ import type {
   Unsubscribe,
 } from "../../types";
 import { fromCoreMessages } from "../edge";
-import { MessageRepository } from "../utils/MessageRepository";
+import { ExportedMessageRepository, MessageRepository } from "../utils/MessageRepository";
 import type { ChatModelAdapter, ChatModelRunResult } from "./ChatModelAdapter";
 import { shouldContinue } from "./shouldContinue";
 import { LocalRuntimeOptions } from "./LocalRuntimeOptions";
@@ -244,7 +244,7 @@ export class LocalThreadRuntime implements ThreadRuntime {
     return this.repository.export();
   }
 
-  import(data: ReturnType<this["export"]>) {
+  import(data: ExportedMessageRepository) {
     this.repository.import(data);
     this.notifySubscribers()
   }

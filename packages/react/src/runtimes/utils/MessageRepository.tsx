@@ -13,6 +13,14 @@ type RepositoryMessage = RepositoryParent & {
   level: number;
 };
 
+export interface ExportedMessageRepository {
+  headId?: string | null;
+  messages: Array<{
+    message: ThreadMessage;
+    parentId: string | null;
+  }>;
+}
+
 const findHead = (message: RepositoryMessage): RepositoryMessage => {
   if (message.next) return findHead(message.next);
   return message;
@@ -225,9 +233,8 @@ export class MessageRepository {
     }
   }
 
-  export() {
-    type ExportItem = { message: ThreadMessage; parentId: string | null };
-    const exportItems: ExportItem[] = [];
+  export(): ExportedMessageRepository {
+    const exportItems: ExportedMessageRepository["messages"] = [];
 
     // hint: we are relying on the insertion order of the messages
     // this is important for the import function to properly link the messages
@@ -239,16 +246,17 @@ export class MessageRepository {
     }
 
     return {
+      headId: this.head?.current.id ?? null,
       messages: exportItems,
     };
   }
 
-  import({ messages }: ReturnType<MessageRepository["export"]>) {
+  import({ headId, messages }: ExportedMessageRepository) {
     for (const { message, parentId } of messages) {
       this.addOrUpdateMessage(parentId, message);
     }
 
-    // switch to the most recent message
-    this.resetHead(messages.at(-1)?.message.id ?? null);
+    // switch to the saved head id if it is not the most recent message
+    this.resetHead(headId ?? messages.at(-1)?.message.id ?? null);
   }
 }
