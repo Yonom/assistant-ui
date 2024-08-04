@@ -89,12 +89,6 @@ const CAPABILITIES = Object.freeze({
 
 const EMPTY_BRANCHES: readonly string[] = Object.freeze([]);
 
-// TODO decide on what the empty status should be
-const COMPLETE_STATUS = Object.freeze({
-  type: "complete",
-  reason: "stop",
-});
-
 export class PlaygroundThreadRuntime implements ReactThreadRuntime {
   private _subscriptions = new Set<() => void>();
 
@@ -103,12 +97,6 @@ export class PlaygroundThreadRuntime implements ReactThreadRuntime {
   public tools: Record<string, Tool<any, any>> = {};
 
   public readonly isDisabled = false;
-  public get status() {
-    const lastMessage = this.messages.at(-1);
-    if (lastMessage?.role !== "assistant") return COMPLETE_STATUS;
-    return lastMessage.status;
-  }
-
   public readonly capabilities = CAPABILITIES;
 
   private configProvider = new ProxyConfigProvider();

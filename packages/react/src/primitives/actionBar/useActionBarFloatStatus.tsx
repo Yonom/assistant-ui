@@ -26,8 +26,7 @@ export const useActionBarFloatStatus = ({
   return useCombinedStore(
     [useThread, useMessage, useMessageUtils],
     (t, m, mu) => {
-      if (hideWhenRunning && t.status.type === "running")
-        return HideAndFloatStatus.Hidden;
+      if (hideWhenRunning && t.isRunning) return HideAndFloatStatus.Hidden;
 
       const autohideEnabled =
         autohide === "always" || (autohide === "not-last" && !m.isLast);

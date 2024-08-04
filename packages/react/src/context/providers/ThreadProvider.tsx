@@ -4,7 +4,11 @@ import type { ReactThreadRuntime } from "../../runtimes/core/ReactThreadRuntime"
 import type { ThreadContextValue } from "../react/ThreadContext";
 import { ThreadContext } from "../react/ThreadContext";
 import { makeComposerStore } from "../stores/Composer";
-import { ThreadState, makeThreadStore } from "../stores/Thread";
+import {
+  ThreadState,
+  getThreadStateFromRuntime,
+  makeThreadStore,
+} from "../stores/Thread";
 import { makeThreadViewportStore } from "../stores/ThreadViewport";
 import { makeThreadActionStore } from "../stores/ThreadActions";
 import { StoreApi } from "zustand";
@@ -49,17 +53,15 @@ export const ThreadProvider: FC<PropsWithChildren<ThreadProviderProps>> = ({
     useCallback(
       (thread: ReactThreadRuntime) => {
         const onThreadUpdate = () => {
-          const threadState = context.useThread.getState();
+          const oldState = context.useThread.getState();
+          const state = getThreadStateFromRuntime(thread);
           if (
-            thread.isDisabled !== threadState.isDisabled ||
-            thread.status !== threadState.status
+            oldState.isDisabled !== state.isDisabled ||
+            oldState.isRunning !== state.isRunning ||
+            oldState.canAppendNew !== state.canAppendNew
           ) {
             (context.useThread as unknown as StoreApi<ThreadState>).setState(
-              Object.freeze({
-                isRunning: thread.status.type === "running", // TODO remove in v0.6
-                isDisabled: thread.isDisabled,
-                status: thread.status,
-              }) satisfies ThreadState,
+              getThreadStateFromRuntime(thread),
               true,
             );
           }

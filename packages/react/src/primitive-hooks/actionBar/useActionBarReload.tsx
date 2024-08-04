@@ -10,10 +10,7 @@ export const useActionBarReload = () => {
 
   const disabled = useCombinedStore(
     [useThread, useMessage],
-    (t, m) =>
-      t.status.type === "running" ||
-      t.isDisabled ||
-      m.message.role !== "assistant",
+    (t, m) => t.isRunning || t.isDisabled || m.message.role !== "assistant",
   );
 
   const callback = useCallback(() => {

@@ -25,12 +25,6 @@ const CAPABILITIES = Object.freeze({
   copy: true,
 });
 
-// TODO decide on what the empty status should be
-const COMPLETE_STATUS = Object.freeze({
-  type: "complete",
-  reason: "stop",
-});
-
 export class LocalThreadRuntime implements ThreadRuntime {
   private _subscriptions = new Set<() => void>();
 
@@ -43,11 +37,6 @@ export class LocalThreadRuntime implements ThreadRuntime {
 
   public get messages() {
     return this.repository.getMessages();
-  }
-  public get status() {
-    const lastMessage = this.messages.at(-1);
-    if (lastMessage?.role !== "assistant") return COMPLETE_STATUS;
-    return lastMessage.status;
   }
 
   constructor(

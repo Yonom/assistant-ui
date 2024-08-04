@@ -104,8 +104,7 @@ const Composer: FC = () => {
   const { useThread, useThreadActions, useComposer, useThreadMessages } =
     useThreadContext();
 
-  // TODO disable composer if pending tool calls exist
-  const isRunning = useThread((t) => t.status.type === "running");
+  const canAppendNew = useThread((t) => t.canAppendNew);
   const hasValue = useComposer((c) => c.value.length > 0);
 
   const performAdd = () => {
@@ -168,7 +167,7 @@ const Composer: FC = () => {
         <div className="flex-grow" />
         <Button
           onClick={handleAdd}
-          disabled={isRunning || !hasValue}
+          disabled={!canAppendNew || !hasValue}
           variant="default"
           size="sm"
           className="transition-opacity"
@@ -177,7 +176,7 @@ const Composer: FC = () => {
         </Button>
         <Button
           onClick={handleSubmit}
-          disabled={isRunning}
+          disabled={!canAppendNew}
           variant="default"
           size="sm"
           className="transition-opacity"

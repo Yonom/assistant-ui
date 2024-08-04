@@ -1,11 +1,6 @@
 import { ReactThreadRuntime } from "../core";
 import { MessageRepository } from "../utils/MessageRepository";
-import {
-  AppendMessage,
-  MessageStatus,
-  ThreadMessage,
-  Unsubscribe,
-} from "../../types";
+import { AppendMessage, ThreadMessage, Unsubscribe } from "../../types";
 import { ExternalStoreAdapter } from "./ExternalStoreAdapter";
 import { AddToolResultOptions } from "../../context";
 import {
@@ -26,12 +21,6 @@ export const hasUpcomingMessage = (
   return isRunning && messages[messages.length - 1]?.role !== "assistant";
 };
 
-// TODO decide on what the empty status should be
-const COMPLETE_STATUS: MessageStatus = Object.freeze({
-  type: "complete",
-  reason: "stop",
-});
-
 export class ExternalStoreThreadRuntime implements ReactThreadRuntime {
   private _subscriptions = new Set<() => void>();
   private repository = new MessageRepository();
@@ -50,12 +39,6 @@ export class ExternalStoreThreadRuntime implements ReactThreadRuntime {
   public messages: ThreadMessage[] = [];
   public isDisabled = false;
   public converter = new ThreadMessageConverter();
-
-  public get status() {
-    const lastMessage = this.messages.at(-1);
-    if (lastMessage?.role !== "assistant") return COMPLETE_STATUS;
-    return lastMessage.status;
-  }
 
   private _store!: ExternalStoreAdapter<any>;
 

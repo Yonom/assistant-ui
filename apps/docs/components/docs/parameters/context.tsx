@@ -199,10 +199,10 @@ export const ThreadState: ParametersTableProps = {
       description: "Whether the thread is disabled.",
     },
     {
-      name: "status",
-      type: "MessageStatus",
+      name: "canAppendNew",
+      type: "boolean",
       required: true,
-      description: "The current message status.",
+      description: "Whether the thread can append a new message.",
     },
   ],
 };
