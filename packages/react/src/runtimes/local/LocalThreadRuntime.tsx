@@ -213,13 +213,11 @@ export class LocalThreadRuntime implements ThreadRuntime {
     if (message.role !== "assistant")
       throw new Error("Tried to add tool result to non-assistant message");
 
-    let added = false;
     let found = false;
     const newContent = message.content.map((c) => {
       if (c.type !== "tool-call") return c;
       if (c.toolCallId !== toolCallId) return c;
       found = true;
-      if (!c.result) added = true;
       return {
         ...c,
         result,
@@ -235,7 +233,12 @@ export class LocalThreadRuntime implements ThreadRuntime {
     };
     this.repository.addOrUpdateMessage(parentId, message);
 
-    if (added && shouldContinue(message)) {
+    // Check if all tool calls have results
+    const allToolCallsHaveResults = message.content.every(
+      (c) => c.type !== "tool-call" || c.result,
+    );
+
+    if (allToolCallsHaveResults && shouldContinue(message)) {
       this.performRoundtrip(parentId, message);
     }
   }
