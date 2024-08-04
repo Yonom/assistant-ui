@@ -103,7 +103,9 @@ const Composer: FC = () => {
   const [role, setRole] = useState<"user" | "assistant" | "system">("user");
   const { useThread, useThreadActions, useComposer, useThreadMessages } =
     useThreadContext();
-  const isRunning = useThread((t) => t.isRunning);
+
+  // TODO disable composer if pending tool calls exist
+  const isRunning = useThread((t) => t.status.type === "running");
   const hasValue = useComposer((c) => c.value.length > 0);
 
   const performAdd = () => {

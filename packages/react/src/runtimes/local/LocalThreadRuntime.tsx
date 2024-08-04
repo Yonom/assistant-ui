@@ -9,7 +9,10 @@ import type {
   Unsubscribe,
 } from "../../types";
 import { fromCoreMessages } from "../edge";
-import { ExportedMessageRepository, MessageRepository } from "../utils/MessageRepository";
+import {
+  ExportedMessageRepository,
+  MessageRepository,
+} from "../utils/MessageRepository";
 import type { ChatModelAdapter, ChatModelRunResult } from "./ChatModelAdapter";
 import { shouldContinue } from "./shouldContinue";
 import { LocalRuntimeOptions } from "./LocalRuntimeOptions";
@@ -21,6 +24,13 @@ const CAPABILITIES = Object.freeze({
   cancel: true,
   copy: true,
 });
+
+// TODO decide on what the empty status should be
+const COMPLETE_STATUS = Object.freeze({
+  type: "complete",
+  reason: "stop",
+});
+
 export class LocalThreadRuntime implements ThreadRuntime {
   private _subscriptions = new Set<() => void>();
 
@@ -34,8 +44,10 @@ export class LocalThreadRuntime implements ThreadRuntime {
   public get messages() {
     return this.repository.getMessages();
   }
-  public get isRunning() {
-    return this.abortController != null;
+  public get status() {
+    const lastMessage = this.messages.at(-1);
+    if (lastMessage?.role !== "assistant") return COMPLETE_STATUS;
+    return lastMessage.status;
   }
 
   constructor(
@@ -168,9 +180,6 @@ export class LocalThreadRuntime implements ThreadRuntime {
         updateMessage({
           status: { type: "complete", reason: "unknown" },
         });
-      } else {
-        // notify subscribers that isRunning is now false
-        this.notifySubscribers();
       }
     } catch (e) {
       this.abortController = null;
@@ -246,6 +255,6 @@ export class LocalThreadRuntime implements ThreadRuntime {
 
   import(data: ExportedMessageRepository) {
     this.repository.import(data);
-    this.notifySubscribers()
+    this.notifySubscribers();
   }
 }

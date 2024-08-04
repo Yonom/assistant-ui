@@ -4,7 +4,7 @@ import { ThreadMessage } from "../../types";
 import type { Unsubscribe } from "../../types/Unsubscribe";
 
 export type ThreadRuntime = Readonly<
-  ThreadState &
+  Omit<ThreadState, "isRunning"> &
     Omit<ThreadActionsState, "getRuntime"> & {
       messages: readonly ThreadMessage[];
       subscribe: (callback: () => void) => Unsubscribe;

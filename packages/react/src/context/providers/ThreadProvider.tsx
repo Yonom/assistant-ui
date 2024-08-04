@@ -51,13 +51,14 @@ export const ThreadProvider: FC<PropsWithChildren<ThreadProviderProps>> = ({
         const onThreadUpdate = () => {
           const threadState = context.useThread.getState();
           if (
-            thread.isRunning !== threadState.isRunning ||
-            thread.isDisabled !== threadState.isDisabled
+            thread.isDisabled !== threadState.isDisabled ||
+            thread.status !== threadState.status
           ) {
             (context.useThread as unknown as StoreApi<ThreadState>).setState(
               Object.freeze({
-                isRunning: thread.isRunning,
+                isRunning: thread.status.type === "running", // TODO remove in v0.6
                 isDisabled: thread.isDisabled,
+                status: thread.status,
               }) satisfies ThreadState,
               true,
             );

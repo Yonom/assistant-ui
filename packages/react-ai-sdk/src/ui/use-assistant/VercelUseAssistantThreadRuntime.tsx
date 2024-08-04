@@ -9,6 +9,7 @@ import { useVercelAIComposerSync } from "../utils/useVercelAIComposerSync";
 import { useVercelAIThreadSync } from "../utils/useVercelAIThreadSync";
 import { useAssistant } from "ai/react";
 import { hasUpcomingMessage } from "./VercelUseAssistantRuntime";
+import { MessageStatus } from "@assistant-ui/react";
 
 const EMPTY_BRANCHES: readonly string[] = Object.freeze([]);
 
@@ -18,6 +19,15 @@ const CAPABILITIES = Object.freeze({
   reload: false,
   cancel: false,
   copy: true,
+});
+
+const COMPLETE_STATUS: MessageStatus = Object.freeze({
+  type: "complete",
+  reason: "stop",
+});
+
+const RUNNING_STATUS: MessageStatus = Object.freeze({
+  type: "running",
 });
 
 export class VercelUseAssistantThreadRuntime implements ReactThreadRuntime {
@@ -31,7 +41,7 @@ export class VercelUseAssistantThreadRuntime implements ReactThreadRuntime {
 
   public messages: readonly ThreadMessage[] = [];
   public readonly isDisabled = false;
-  public isRunning = false;
+  public status = COMPLETE_STATUS;
 
   constructor(public vercel: ReturnType<typeof useAssistant>) {
     this.useVercel = create(() => ({
@@ -105,7 +115,7 @@ export class VercelUseAssistantThreadRuntime implements ReactThreadRuntime {
     }
 
     this.messages = vm;
-    this.isRunning = isRunning;
+    this.status = isRunning ? RUNNING_STATUS : COMPLETE_STATUS;
 
     for (const callback of this._subscriptions) callback();
   };

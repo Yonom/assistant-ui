@@ -63,8 +63,10 @@ export const ComposerPrimitiveInput = forwardRef<
       if (isDisabled) return;
 
       if (e.key === "Enter" && e.shiftKey === false) {
-        const isRunning = useThread.getState().isRunning;
-        if (!isRunning) {
+        const { status } = useThread.getState();
+
+        // TODO sync this with the one in useComposerSend.ts
+        if (status.type !== "running" && status.type !== "requires-action") {
           e.preventDefault();
 
           textareaRef.current?.closest("form")?.requestSubmit();

@@ -5,6 +5,7 @@ import {
   type ThreadMessage,
   AddToolResultOptions,
   INTERNAL,
+  MessageStatus,
 } from "@assistant-ui/react";
 import type { Message } from "ai";
 import { type StoreApi, type UseBoundStore, create } from "zustand";
@@ -31,6 +32,15 @@ const CAPABILITIES = Object.freeze({
   copy: true,
 });
 
+const COMPLETE_STATUS: MessageStatus = Object.freeze({
+  type: "complete",
+  reason: "stop",
+});
+
+const RUNNING_STATUS: MessageStatus = Object.freeze({
+  type: "running",
+});
+
 export class VercelUseChatThreadRuntime implements ReactThreadRuntime {
   private _subscriptions = new Set<() => void>();
   private repository = new MessageRepository();
@@ -44,7 +54,7 @@ export class VercelUseChatThreadRuntime implements ReactThreadRuntime {
 
   public messages: ThreadMessage[] = [];
   public readonly isDisabled = false;
-  public isRunning = false;
+  public status = COMPLETE_STATUS;
 
   constructor(public vercel: ReturnType<typeof useChat>) {
     this.useVercel = create(() => ({
@@ -160,7 +170,7 @@ export class VercelUseChatThreadRuntime implements ReactThreadRuntime {
     );
 
     this.messages = this.repository.getMessages();
-    this.isRunning = isRunning;
+    this.status = isRunning ? RUNNING_STATUS : COMPLETE_STATUS;
 
     for (const callback of this._subscriptions) callback();
   };
