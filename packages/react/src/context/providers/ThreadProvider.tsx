@@ -58,7 +58,7 @@ export const ThreadProvider: FC<PropsWithChildren<ThreadProviderProps>> = ({
           if (
             oldState.isDisabled !== state.isDisabled ||
             oldState.isRunning !== state.isRunning ||
-            oldState.canAppendNew !== state.canAppendNew
+            oldState.unstable_canAppendNew !== state.unstable_canAppendNew
           ) {
             (context.useThread as unknown as StoreApi<ThreadState>).setState(
               getThreadStateFromRuntime(thread),

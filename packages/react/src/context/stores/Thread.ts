@@ -5,7 +5,8 @@ import { ThreadRuntimeStore } from "./ThreadRuntime";
 export type ThreadState = Readonly<{
   isRunning: boolean;
   isDisabled: boolean;
-  canAppendNew: boolean;
+  // TODO remove this once we have cancel tool call support
+  unstable_canAppendNew: boolean;
 }>;
 
 export const getThreadStateFromRuntime = (
@@ -16,12 +17,12 @@ export const getThreadStateFromRuntime = (
     return Object.freeze({
       isDisabled: runtime.isDisabled,
       isRunning: false,
-      canAppendNew: runtime.isDisabled,
+      unstable_canAppendNew: runtime.isDisabled,
     });
   return Object.freeze({
     isDisabled: runtime.isDisabled,
     isRunning: lastMessage.status.type === "running",
-    canAppendNew:
+    unstable_canAppendNew:
       !runtime.isDisabled &&
       lastMessage.status.type !== "running" &&
       lastMessage.status.type !== "requires-action",

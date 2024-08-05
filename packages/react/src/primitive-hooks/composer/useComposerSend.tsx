@@ -12,7 +12,7 @@ export const useComposerSend = () => {
 
   const disabled = useCombinedStore(
     [useThread, useComposer],
-    (t, c) => !t.canAppendNew || !c.isEditing || c.value.length === 0,
+    (t, c) => !t.unstable_canAppendNew || !c.isEditing || c.value.length === 0,
   );
 
   const callback = useCallback(() => {

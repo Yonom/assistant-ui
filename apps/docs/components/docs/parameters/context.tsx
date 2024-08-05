@@ -198,12 +198,6 @@ export const ThreadState: ParametersTableProps = {
       required: true,
       description: "Whether the thread is disabled.",
     },
-    {
-      name: "canAppendNew",
-      type: "boolean",
-      required: true,
-      description: "Whether the thread can append a new message.",
-    },
   ],
 };
 
