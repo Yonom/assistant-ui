@@ -272,4 +272,10 @@ export class MessageRepository {
     // switch to the saved head id if it is not the most recent message
     this.resetHead(headId ?? messages.at(-1)?.message.id ?? null);
   }
+
+  reset() {
+    this.messages.clear();
+    this.head = null;
+    this.root.children = [];
+  }
 }

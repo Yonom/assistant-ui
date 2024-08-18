@@ -246,4 +246,9 @@ export class LocalThreadRuntime implements ThreadRuntime {
     this.repository.import(data);
     this.notifySubscribers();
   }
+
+  reset() {
+    this.repository.reset();
+    this.notifySubscribers();
+  }
 }
