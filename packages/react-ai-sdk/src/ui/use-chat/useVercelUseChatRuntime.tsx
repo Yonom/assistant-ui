@@ -47,7 +47,10 @@ export const useVercelUseChatRuntime = (
 
       await chatHelpers.reload();
     },
-    onAddToolResult: () => {},
+    onAddToolResult: ({ toolCallId, result }) => {
+      chatHelpers.addToolResult({ toolCallId, result });
+    },
+    // onCopy // TODO
     onNewThread: () => {
       chatHelpers.messages = [];
       chatHelpers.input = "";
