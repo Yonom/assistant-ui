@@ -3,7 +3,11 @@ import {
   ExternalStoreRuntime,
   subscribeToMainThread,
 } from "../../../../react/src";
-import { VercelHelpers } from "./VercelHelpers";
+import { useAssistant, useChat } from "ai/react";
+
+type VercelHelpers =
+  | ReturnType<typeof useChat>
+  | ReturnType<typeof useAssistant>;
 
 export const useInputSync = (
   helpers: VercelHelpers,
