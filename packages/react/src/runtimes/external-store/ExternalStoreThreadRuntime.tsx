@@ -190,7 +190,9 @@ export class ExternalStoreThreadRuntime implements ReactThreadRuntime {
       previousMessage.id === messages.at(-1)?.id // ensure the previous message is a leaf node
     ) {
       this.repository.deleteMessage(previousMessage.id);
-      this.composer.setText(getThreadMessageText(previousMessage));
+      if (!this.composer.text.trim()) {
+        this.composer.setText(getThreadMessageText(previousMessage));
+      }
 
       messages = this.repository.getMessages();
     } else {

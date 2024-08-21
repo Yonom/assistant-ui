@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react";
 import {
   ExternalStoreRuntime,
   subscribeToMainThread,
-} from "../../../../react/src";
+} from "@assistant-ui/react";
 import { useAssistant, useChat } from "ai/react";
 
 type VercelHelpers =
