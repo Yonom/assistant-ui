@@ -1,4 +1,4 @@
-import { useRef, useInsertionEffect, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import {
   ExternalStoreRuntime,
   subscribeToMainThread,
@@ -15,12 +15,12 @@ export const useInputSync = (
 ) => {
   // sync input from vercel to assistant-ui
   const helpersRef = useRef(helpers);
-  useInsertionEffect(() => {
+  useEffect(() => {
     helpersRef.current = helpers;
     if (runtime.thread.composer.text !== helpers.input) {
       runtime.thread.composer.setText(helpers.input);
     }
-  });
+  }, [helpers, runtime]);
 
   // sync input from assistant-ui to vercel
   useEffect(() => {

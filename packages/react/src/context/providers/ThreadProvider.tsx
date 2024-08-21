@@ -1,5 +1,5 @@
 import type { FC, PropsWithChildren } from "react";
-import { useInsertionEffect, useState } from "react";
+import { useEffect, useInsertionEffect, useState } from "react";
 import type { ReactThreadRuntime } from "../../runtimes/core/ReactThreadRuntime";
 import type { ThreadContextValue } from "../react/ThreadContext";
 import { ThreadContext } from "../react/ThreadContext";
@@ -50,7 +50,7 @@ export const ThreadProvider: FC<PropsWithChildren<ThreadProviderProps>> = ({
   });
 
   // TODO it might make sense to move this into the make* functions
-  useInsertionEffect(() => {
+  useEffect(() => {
     const onThreadUpdate = () => {
       const thread = provider.thread;
 
@@ -88,7 +88,7 @@ export const ThreadProvider: FC<PropsWithChildren<ThreadProviderProps>> = ({
 
     onThreadUpdate();
     return subscribeToMainThread(provider, onThreadUpdate);
-  });
+  }, [provider, context]);
 
   useInsertionEffect(
     () =>
