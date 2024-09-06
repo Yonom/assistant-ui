@@ -1,4 +1,5 @@
 import { ThreadState, Client } from "@langchain/langgraph-sdk";
+import { LangChainMessage } from "./types";
 
 const createClient = () => {
   const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "/";
@@ -41,7 +42,7 @@ export const updateState = async (
 export const sendMessage = async (params: {
   threadId: string;
   assistantId: string;
-  message: string | null;
+  message: LangChainMessage | null;
   model: string;
   userId: string;
   systemInstructions: string;
@@ -51,12 +52,7 @@ export const sendMessage = async (params: {
   let input: Record<string, any> | null = null;
   if (params.message !== null) {
     input = {
-      messages: [
-        {
-          role: "human",
-          content: params.message,
-        },
-      ],
+      messages: [params.message],
       userId: params.userId,
     };
   }

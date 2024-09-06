@@ -2,11 +2,10 @@
 
 import { useRef, useState } from "react";
 import { LangChainMessage } from "../lib/types";
-import { handleStreamEvent } from "../lib/streamHandler";
 import {
   createThread,
   getThreadState,
-  sendMessage,
+  sendMessage as sendMessageApi,
   updateState,
 } from "../lib/chatApi";
 import {
@@ -14,7 +13,6 @@ import {
   ToolCallContentPart,
   useExternalStoreRuntime,
 } from "@assistant-ui/react";
-import { useCallbackRef } from "@radix-ui/react-use-callback-ref";
 
 const convertMessages: useExternalMessageConverter.Callback<
   LangChainMessage
@@ -23,11 +21,13 @@ const convertMessages: useExternalMessageConverter.Callback<
     case "system":
       return {
         role: "system",
+        id: message.id,
         content: [{ type: "text", text: message.content }],
       };
     case "human":
       return {
         role: "user",
+        id: message.id,
         content: [{ type: "text", text: message.content }],
       };
     case "ai":
@@ -55,6 +55,7 @@ const convertMessages: useExternalMessageConverter.Callback<
     case "tool":
       return {
         role: "tool",
+        toolName: message.name,
         toolCallId: message.tool_call_id,
         result: message.content,
       };
@@ -68,35 +69,59 @@ const CONFIRM_PURCHASE = {
 // The name of the node to update the state as
 const PREPARE_PURCHASE_DETAILS_NODE = "prepare_purchase_details";
 
+const useLangGraphMessages = ({
+  stream,
+}: {
+  stream: (message: LangChainMessage | null) => Promise<
+    AsyncGenerator<{
+      event: string;
+      data: any;
+    }>
+  >;
+}) => {
+  const [messages, setMessages] = useState<LangChainMessage[]>([]);
+
+  const sendMessage = async (message: LangChainMessage | null) => {
+    if (message !== null) {
+      setMessages((currentMessages) => [...currentMessages, message]);
+    }
+
+    const response = await stream(message);
+
+    const completeMessages: LangChainMessage[] = [];
+    let partialMessages: LangChainMessage[] = [];
+    for await (const chunk of response) {
+      if (chunk.event === "messages/partial") {
+        partialMessages = chunk.data;
+      } else if (chunk.event === "messages/complete") {
+        partialMessages = [];
+        completeMessages.push(...chunk.data);
+      } else {
+        continue;
+      }
+
+      setMessages([...completeMessages, ...partialMessages]);
+    }
+  };
+
+  return { messages, sendMessage };
+};
+
 export const useLangGraphRuntime = () => {
   const threadIdRef = useRef<string | null>(null);
-  const [messages, setMessages] = useState<LangChainMessage[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [graphInterrupted, setGraphInterrupted] = useState(false);
 
-  console.log({ messages });
+  const { messages, sendMessage } = useLangGraphMessages({
+    stream: async (message) => {
+      let threadId = threadIdRef.current;
+      if (!threadId) {
+        const { thread_id } = await createThread();
+        threadId = thread_id;
+        threadIdRef.current = thread_id;
+      }
 
-  const handleSendMessage = useCallbackRef(async (message: string | null) => {
-    let currentMessages = messages;
-    if (message !== null) {
-      currentMessages = [
-        ...currentMessages,
-        { content: message, type: "human" },
-      ];
-      setMessages(currentMessages);
-    }
-
-    let threadId = threadIdRef.current;
-    if (!threadId) {
-      const { thread_id } = await createThread();
-      threadId = thread_id;
-      threadIdRef.current = thread_id;
-    }
-
-    try {
-      setIsRunning(true);
-      setGraphInterrupted(false);
-      const response = await sendMessage({
+      return sendMessageApi({
         threadId,
         assistantId: process.env["NEXT_PUBLIC_LANGGRAPH_GRAPH_ID"] as string,
         message,
@@ -104,13 +129,15 @@ export const useLangGraphRuntime = () => {
         userId: "",
         systemInstructions: "",
       });
+    },
+  });
 
-      for await (const chunk of response) {
-        currentMessages = handleStreamEvent(currentMessages, chunk as any);
-        setMessages(currentMessages);
-      }
+  const handleSendMessage = async (message: LangChainMessage | null) => {
+    setIsRunning(true);
+    try {
+      await sendMessage(message);
 
-      const currentState = await getThreadState(threadId);
+      const currentState = await getThreadState(threadIdRef.current!);
       if (currentState.next.length) {
         setGraphInterrupted(true);
       }
@@ -119,7 +146,7 @@ export const useLangGraphRuntime = () => {
     } finally {
       setIsRunning(false);
     }
-  });
+  };
 
   const convertedMessages = useExternalMessageConverter({
     callback: convertMessages,
@@ -128,32 +155,30 @@ export const useLangGraphRuntime = () => {
   });
   return useExternalStoreRuntime({
     isRunning,
-    isDisabled: graphInterrupted,
+    isDisabled: graphInterrupted || isRunning,
     messages: convertedMessages,
     onNew: (msg) => {
       if (msg.content.length !== 1 || msg.content[0]?.type !== "text")
         throw new Error("Only text messages are supported");
-      return handleSendMessage(msg.content[0].text);
+      return handleSendMessage({
+        type: "human",
+        content: msg.content[0].text,
+      });
     },
     onAddToolResult: async ({ toolCallId, toolName, result }) => {
-      setMessages((m) => [
-        ...m,
-        {
-          type: "tool",
-          name: toolName,
-          tool_call_id: toolCallId,
-          content: JSON.stringify(result),
-        },
-      ]);
-
       if (toolName === "purchase_stock" && result.confirmed) {
         await updateState(threadIdRef.current as string, {
           newState: CONFIRM_PURCHASE,
           asNode: PREPARE_PURCHASE_DETAILS_NODE,
         });
-        // send a null message to resume execution
-        handleSendMessage(null);
       }
+
+      await handleSendMessage({
+        type: "tool",
+        name: toolName,
+        tool_call_id: toolCallId,
+        content: JSON.stringify(result),
+      });
     },
   });
 };
