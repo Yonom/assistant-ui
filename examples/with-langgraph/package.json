@@ -11,14 +11,17 @@
   "dependencies": {
     "@assistant-ui/react": "workspace:*",
     "@langchain/langgraph-sdk": "^0.0.8",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-use-callback-ref": "^1.1.0",
+    "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "js-cookie": "^3.0.5",
+    "lucide-react": "^0.438.0",
     "next": "14.2.7",
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.5.2",
-    "tailwindcss-animate": "^1.0.7",
-    "uuid": "^10.0.0"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@assistant-ui/tsconfig": "workspace:*",
@@ -26,7 +29,6 @@
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/uuid": "^10.0.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.7",
     "postcss": "^8",
