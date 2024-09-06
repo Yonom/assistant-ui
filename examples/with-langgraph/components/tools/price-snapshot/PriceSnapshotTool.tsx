@@ -19,14 +19,14 @@ export const PriceSnapshotTool = makeAssistantToolUI<
   string
 >({
   toolName: "price_snapshot",
-  render: ({ part: { args, argsText, result } }) => {
+  render: function PriceSnapshotUI({ part: { args, argsText, result } }) {
     const resultObj = result
       ? (JSON.parse(result) as PriceSnapshotToolResult)
       : undefined;
 
     return (
-      <div className="my-4 flex flex-col items-center gap-2">
-        <pre>price_snapshot({argsText})</pre>
+      <div className="mb-4 flex flex-col items-center gap-2">
+        <pre className="whitespace-pre-wrap">price_snapshot({argsText})</pre>
         {resultObj && (
           <PriceSnapshot ticker={args.ticker} {...resultObj.snapshot} />
         )}

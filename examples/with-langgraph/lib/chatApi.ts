@@ -1,8 +1,8 @@
 import { ThreadState, Client } from "@langchain/langgraph-sdk";
-import { LangChainMessage } from "./types";
+import { LangChainMessage } from "../../../packages/react-langgraph/src/types";
 
 const createClient = () => {
-  const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "/";
+  const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "/api";
   return new Client({
     apiUrl,
   });

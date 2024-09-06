@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@assistant-ui/react": "workspace:*",
+    "@assistant-ui/react-langgraph": "workspace:*",
     "@langchain/langgraph-sdk": "^0.0.8",
     "@radix-ui/react-slot": "^1.1.0",
-    "@radix-ui/react-use-callback-ref": "^1.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "js-cookie": "^3.0.5",
