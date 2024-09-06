@@ -1,13 +1,9 @@
 import { ThreadState, Client } from "@langchain/langgraph-sdk";
 
 const createClient = () => {
-  const apiUrl =
-    process.env["NEXT_PUBLIC_API_URL"] ?? "http://localhost:3000/api";
+  const apiUrl = process.env["NEXT_PUBLIC_API_URL"] ?? "/";
   return new Client({
     apiUrl,
-    defaultHeaders: {
-      "x-api-key": process.env["NEXT_PUBLIC_LANGCHAIN_API_KEY"] || "",
-    }
   });
 };
 

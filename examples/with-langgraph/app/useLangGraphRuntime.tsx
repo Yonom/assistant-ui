@@ -1,143 +1,159 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { Message, Model } from "../types";
+import { useRef, useState } from "react";
+import { LangChainMessage } from "../lib/types";
 import { handleStreamEvent } from "../lib/streamHandler";
 import {
-  createAssistant,
   createThread,
   getThreadState,
   sendMessage,
+  updateState,
 } from "../lib/chatApi";
-import { ASSISTANT_ID_COOKIE } from "@/constants";
-import { getCookie, setCookie } from "@/lib/cookies";
-import { ThreadState } from "@langchain/langgraph-sdk";
 import {
-  ThreadMessageLike,
+  useExternalMessageConverter,
+  ToolCallContentPart,
   useExternalStoreRuntime,
 } from "@assistant-ui/react";
+import { useCallbackRef } from "@radix-ui/react-use-callback-ref";
 
-type LangGraphRuntimeSettings = {
-  model?: Model;
-  systemInstructions?: string;
+const convertMessages: useExternalMessageConverter.Callback<
+  LangChainMessage
+> = (message) => {
+  switch (message.type) {
+    case "system":
+      return {
+        role: "system",
+        content: [{ type: "text", text: message.content }],
+      };
+    case "human":
+      return {
+        role: "user",
+        content: [{ type: "text", text: message.content }],
+      };
+    case "ai":
+      return {
+        role: "assistant",
+        id: message.id,
+        content: [
+          {
+            type: "text",
+            text: message.content,
+          },
+          ...(message.tool_calls?.map(
+            (chunk): ToolCallContentPart => ({
+              type: "tool-call",
+              toolCallId: chunk.id,
+              toolName: chunk.name,
+              args: chunk.args,
+              argsText:
+                message.tool_call_chunks?.find((c) => c.id === chunk.id)
+                  ?.args ?? JSON.stringify(chunk.args),
+            }),
+          ) ?? []),
+        ],
+      };
+    case "tool":
+      return {
+        role: "tool",
+        toolCallId: message.tool_call_id,
+        result: message.content,
+      };
+  }
 };
 
-const convertMessage = (message: Message): ThreadMessageLike => {
-  return {
-    role: message.sender === "user" ? "user" : "assistant",
-    content: [{ type: "text", text: message.text }],
-    id: message.id,
-    createdAt: new Date(),
-  };
+// The JSON to update state with if the user confirms the purchase.
+const CONFIRM_PURCHASE = {
+  purchaseConfirmed: true,
 };
+// The name of the node to update the state as
+const PREPARE_PURCHASE_DETAILS_NODE = "prepare_purchase_details";
 
-export const useLangGraphRuntime = ({
-  model = "openai",
-  systemInstructions = "",
-}: LangGraphRuntimeSettings) => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [threadId, setThreadId] = useState<string | null>(null);
-  const [assistantId, setAssistantId] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [threadState, setThreadState] =
-    useState<ThreadState<Record<string, any>>>();
+export const useLangGraphRuntime = () => {
+  const threadIdRef = useRef<string | null>(null);
+  const [messages, setMessages] = useState<LangChainMessage[]>([]);
+  const [isRunning, setIsRunning] = useState(false);
   const [graphInterrupted, setGraphInterrupted] = useState(false);
-  const [allowNullMessage, setAllowNullMessage] = useState(false);
 
-  const messageListRef = useRef<HTMLDivElement>(null);
+  console.log({ messages });
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const initializeChat = async () => {
-      let assistantId = getCookie(ASSISTANT_ID_COOKIE);
-
-      if (!assistantId) {
-        const assistant = await createAssistant(
-          process.env["NEXT_PUBLIC_LANGGRAPH_GRAPH_ID"] as string,
-        );
-        assistantId = assistant.assistant_id as string;
-        setCookie(ASSISTANT_ID_COOKIE, assistantId);
-        setAssistantId(assistantId);
-        // Use the assistant ID as the user ID.
-        setUserId(assistantId);
-      } else {
-        setUserId(assistantId);
-      }
-
-      const { thread_id } = await createThread();
-      setThreadId(thread_id);
-      setAssistantId(assistantId);
-    };
-
-    initializeChat();
-  }, []);
-
-  useEffect(() => {
-    if (messageListRef.current) {
-      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  const handleSendMessage = async (message: string | null) => {
+  const handleSendMessage = useCallbackRef(async (message: string | null) => {
+    let currentMessages = messages;
     if (message !== null) {
-      setMessages([
-        ...messages,
-        { text: message, sender: "user", id: uuidv4() },
-      ]);
+      currentMessages = [
+        ...currentMessages,
+        { content: message, type: "human" },
+      ];
+      setMessages(currentMessages);
     }
 
+    let threadId = threadIdRef.current;
     if (!threadId) {
-      console.error("Thread ID is not available");
-      return;
-    }
-    if (!assistantId) {
-      console.error("Assistant ID is not available");
-      return;
+      const { thread_id } = await createThread();
+      threadId = thread_id;
+      threadIdRef.current = thread_id;
     }
 
     try {
-      setIsLoading(true);
-      setThreadState(undefined);
+      setIsRunning(true);
       setGraphInterrupted(false);
-      setAllowNullMessage(false);
       const response = await sendMessage({
         threadId,
-        assistantId,
+        assistantId: process.env["NEXT_PUBLIC_LANGGRAPH_GRAPH_ID"] as string,
         message,
-        model,
-        userId,
-        systemInstructions,
+        model: "openai",
+        userId: "",
+        systemInstructions: "",
       });
 
       for await (const chunk of response) {
-        handleStreamEvent(chunk, setMessages);
+        currentMessages = handleStreamEvent(currentMessages, chunk as any);
+        setMessages(currentMessages);
       }
 
-      // Fetch the current state of the thread
       const currentState = await getThreadState(threadId);
-      setThreadState(currentState);
       if (currentState.next.length) {
         setGraphInterrupted(true);
       }
-      setIsLoading(false);
     } catch (error) {
       console.error("Error streaming messages:", error);
-      setIsLoading(false);
+    } finally {
+      setIsRunning(false);
     }
-  };
+  });
 
-  return useExternalStoreRuntime({
+  const convertedMessages = useExternalMessageConverter({
+    callback: convertMessages,
     messages,
+    isRunning,
+  });
+  return useExternalStoreRuntime({
+    isRunning,
+    isDisabled: graphInterrupted,
+    messages: convertedMessages,
     onNew: (msg) => {
       if (msg.content.length !== 1 || msg.content[0]?.type !== "text")
         throw new Error("Only text messages are supported");
       return handleSendMessage(msg.content[0].text);
     },
-    isRunning: isLoading,
-    isDisabled: graphInterrupted,
-    convertMessage,
+    onAddToolResult: async ({ toolCallId, toolName, result }) => {
+      setMessages((m) => [
+        ...m,
+        {
+          type: "tool",
+          name: toolName,
+          tool_call_id: toolCallId,
+          content: JSON.stringify(result),
+        },
+      ]);
+
+      if (toolName === "purchase_stock" && result.confirmed) {
+        await updateState(threadIdRef.current as string, {
+          newState: CONFIRM_PURCHASE,
+          asNode: PREPARE_PURCHASE_DETAILS_NODE,
+        });
+        // send a null message to resume execution
+        handleSendMessage(null);
+      }
+    },
   });
 };

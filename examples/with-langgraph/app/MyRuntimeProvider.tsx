@@ -8,7 +8,7 @@ export function MyRuntimeProvider({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const runtime = useLangGraphRuntime({});
+  const runtime = useLangGraphRuntime();
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
