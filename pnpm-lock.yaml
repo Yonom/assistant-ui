@@ -38,6 +38,9 @@ importers:
       '@assistant-ui/react-ai-sdk':
         specifier: workspace:^
         version: link:../../packages/react-ai-sdk
+      '@assistant-ui/react-langgraph':
+        specifier: workspace:^
+        version: link:../../packages/react-langgraph
       '@assistant-ui/react-markdown':
         specifier: workspace:^
         version: link:../../packages/react-markdown
@@ -50,6 +53,9 @@ importers:
       '@langchain/core':
         specifier: ^0.2.31
         version: 0.2.31(openai@4.57.0(zod@3.23.8))
+      '@langchain/langgraph-sdk':
+        specifier: ^0.0.8
+        version: 0.0.8
       '@radix-ui/react-avatar':
         specifier: ^1.1.0
         version: 1.1.0(@types/react-dom@18.3.0)(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

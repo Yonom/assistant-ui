@@ -1,7 +1,10 @@
 "use client";
 
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
-import { useLangChainLangGraphRuntime } from "@assistant-ui/react-langgraph";
+import {
+  useLangChainLangGraphRuntime,
+  LangChainMessage,
+} from "@assistant-ui/react-langgraph";
 import { useRef } from "react";
 import { createThread, sendMessage } from "@/lib/chatApi";
 
