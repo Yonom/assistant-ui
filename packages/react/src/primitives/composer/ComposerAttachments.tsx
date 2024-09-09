@@ -12,7 +12,7 @@ export type ComposerPrimitiveAttachmentsProps = {
         Image?: ComponentType | undefined;
         Document?: ComponentType | undefined;
         File?: ComponentType | undefined;
-        Fallback?: ComponentType | undefined;
+        Attachment?: ComponentType | undefined;
       }
     | undefined;
 };
@@ -24,11 +24,11 @@ const getComponent = (
   const type = attachment.type;
   switch (type) {
     case "image":
-      return components?.Image ?? components?.Fallback;
+      return components?.Image ?? components?.Attachment;
     case "document":
-      return components?.Document ?? components?.Fallback;
+      return components?.Document ?? components?.Attachment;
     case "file":
-      return components?.File ?? components?.Fallback;
+      return components?.File ?? components?.Attachment;
     default:
       const _exhaustiveCheck: never = type;
       throw new Error(`Unknown attachment type: ${_exhaustiveCheck}`);
@@ -64,7 +64,7 @@ const ComposerAttachment = memo(
     prev.components?.Image === next.components?.Image &&
     prev.components?.Document === next.components?.Document &&
     prev.components?.File === next.components?.File &&
-    prev.components?.Fallback === next.components?.Fallback,
+    prev.components?.Attachment === next.components?.Attachment,
 );
 
 export const ComposerPrimitiveAttachments: FC<
