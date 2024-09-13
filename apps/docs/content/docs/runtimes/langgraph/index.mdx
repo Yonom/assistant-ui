@@ -46,9 +46,56 @@ npm install @assistant-ui/react @assistant-ui/react-langgraph @langchain/langgra
 ```
 
   </Step>
+  <Step>
+
+### Setup helper functions
+
+<Callout type="warn">
+  This example connects to the LangGraph server directly from the browser. For
+  production use-cases, you should use a proxy server (see below).
+</Callout>
+
+```tsx twoslash include chatApi title="@/lib/chatApi.ts"
+// @filename: /lib/chatApi.ts
+
+// ---cut---
+import { Client } from "@langchain/langgraph-sdk";
+import { LangChainMessage } from "@assistant-ui/react-langgraph";
+
+const createClient = () => {
+  const apiUrl = process.env["NEXT_PUBLIC_LANGGRAPH_API_URL"] || "/api";
+  return new Client({
+    apiUrl,
+  });
+};
+
+export const createThread = async () => {
+  const client = createClient();
+  return client.threads.create();
+};
+
+export const sendMessage = async (params: {
+  threadId: string;
+  messages: LangChainMessage;
+}) => {
+  const client = createClient();
+  return client.runs.stream(
+    params.threadId,
+    process.env["NEXT_PUBLIC_LANGGRAPH_ASSISTANT_ID"]!,
+    {
+      input: {
+        messages: params.messages,
+      },
+      streamMode: "messages",
+    },
+  );
+};
+```
+
+  </Step>
     <Step>
 
-### (Optional for development) Setup a proxy backend endpoint
+### Setup a proxy backend endpoint (optional, for production)
 
 <Callout type="warn">
   This example forwards every request to the LangGraph server directly from the
@@ -123,54 +170,6 @@ export const OPTIONS = () => {
       ...getCorsHeaders(),
     },
   });
-};
-```
-
-  </Step>
-  <Step>
-
-### Setup helper functions
-
-<Callout type="warn">
-  This example connects to the LangGraph server directly from the browser. For
-  production use-cases, you should use a proxy server to connect to the
-  LangGraph server in order to not expose your API key.
-</Callout>
-
-```tsx twoslash include chatApi title="@/lib/chatApi.ts"
-// @filename: /lib/chatApi.ts
-
-// ---cut---
-import { Client } from "@langchain/langgraph-sdk";
-import { LangChainMessage } from "@assistant-ui/react-langgraph";
-
-const createClient = () => {
-  const apiUrl = process.env["NEXT_PUBLIC_LANGGRAPH_API_URL"] || "/api";
-  return new Client({
-    apiUrl,
-  });
-};
-
-export const createThread = async () => {
-  const client = createClient();
-  return client.threads.create();
-};
-
-export const sendMessage = async (params: {
-  threadId: string;
-  messages: LangChainMessage;
-}) => {
-  const client = createClient();
-  return client.runs.stream(
-    params.threadId,
-    process.env["NEXT_PUBLIC_LANGGRAPH_ASSISTANT_ID"]!,
-    {
-      input: {
-        messages: params.messages,
-      },
-      streamMode: "messages",
-    },
-  );
 };
 ```
 
