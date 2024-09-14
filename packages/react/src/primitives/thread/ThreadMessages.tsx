@@ -3,22 +3,28 @@
 import { type ComponentType, type FC, memo } from "react";
 import { useThreadContext } from "../../context/react/ThreadContext";
 import { MessageProvider } from "../../context/providers/MessageProvider";
-import { ComposerPrimitiveIf } from "../composer/ComposerIf";
-import { MessagePrimitiveIf } from "../message/MessageIf";
+import { useMessageContext } from "../../context";
+import { ThreadMessage as ThreadMessageType } from "../../types";
 
 export type ThreadPrimitiveMessagesProps = {
   components:
     | {
         Message: ComponentType;
-        UserMessage?: ComponentType | undefined;
         EditComposer?: ComponentType | undefined;
+        UserEditComposer?: ComponentType | undefined;
+        AssistantEditComposer?: ComponentType | undefined;
+        SystemEditComposer?: ComponentType | undefined;
+        UserMessage?: ComponentType | undefined;
         AssistantMessage?: ComponentType | undefined;
         SystemMessage?: ComponentType | undefined;
       }
     | {
         Message?: ComponentType | undefined;
-        UserMessage: ComponentType;
         EditComposer?: ComponentType | undefined;
+        UserEditComposer?: ComponentType | undefined;
+        AssistantEditComposer?: ComponentType | undefined;
+        SystemEditComposer?: ComponentType | undefined;
+        UserMessage: ComponentType;
         AssistantMessage: ComponentType;
         SystemMessage?: ComponentType | undefined;
       };
@@ -26,20 +32,51 @@ export type ThreadPrimitiveMessagesProps = {
 
 const DEFAULT_SYSTEM_MESSAGE = () => null;
 
-const getComponents = (
+const getComponent = (
   components: ThreadPrimitiveMessagesProps["components"],
+  role: ThreadMessageType["role"],
+  isEditing: boolean,
 ) => {
-  return {
-    EditComposer:
-      components.EditComposer ??
-      components.UserMessage ??
-      (components.Message as ComponentType),
-    UserMessage:
-      components.UserMessage ?? (components.Message as ComponentType),
-    AssistantMessage:
-      components.AssistantMessage ?? (components.Message as ComponentType),
-    SystemMessage: components.SystemMessage ?? DEFAULT_SYSTEM_MESSAGE,
-  };
+  switch (role) {
+    case "user":
+      if (isEditing) {
+        return (
+          components.UserEditComposer ??
+          components.EditComposer ??
+          components.UserMessage ??
+          (components.Message as ComponentType)
+        );
+      } else {
+        return components.UserMessage ?? (components.Message as ComponentType);
+      }
+    case "assistant":
+      if (isEditing) {
+        return (
+          components.AssistantEditComposer ??
+          components.EditComposer ??
+          components.AssistantMessage ??
+          (components.Message as ComponentType)
+        );
+      } else {
+        return (
+          components.AssistantMessage ?? (components.Message as ComponentType)
+        );
+      }
+    case "system":
+      if (isEditing) {
+        return (
+          components.SystemEditComposer ??
+          components.EditComposer ??
+          components.SystemMessage ??
+          (components.Message as ComponentType)
+        );
+      } else {
+        return components.SystemMessage ?? DEFAULT_SYSTEM_MESSAGE;
+      }
+    default:
+      const _exhaustiveCheck: never = role;
+      throw new Error(`Unknown message role: ${_exhaustiveCheck}`);
+  }
 };
 
 type ThreadMessageProps = {
@@ -51,24 +88,14 @@ const ThreadMessageImpl: FC<ThreadMessageProps> = ({
   messageIndex,
   components,
 }) => {
-  const { UserMessage, EditComposer, AssistantMessage, SystemMessage } =
-    getComponents(components);
+  const { useMessage, useEditComposer } = useMessageContext();
+  const role = useMessage((m) => m.message.role);
+  const isEditing = useEditComposer((c) => c.isEditing);
+  const Component = getComponent(components, role, isEditing);
+
   return (
     <MessageProvider messageIndex={messageIndex}>
-      <MessagePrimitiveIf user>
-        <ComposerPrimitiveIf editing={false}>
-          <UserMessage />
-        </ComposerPrimitiveIf>
-        <ComposerPrimitiveIf editing>
-          <EditComposer />
-        </ComposerPrimitiveIf>
-      </MessagePrimitiveIf>
-      <MessagePrimitiveIf assistant>
-        <AssistantMessage />
-      </MessagePrimitiveIf>
-      <MessagePrimitiveIf system>
-        <SystemMessage />
-      </MessagePrimitiveIf>
+      <Component />
     </MessageProvider>
   );
 };
