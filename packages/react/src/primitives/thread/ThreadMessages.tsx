@@ -30,6 +30,22 @@ export type ThreadPrimitiveMessagesProps = {
       };
 };
 
+const isComponentsSame = (
+  prev: ThreadPrimitiveMessagesProps["components"],
+  next: ThreadPrimitiveMessagesProps["components"],
+) => {
+  return (
+    prev.Message === next.Message &&
+    prev.EditComposer === next.EditComposer &&
+    prev.UserEditComposer === next.UserEditComposer &&
+    prev.AssistantEditComposer === next.AssistantEditComposer &&
+    prev.SystemEditComposer === next.SystemEditComposer &&
+    prev.UserMessage === next.UserMessage &&
+    prev.AssistantMessage === next.AssistantMessage &&
+    prev.SystemMessage === next.SystemMessage
+  );
+};
+
 const DEFAULT_SYSTEM_MESSAGE = () => null;
 
 const getComponent = (
@@ -79,6 +95,21 @@ const getComponent = (
   }
 };
 
+type ThreadMessageComponentProps = {
+  components: ThreadPrimitiveMessagesProps["components"];
+};
+
+const ThreadMessageComponent: FC<ThreadMessageComponentProps> = ({
+  components,
+}) => {
+  const { useMessage, useEditComposer } = useMessageContext();
+  const role = useMessage((m) => m.message.role);
+  const isEditing = useEditComposer((c) => c.isEditing);
+  const Component = getComponent(components, role, isEditing);
+
+  return <Component />;
+};
+
 type ThreadMessageProps = {
   messageIndex: number;
   components: ThreadPrimitiveMessagesProps["components"];
@@ -88,14 +119,9 @@ const ThreadMessageImpl: FC<ThreadMessageProps> = ({
   messageIndex,
   components,
 }) => {
-  const { useMessage, useEditComposer } = useMessageContext();
-  const role = useMessage((m) => m.message.role);
-  const isEditing = useEditComposer((c) => c.isEditing);
-  const Component = getComponent(components, role, isEditing);
-
   return (
     <MessageProvider messageIndex={messageIndex}>
-      <Component />
+      <ThreadMessageComponent components={components} />
     </MessageProvider>
   );
 };
@@ -104,11 +130,7 @@ const ThreadMessage = memo(
   ThreadMessageImpl,
   (prev, next) =>
     prev.messageIndex === next.messageIndex &&
-    prev.components.Message === next.components.Message &&
-    prev.components.UserMessage === next.components.UserMessage &&
-    prev.components.EditComposer === next.components.EditComposer &&
-    prev.components.AssistantMessage === next.components.AssistantMessage &&
-    prev.components.SystemMessage === next.components.SystemMessage,
+    isComponentsSame(prev.components, next.components),
 );
 
 export const ThreadPrimitiveMessagesImpl: FC<ThreadPrimitiveMessagesProps> = ({
@@ -128,10 +150,5 @@ ThreadPrimitiveMessagesImpl.displayName = "ThreadPrimitive.Messages";
 
 export const ThreadPrimitiveMessages = memo(
   ThreadPrimitiveMessagesImpl,
-  (prev, next) =>
-    prev.components?.Message === next.components?.Message &&
-    prev.components?.UserMessage === next.components?.UserMessage &&
-    prev.components?.EditComposer === next.components?.EditComposer &&
-    prev.components?.AssistantMessage === next.components?.AssistantMessage &&
-    prev.components?.SystemMessage === next.components?.SystemMessage,
+  (prev, next) => isComponentsSame(prev.components, next.components),
 );
