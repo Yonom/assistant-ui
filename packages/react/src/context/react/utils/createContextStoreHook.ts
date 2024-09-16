@@ -62,9 +62,7 @@ export function createContextStoreHook<T, K extends keyof T & string>(
 
     const store = useStoreStoreHook({
       optional,
-    } as Parameters<typeof useStoreStoreHook>[0]) as UseBoundStore<
-      ReadonlyStore<StateType>
-    >;
+    } as any) as UseBoundStore<ReadonlyStore<StateType>>;
     if (!store) return null;
     return selector ? store(selector) : store();
   }
