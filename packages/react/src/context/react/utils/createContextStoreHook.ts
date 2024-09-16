@@ -16,7 +16,7 @@ export function createContextStoreHook<T, K extends keyof T & string>(
 
   // Define useStoreStoreHook with overloads
   function useStoreStoreHook(): ReadonlyStore<StateType>;
-  function useStoreStoreHook<TSelected>(options: {
+  function useStoreStoreHook(options: {
     optional: true;
   }): ReadonlyStore<StateType> | null;
   function useStoreStoreHook(options?: {
@@ -62,7 +62,9 @@ export function createContextStoreHook<T, K extends keyof T & string>(
 
     const store = useStoreStoreHook({
       optional,
-    } as any) as UseBoundStore<ReadonlyStore<StateType>>;
+    } as Parameters<typeof useStoreStoreHook>[0]) as UseBoundStore<
+      ReadonlyStore<StateType>
+    >;
     if (!store) return null;
     return selector ? store(selector) : store();
   }
