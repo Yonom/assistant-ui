@@ -1,5 +1,5 @@
 {
-  "name": "assistant-ui-starter",
+  "name": "with-local-ollama",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.60",
     "@assistant-ui/react": "^0.5",
     "@assistant-ui/react-markdown": "^0.2",
     "next": "14.2.11",
