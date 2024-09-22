@@ -1,8 +1,11 @@
 import { Unsubscribe } from "../../types";
-import { ThreadRuntimeWithSubscribe } from "./AssistantRuntime";
+import { AssistantRuntimeCore } from "./AssistantRuntimeCore";
 
+/**
+ * @deprecated Use `runtime.thread.subscribe` instead. This will be removed in 0.6.0.
+ */
 export const subscribeToMainThread = (
-  runtime: ThreadRuntimeWithSubscribe,
+  runtime: AssistantRuntimeCore,
   callback: () => void,
 ) => {
   let first = true;
@@ -27,7 +30,7 @@ export const subscribeToMainThread = (
 };
 
 export const subscribeToMainThreadComposer = (
-  runtime: ThreadRuntimeWithSubscribe,
+  runtime: AssistantRuntimeCore,
   callback: () => void,
 ) => {
   let cleanup = runtime.thread.composer.subscribe(callback);

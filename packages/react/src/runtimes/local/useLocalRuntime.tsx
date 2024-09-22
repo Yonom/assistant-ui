@@ -1,20 +1,21 @@
 "use client";
 
-import { useInsertionEffect, useState } from "react";
+import { useInsertionEffect, useMemo, useState } from "react";
 import type { ChatModelAdapter } from "./ChatModelAdapter";
-import { LocalRuntime } from "./LocalRuntime";
+import { LocalRuntimeCore } from "./LocalRuntimeCore";
 import { LocalRuntimeOptions } from "./LocalRuntimeOptions";
+import { AssistantRuntime } from "../../api/AssistantRuntime";
 
 export const useLocalRuntime = (
   adapter: ChatModelAdapter,
   options: LocalRuntimeOptions = {},
 ) => {
-  const [runtime] = useState(() => new LocalRuntime(adapter, options));
+  const [runtime] = useState(() => new LocalRuntimeCore(adapter, options));
 
   useInsertionEffect(() => {
     runtime.adapter = adapter;
     runtime.options = options;
   });
 
-  return runtime;
+  return useMemo(() => new AssistantRuntime(runtime), [runtime]);
 };

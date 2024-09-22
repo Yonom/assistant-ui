@@ -1,4 +1,4 @@
-import { ReactThreadRuntime } from "../core";
+import { AddToolResultOptions, ReactThreadRuntimeCore } from "../core";
 import { MessageRepository } from "../utils/MessageRepository";
 import {
   AppendMessage,
@@ -7,7 +7,6 @@ import {
   Unsubscribe,
 } from "../../types";
 import { ExternalStoreAdapter } from "./ExternalStoreAdapter";
-import { AddToolResultOptions } from "../../context";
 import {
   getExternalStoreMessage,
   symbolInnerMessage,
@@ -18,8 +17,8 @@ import { fromThreadMessageLike } from "./ThreadMessageLike";
 import { RuntimeCapabilities } from "../../context/stores/Thread";
 import { getThreadMessageText } from "../../utils/getThreadMessageText";
 import { generateId } from "../../internal";
-import { ThreadRuntimeComposer } from "../utils/ThreadRuntimeComposer";
-import { SubmitFeedbackOptions } from "../../context/stores/ThreadActions";
+import { BaseThreadComposerRuntimeCore } from "../utils/BaseThreadComposerRuntimeCore";
+import { SubmitFeedbackOptions } from "../core/ThreadRuntimeCore";
 
 export const hasUpcomingMessage = (
   isRunning: boolean,
@@ -28,7 +27,7 @@ export const hasUpcomingMessage = (
   return isRunning && messages[messages.length - 1]?.role !== "assistant";
 };
 
-export class ExternalStoreThreadRuntime implements ReactThreadRuntime {
+export class ExternalStoreThreadRuntimeCore implements ReactThreadRuntimeCore {
   private _subscriptions = new Set<() => void>();
   private repository = new MessageRepository();
   private assistantOptimisticId: string | null = null;
@@ -55,7 +54,7 @@ export class ExternalStoreThreadRuntime implements ReactThreadRuntime {
 
   private _store!: ExternalStoreAdapter<any>;
 
-  public readonly composer = new ThreadRuntimeComposer(this);
+  public readonly composer = new BaseThreadComposerRuntimeCore(this);
 
   constructor(
     private configProvider: ModelConfigProvider,

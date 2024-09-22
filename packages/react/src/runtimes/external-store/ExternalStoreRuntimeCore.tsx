@@ -1,14 +1,14 @@
-import { BaseAssistantRuntime, ProxyConfigProvider } from "../../internal";
+import { BaseAssistantRuntimeCore, ProxyConfigProvider } from "../../internal";
 import { ModelConfigProvider } from "../../types";
 import { ExternalStoreAdapter } from "./ExternalStoreAdapter";
-import { ExternalStoreThreadRuntime } from "./ExternalStoreThreadRuntime";
+import { ExternalStoreThreadRuntimeCore } from "./ExternalStoreThreadRuntimeCore";
 
-export class ExternalStoreRuntime extends BaseAssistantRuntime<ExternalStoreThreadRuntime> {
+export class ExternalStoreRuntimeCore extends BaseAssistantRuntimeCore<ExternalStoreThreadRuntimeCore> {
   private readonly _proxyConfigProvider;
 
   constructor(store: ExternalStoreAdapter<any>) {
     const provider = new ProxyConfigProvider();
-    super(new ExternalStoreThreadRuntime(provider, store));
+    super(new ExternalStoreThreadRuntimeCore(provider, store));
     this._proxyConfigProvider = provider;
   }
 
@@ -32,10 +32,13 @@ export class ExternalStoreRuntime extends BaseAssistantRuntime<ExternalStoreThre
     if (!this.store.onSwitchToNewThread)
       throw new Error("Runtime does not support switching to new threads.");
 
-    this.thread = new ExternalStoreThreadRuntime(this._proxyConfigProvider, {
-      ...this.store,
-      messages: [],
-    });
+    this.thread = new ExternalStoreThreadRuntimeCore(
+      this._proxyConfigProvider,
+      {
+        ...this.store,
+        messages: [],
+      },
+    );
     await this.store.onSwitchToNewThread();
   }
 
@@ -44,10 +47,13 @@ export class ExternalStoreRuntime extends BaseAssistantRuntime<ExternalStoreThre
       if (!this.store.onSwitchToThread)
         throw new Error("Runtime does not support switching threads.");
 
-      this.thread = new ExternalStoreThreadRuntime(this._proxyConfigProvider, {
-        ...this.store,
-        messages: [], // ignore messages until rerender
-      });
+      this.thread = new ExternalStoreThreadRuntimeCore(
+        this._proxyConfigProvider,
+        {
+          ...this.store,
+          messages: [], // ignore messages until rerender
+        },
+      );
       this.store.onSwitchToThread(threadId);
     } else {
       this.switchToNewThread();

@@ -1,18 +1,18 @@
 import { type ModelConfigProvider } from "../../types/ModelConfigTypes";
 import type { CoreMessage } from "../../types/AssistantTypes";
-import { BaseAssistantRuntime } from "../core/BaseAssistantRuntime";
+import { BaseAssistantRuntimeCore } from "../core/BaseAssistantRuntimeCore";
 import type { ChatModelAdapter } from "./ChatModelAdapter";
 import { ProxyConfigProvider } from "../../internal";
-import { LocalThreadRuntime } from "./LocalThreadRuntime";
+import { LocalThreadRuntimeCore } from "./LocalThreadRuntimeCore";
 import { LocalRuntimeOptions } from "./LocalRuntimeOptions";
 import { fromCoreMessages } from "../edge/converters/fromCoreMessage";
 
-export class LocalRuntime extends BaseAssistantRuntime<LocalThreadRuntime> {
+export class LocalRuntimeCore extends BaseAssistantRuntimeCore<LocalThreadRuntimeCore> {
   private readonly _proxyConfigProvider: ProxyConfigProvider;
 
   constructor(adapter: ChatModelAdapter, options: LocalRuntimeOptions) {
     const proxyConfigProvider = new ProxyConfigProvider();
-    super(new LocalThreadRuntime(proxyConfigProvider, adapter, options));
+    super(new LocalThreadRuntimeCore(proxyConfigProvider, adapter, options));
     this._proxyConfigProvider = proxyConfigProvider;
   }
 
@@ -31,7 +31,7 @@ export class LocalRuntime extends BaseAssistantRuntime<LocalThreadRuntime> {
   public switchToNewThread() {
     const { initialMessages, ...options } = this.thread.options;
 
-    return (this.thread = new LocalThreadRuntime(
+    return (this.thread = new LocalThreadRuntimeCore(
       this._proxyConfigProvider,
       this.thread.adapter,
       options,
