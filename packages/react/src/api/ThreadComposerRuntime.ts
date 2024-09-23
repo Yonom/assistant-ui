@@ -71,9 +71,9 @@ export class ThreadComposerRuntime implements ThreadComposerRuntimeCore {
     return this._core.getState().addAttachment(file);
   }
 
-  /**
-   * @deprecated Use `getAttachmentById(id).removeAttachment` instead. This will be removed in 0.6.0.
-   */
+  // /**
+  //  * @deprecated Use `getAttachmentById(id).removeAttachment` instead. This will be removed in 0.6.0.
+  //  */
   public removeAttachment(attachmentId: string) {
     return this._core.getState().removeAttachment(attachmentId);
   }

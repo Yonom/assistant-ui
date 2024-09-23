@@ -1,4 +1,4 @@
-import { AddToolResultOptions, ReactThreadRuntimeCore } from "../core";
+import { AddToolResultOptions } from "../core";
 import {
   ExportedMessageRepository,
   MessageRepository,
@@ -22,6 +22,7 @@ import { getThreadMessageText } from "../../utils/getThreadMessageText";
 import { generateId } from "../../internal";
 import { BaseThreadComposerRuntimeCore } from "../utils/BaseThreadComposerRuntimeCore";
 import { SubmitFeedbackOptions } from "../core/ThreadRuntimeCore";
+import { ReactThreadRuntimeCore } from "../core/ReactThreadRuntimeCore";
 
 export const hasUpcomingMessage = (
   isRunning: boolean,

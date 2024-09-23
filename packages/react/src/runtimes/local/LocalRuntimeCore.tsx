@@ -22,11 +22,11 @@ export class LocalRuntimeCore extends BaseAssistantRuntimeCore<LocalThreadRuntim
   public switchToNewThread() {
     const { initialMessages, ...options } = this.thread.options;
 
-    return (this.thread = new LocalThreadRuntimeCore(
+    this.thread = new LocalThreadRuntimeCore(
       this._proxyConfigProvider,
       this.thread.adapter,
       options,
-    ));
+    );
   }
 
   public switchToThread(threadId: string | null) {

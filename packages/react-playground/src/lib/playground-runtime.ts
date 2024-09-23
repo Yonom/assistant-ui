@@ -8,7 +8,6 @@ import {
   fromLanguageModelTools,
   ModelConfig,
   ModelConfigProvider,
-  ReactThreadRuntimeCore,
   TextContentPart,
   ThreadAssistantContentPart,
   ThreadUserContentPart,
@@ -18,7 +17,6 @@ import {
   ThreadAssistantMessage,
   ChatModelAdapter,
   Unsubscribe,
-  AssistantRuntimeCore,
   ChatModelRunResult,
   CoreMessage,
   fromCoreMessage,
@@ -48,10 +46,7 @@ const makeModelConfigStore = () =>
     config: {},
   }));
 
-class PlaygroundRuntimeCore
-  extends BaseAssistantRuntimeCore<PlaygroundThreadRuntimeCore>
-  implements AssistantRuntimeCore
-{
+class PlaygroundRuntimeCore extends BaseAssistantRuntimeCore<PlaygroundThreadRuntimeCore> {
   private readonly _proxyConfigProvider: InstanceType<
     typeof ProxyConfigProvider
   >;
@@ -103,7 +98,9 @@ const CAPABILITIES = Object.freeze({
 
 const EMPTY_BRANCHES: readonly string[] = Object.freeze([]);
 
-export class PlaygroundThreadRuntimeCore implements ReactThreadRuntimeCore {
+export class PlaygroundThreadRuntimeCore
+  implements INTERNAL.ReactThreadRuntimeCore
+{
   private _subscriptions = new Set<() => void>();
 
   private abortController: AbortController | null = null;
