@@ -34,6 +34,7 @@ const {
   generateId,
   BaseThreadRuntimeComposerCore,
   AssistantRuntime,
+  ThreadRuntime,
 } = INTERNAL;
 
 const makeModelConfigStore = () =>
@@ -490,6 +491,26 @@ export class PlaygroundThreadRuntimeCore implements ReactThreadRuntimeCore {
       }),
     );
   }
+
+  public import() {
+    throw new Error("Playground does not support importing messages.");
+  }
+
+  public export(): never {
+    throw new Error("Playground does not support exporting messages.");
+  }
+}
+
+class PlaygroundThreadRuntime extends ThreadRuntime {
+  constructor(private binding: INTERNAL.ThreadRuntimeCoreBinding) {
+    super(binding);
+  }
+
+  public setRequestData(options: EdgeRuntimeRequestOptions) {
+    return (
+      this.binding.getState() as PlaygroundThreadRuntimeCore
+    ).setRequestData(options);
+  }
 }
 
 export const usePlaygroundRuntime = ({
@@ -507,5 +528,8 @@ export const usePlaygroundRuntime = ({
       ),
   );
 
-  return useMemo(() => new AssistantRuntime(runtime), [runtime]);
+  return useMemo(
+    () => new AssistantRuntime(runtime, PlaygroundThreadRuntime),
+    [runtime],
+  );
 };

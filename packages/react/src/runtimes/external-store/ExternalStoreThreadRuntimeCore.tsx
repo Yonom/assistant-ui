@@ -1,5 +1,8 @@
 import { AddToolResultOptions, ReactThreadRuntimeCore } from "../core";
-import { MessageRepository } from "../utils/MessageRepository";
+import {
+  ExportedMessageRepository,
+  MessageRepository,
+} from "../utils/MessageRepository";
 import {
   AppendMessage,
   ModelConfigProvider,
@@ -259,4 +262,12 @@ export class ExternalStoreThreadRuntimeCore implements ReactThreadRuntimeCore {
       messages.flatMap(getExternalStoreMessage).filter((m) => m != null),
     );
   };
+
+  public import(repository: ExportedMessageRepository) {
+    this.repository.import(repository);
+  }
+
+  public export(): ExportedMessageRepository {
+    return this.repository.export();
+  }
 }

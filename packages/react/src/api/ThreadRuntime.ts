@@ -3,6 +3,7 @@ import {
   SubmitFeedbackOptions,
   ThreadRuntimeCore,
 } from "../runtimes/core/ThreadRuntimeCore";
+import { ExportedMessageRepository } from "../runtimes/utils/MessageRepository";
 import { AppendMessage } from "../types";
 import { MessageRuntime, MessageSnapshot } from "./MessageRuntime";
 import { NestedSubscriptionSubject } from "./subscribable/NestedSubscriptionSubject";
@@ -34,7 +35,7 @@ class ThreadState {
 }
 
 export class ThreadRuntime implements ThreadRuntimeCore {
-  public path = "assistant.threads[main]"; // TODO
+  // public path = "assistant.threads[main]"; // TODO
 
   /**
    * @deprecated Use `getState().threadId` instead. This will be removed in 0.6.0.
@@ -139,6 +140,14 @@ export class ThreadRuntime implements ThreadRuntimeCore {
   //  */
   public submitFeedback(options: SubmitFeedbackOptions) {
     return this._threadBinding.getState().submitFeedback(options);
+  }
+
+  public export() {
+    return this._threadBinding.getState().export();
+  }
+
+  public import(data: ExportedMessageRepository) {
+    this._threadBinding.getState().import(data);
   }
 
   public unstable_getMesssageByIndex(idx: number) {

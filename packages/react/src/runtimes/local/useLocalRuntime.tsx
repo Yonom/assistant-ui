@@ -5,6 +5,17 @@ import type { ChatModelAdapter } from "./ChatModelAdapter";
 import { LocalRuntimeCore } from "./LocalRuntimeCore";
 import { LocalRuntimeOptions } from "./LocalRuntimeOptions";
 import { AssistantRuntime } from "../../api/AssistantRuntime";
+import { ThreadRuntime } from "../../api/ThreadRuntime";
+
+export class LocalRuntime extends AssistantRuntime {
+  constructor(private core: LocalRuntimeCore) {
+    super(core, ThreadRuntime);
+  }
+
+  public reset(options?: Parameters<LocalRuntimeCore["reset"]>[0]) {
+    this.core.reset(options);
+  }
+}
 
 export const useLocalRuntime = (
   adapter: ChatModelAdapter,
@@ -13,9 +24,9 @@ export const useLocalRuntime = (
   const [runtime] = useState(() => new LocalRuntimeCore(adapter, options));
 
   useInsertionEffect(() => {
-    runtime.adapter = adapter;
-    runtime.options = options;
+    runtime.thread.adapter = adapter;
+    runtime.thread.options = options;
   });
 
-  return useMemo(() => new AssistantRuntime(runtime), [runtime]);
+  return useMemo(() => new LocalRuntime(runtime), [runtime]);
 };

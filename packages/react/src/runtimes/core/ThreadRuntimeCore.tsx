@@ -2,6 +2,7 @@ import { RuntimeCapabilities } from "../../context/stores/Thread";
 import { AppendMessage, ModelConfig, ThreadMessage } from "../../types";
 import type { Unsubscribe } from "../../types/Unsubscribe";
 import { SpeechSynthesisAdapter } from "../speech";
+import { ExportedMessageRepository } from "../utils/MessageRepository";
 import { ThreadComposerRuntimeCore } from "./ThreadComposerRuntimeCore";
 
 export type AddToolResultOptions = {
@@ -37,5 +38,9 @@ export type ThreadRuntimeCore = Readonly<{
   threadId: string;
   isDisabled: boolean;
   messages: readonly ThreadMessage[];
+
   subscribe: (callback: () => void) => Unsubscribe;
+
+  import(repository: ExportedMessageRepository): void;
+  export(): ExportedMessageRepository;
 }>;

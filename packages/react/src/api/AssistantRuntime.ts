@@ -1,17 +1,27 @@
 import { AssistantRuntimeCore } from "../runtimes/core/AssistantRuntimeCore";
 import { NestedSubscriptionSubject } from "./subscribable/NestedSubscriptionSubject";
 import { ModelConfigProvider } from "../types/ModelConfigTypes";
-import { ThreadRuntime } from "./ThreadRuntime";
+import { ThreadRuntime, ThreadRuntimeCoreBinding } from "./ThreadRuntime";
 
-export class AssistantRuntime implements AssistantRuntimeCore {
-  constructor(private _core: AssistantRuntimeCore) {}
+export class AssistantRuntime<
+  TThreadRuntime extends ThreadRuntime = ThreadRuntime,
+> implements AssistantRuntimeCore
+{
+  constructor(
+    private _core: AssistantRuntimeCore,
+    CustomThreadRuntime: new (
+      binding: ThreadRuntimeCoreBinding,
+    ) => TThreadRuntime,
+  ) {
+    this.thread = new CustomThreadRuntime(
+      new NestedSubscriptionSubject({
+        getState: () => this._core.thread,
+        subscribe: (callback) => this._core.subscribe(callback),
+      }),
+    );
+  }
 
-  public readonly thread = new ThreadRuntime(
-    new NestedSubscriptionSubject({
-      getState: () => this._core.thread,
-      subscribe: (callback) => this._core.subscribe(callback),
-    }),
-  );
+  public readonly thread;
 
   public switchToNewThread() {
     return this._core.switchToNewThread();

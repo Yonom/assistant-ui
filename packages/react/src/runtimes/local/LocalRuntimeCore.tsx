@@ -15,16 +15,7 @@ export class LocalRuntimeCore extends BaseAssistantRuntimeCore<LocalThreadRuntim
     super(new LocalThreadRuntimeCore(proxyConfigProvider, adapter, options));
     this._proxyConfigProvider = proxyConfigProvider;
   }
-
-  public set adapter(adapter: ChatModelAdapter) {
-    this.thread.adapter = adapter;
-  }
-
-  public set options(options: LocalRuntimeOptions) {
-    this.thread.options = options;
-  }
-
-  registerModelConfigProvider(provider: ModelConfigProvider) {
+  public registerModelConfigProvider(provider: ModelConfigProvider) {
     return this._proxyConfigProvider.registerModelConfigProvider(provider);
   }
 
