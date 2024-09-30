@@ -34,7 +34,7 @@ export type EdgeChatAdapterOptions = {
 };
 
 export class EdgeChatAdapter implements ChatModelAdapter {
-  constructor(private options: EdgeChatAdapterOptions) {}
+  constructor(private options: EdgeChatAdapterOptions) { }
 
   async *run({ messages, abortSignal, config }: ChatModelRunOptions) {
     const headers = new Headers(this.options.headers);
@@ -56,7 +56,7 @@ export class EdgeChatAdapter implements ChatModelAdapter {
       signal: abortSignal,
     });
 
-    if (result.status !== 200) {
+    if (!result.ok) {
       throw new Error(`Status ${result.status}: ${await result.text()}`);
     }
 
