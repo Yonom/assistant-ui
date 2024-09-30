@@ -34,7 +34,7 @@ export type EdgeChatAdapterOptions = {
 };
 
 export class EdgeChatAdapter implements ChatModelAdapter {
-  constructor(private options: EdgeChatAdapterOptions) { }
+  constructor(private options: EdgeChatAdapterOptions) {}
 
   async *run({ messages, abortSignal, config }: ChatModelRunOptions) {
     const headers = new Headers(this.options.headers);
