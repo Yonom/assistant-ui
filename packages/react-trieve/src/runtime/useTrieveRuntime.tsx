@@ -91,7 +91,7 @@ export const useTrieveRuntime = ({
       setMessages(data);
     });
     fetchInitialSuggestions(trieve).then((data) => {
-      setSuggestions(data.map((d) => ({ prompt: d })));
+      setSuggestions(data.slice(0, 3).map((d) => ({ prompt: d })));
     });
   }, [trieve]);
 

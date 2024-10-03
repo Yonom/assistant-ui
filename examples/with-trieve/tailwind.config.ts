@@ -80,6 +80,7 @@ const config = {
     require("tailwindcss-animate"),
     require("@assistant-ui/react/tailwindcss")({ shadcn: true }),
     require("@assistant-ui/react-markdown/tailwindcss"),
+    require("@assistant-ui/react-trieve/tailwindcss"),
   ],
 } satisfies Config;
 

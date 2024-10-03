@@ -3,6 +3,7 @@
 import { AssistantRuntimeProvider, Thread } from "@assistant-ui/react";
 import {
   makeTrieveMarkdownText,
+  TrieveComposer,
   useTrieveExtras,
   useTrieveRuntime,
 } from "@assistant-ui/react-trieve";
@@ -37,7 +38,10 @@ function MyAssistant() {
   return (
     <div className="flex h-full flex-col pt-8">
       <p className="text-center text-xl font-bold">{title}</p>
-      <Thread assistantMessage={{ components: { Text: TrieveMarkdownText } }} />
+      <Thread
+        components={{ Composer: TrieveComposer }}
+        assistantMessage={{ components: { Text: TrieveMarkdownText } }}
+      />
     </div>
   );
 }
