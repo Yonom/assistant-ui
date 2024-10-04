@@ -10,10 +10,21 @@ import {
   useThread,
 } from "@assistant-ui/react";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toTrieveStream, TrieveStreamPart } from "../trieve/trieveStream";
 import { TrieveSDK } from "trieve-ts-sdk";
 import { TrieveMessage } from "../trieve/TrieveMessage";
+import { useCallbackRef } from "@radix-ui/react-use-callback-ref";
+
+const symbolTrieveExtras = Symbol("trieve-extras");
+
+export type TrieveExtras = {
+  [symbolTrieveExtras]: true;
+  title: string;
+  tags: TrieveTag[] | undefined;
+  selectedTag: string | undefined;
+  setSelectedTag: (tag: string | undefined) => void;
+};
 
 const convertMessage = (message: TrieveMessage): ThreadMessageLike => {
   return {
@@ -23,19 +34,15 @@ const convertMessage = (message: TrieveMessage): ThreadMessageLike => {
   };
 };
 
-const fetchMessages = async (
-  trieve: TrieveSDK,
-  messagesTopicId: string | undefined,
-) => {
-  if (!messagesTopicId) return [];
-  return trieve.getAllMessagesForTopic({
-    messagesTopicId,
-  });
-};
-
-const fetchInitialSuggestions = async (trieve: TrieveSDK) => {
-  return (await trieve.suggestedQueries({})).queries;
-};
+// const fetchMessages = async (
+//   trieve: TrieveSDK,
+//   messagesTopicId: string | undefined,
+// ) => {
+//   if (!messagesTopicId) return [];
+//   return trieve.getAllMessagesForTopic({
+//     messagesTopicId,
+//   });
+// };
 
 const sliceMessagesUntil = (
   messages: TrieveMessage[],
@@ -52,10 +59,6 @@ const sliceMessagesUntil = (
   return messages.slice(0, messageIdx + 1);
 };
 
-export type TrieveExtras = {
-  title: string;
-};
-
 type AssistantRuntimeWithExtras<TExtras> = Omit<AssistantRuntime, "thread"> & {
   thread: Omit<ThreadRuntime, "getState"> & {
     getState(): ThreadState & {
@@ -64,12 +67,19 @@ type AssistantRuntimeWithExtras<TExtras> = Omit<AssistantRuntime, "thread"> & {
   };
 };
 
+type TrieveTag = {
+  name: string;
+  value: string;
+};
+
 export const useTrieveRuntime = ({
   trieve,
   ownerId,
+  tags,
 }: {
   trieve: TrieveSDK;
   ownerId: string;
+  tags?: TrieveTag[];
 }) => {
   const [title, setTitle] = useState("");
   const threadIdRef = useRef<string | undefined>();
@@ -77,7 +87,21 @@ export const useTrieveRuntime = ({
   const [messages, setMessages] = useState<TrieveMessage[]>([]);
   const [suggestions, setSuggestions] = useState<ThreadSuggestion[]>([]);
 
+  const getFilter = () => {
+    return !selectedTag
+      ? null
+      : {
+          must: [
+            {
+              field: "tag_set",
+              match_all: [selectedTag],
+            },
+          ],
+        };
+  };
+
   const withRunning = useCallback(async <T,>(promise: Promise<T>) => {
+    setSuggestions([]);
     setIsRunning(true);
     try {
       return await promise;
@@ -86,13 +110,20 @@ export const useTrieveRuntime = ({
     }
   }, []);
 
+  const fetchSuggestions = useCallbackRef(async (query: string | null) => {
+    const suggestions = (
+      await trieve.suggestedQueries({
+        query,
+      })
+    ).queries;
+    setSuggestions(suggestions.slice(0, 3).map((d) => ({ prompt: d })));
+  });
+
   useEffect(() => {
-    fetchMessages(trieve, undefined).then((data) => {
-      setMessages(data);
-    });
-    fetchInitialSuggestions(trieve).then((data) => {
-      setSuggestions(data.slice(0, 3).map((d) => ({ prompt: d })));
-    });
+    // fetchMessages(trieve, undefined).then((data) => {
+    //   setMessages(data);
+    // });
+    fetchSuggestions(null);
   }, [trieve]);
 
   const handleStream = useCallback(
@@ -122,10 +153,22 @@ export const useTrieveRuntime = ({
     [],
   );
 
+  const [selectedTag, setSelectedTag] = useState<string | undefined>();
+
   const runtime = useExternalStoreRuntime({
     isRunning,
     messages,
-    extras: { title } satisfies TrieveExtras,
+    extras: useMemo(
+      () =>
+        ({
+          [symbolTrieveExtras]: true,
+          title,
+          tags,
+          selectedTag,
+          setSelectedTag,
+        }) satisfies TrieveExtras,
+      [title, tags, selectedTag],
+    ),
     convertMessage,
     onNew: async ({ content }) => {
       const userMessage = content
@@ -133,6 +176,7 @@ export const useTrieveRuntime = ({
         .map((m) => m.text)
         .join("\n\n");
 
+      setSuggestions([]);
       setMessages((prev) => [
         ...prev,
         {
@@ -163,10 +207,12 @@ export const useTrieveRuntime = ({
           .createMessageReader({
             topic_id: threadIdRef.current,
             new_message_content: userMessage,
+            filters: getFilter(),
           })
           .then(toTrieveStream)
           .then(handleStream),
       );
+      fetchSuggestions(userMessage);
     },
     onEdit: async ({ content, parentId }) => {
       const userMessage = content
@@ -175,6 +221,7 @@ export const useTrieveRuntime = ({
         .join("\n\n");
 
       let message_sort_order = 0;
+      setSuggestions([]);
       setMessages((prev) => {
         prev = sliceMessagesUntil(prev, parentId);
         message_sort_order = prev.length + 1;
@@ -199,10 +246,13 @@ export const useTrieveRuntime = ({
             topic_id: threadIdRef.current!,
             message_sort_order,
             new_message_content: userMessage,
+            filters: getFilter(),
           })
           .then(toTrieveStream)
           .then(handleStream),
       );
+
+      fetchSuggestions(userMessage);
     },
 
     onReload: async () => {
@@ -212,6 +262,7 @@ export const useTrieveRuntime = ({
           ...prev[prev.length - 1]!,
           content: "",
           citations: undefined,
+          filters: getFilter(),
         },
       ]);
 
@@ -236,5 +287,13 @@ export function useTrieveExtras<T>(selector: (extras: TrieveExtras) => T): T;
 export function useTrieveExtras<T>(
   selector: (extras: TrieveExtras) => T = (extras) => extras as T,
 ): T {
-  return useThread((t) => selector(t.extras as TrieveExtras));
+  return useThread((t) => {
+    const extras = t.extras as TrieveExtras;
+    if (!extras[symbolTrieveExtras])
+      throw new Error(
+        "useTrieveExtras can only be used inside a Trieve runtime",
+      );
+
+    return selector(extras);
+  });
 }

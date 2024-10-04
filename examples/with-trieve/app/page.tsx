@@ -21,6 +21,32 @@ const RuntimeProvider = () => {
   const runtime = useTrieveRuntime({
     trieve,
     ownerId: "abcd",
+    tags: [
+      {
+        name: "Stories",
+        value: "story",
+      },
+      {
+        name: "Comments",
+        value: "comment",
+      },
+      {
+        name: "Ask HN",
+        value: "ask",
+      },
+      {
+        name: "Show HN",
+        value: "show",
+      },
+      {
+        name: "Jobs",
+        value: "job",
+      },
+      {
+        name: "Polls",
+        value: "poll",
+      },
+    ],
   });
 
   return (
@@ -36,12 +62,14 @@ function MyAssistant() {
   const { title } = useTrieveExtras();
 
   return (
-    <div className="flex h-full flex-col pt-8">
+    <div className="flex h-full flex-col overflow-hidden pt-8">
       <p className="text-center text-xl font-bold">{title}</p>
-      <Thread
-        components={{ Composer: TrieveComposer }}
-        assistantMessage={{ components: { Text: TrieveMarkdownText } }}
-      />
+      <div className="flex-grow overflow-hidden">
+        <Thread
+          components={{ Composer: TrieveComposer }}
+          assistantMessage={{ components: { Text: TrieveMarkdownText } }}
+        />
+      </div>
     </div>
   );
 }

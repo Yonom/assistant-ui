@@ -3,5 +3,13 @@
 }
 
 .aui-trieve-composer-tag-selector {
-  @apply flex w-full flex-row gap-3;
+  @apply bg-aui-muted z-[-10] -mt-2 flex w-full flex-row gap-3 rounded-b-lg border px-3 pt-2;
+}
+
+.aui-trieve-composer-tag-selector-tag {
+  @apply text-aui-muted-foreground flex items-center px-1.5 py-2 text-sm font-medium;
+}
+
+.aui-trieve-composer-tag-selector-tag[data-selected] {
+  @apply text-aui-foreground border-aui-foreground -mb-[1px] border-b;
 }
