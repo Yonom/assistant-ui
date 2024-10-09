@@ -46,9 +46,13 @@
     "classnames": "^2.5.1",
     "lucide-react": "^0.447.0",
     "react-markdown": "^9.0.1",
+    "rehype-parse": "^9.0.1",
+    "rehype-react": "^8.0.0",
+    "rehype-sanitize": "^6.0.0",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
     "trieve-ts-sdk": "^0.0.12",
+    "unified": "^11.0.5",
     "unist-util-visit": "^5.0.0"
   },
   "peerDependencies": {
@@ -69,6 +73,7 @@
   "devDependencies": {
     "@assistant-ui/tailwindcss-transformer": "workspace:*",
     "@assistant-ui/tsconfig": "workspace:*",
+    "@types/hast": "^3.0.4",
     "@types/mdast": "^4.0.4",
     "@types/node": "^22.7.4",
     "autoprefixer": "^10.4.20",

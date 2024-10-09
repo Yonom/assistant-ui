@@ -6,19 +6,15 @@ import {
   useContentPartText,
   useMessage,
 } from "@assistant-ui/react";
-import {
-  makeMarkdownText,
-  MarkdownTextPrimitiveProps,
-} from "@assistant-ui/react-markdown";
+import { makeMarkdownText } from "@assistant-ui/react-markdown";
 import { visit, SKIP } from "unist-util-visit";
 import remarkGfm from "remark-gfm";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "../ui/hover-card";
 import { TrieveMessage } from "../trieve/TrieveMessage";
 import { Root } from "mdast";
+import { MakeMarkdownTextProps } from "@assistant-ui/react-markdown";
+import { CitationHoverContentProps } from "./TrieveCitationHoverContent";
+import { ComponentType } from "react";
+import { TrieveCitation } from "./TrieveCitation";
 
 function removeFootnoteDefinitions() {
   return (tree: Root) => {
@@ -32,43 +28,6 @@ function removeFootnoteDefinitions() {
   };
 }
 
-const Citation = ({ node, ...rest }: { node?: any }) => {
-  const assistantUiMessage = useMessage();
-
-  const indexString = node.children[0].children[0].value;
-  let index;
-  try {
-    index = parseInt(indexString.replace(/[^0-9]/g, ""), 10);
-  } catch {
-    return <sup {...rest} />;
-  }
-
-  const message = getExternalStoreMessage<TrieveMessage>(assistantUiMessage);
-  const citation = message?.citations?.[index];
-
-  if (citation === undefined) return <sup {...rest} />;
-
-  return (
-    <HoverCard>
-      <HoverCardTrigger asChild>
-        <sup {...rest} />
-      </HoverCardTrigger>
-      <HoverCardContent>
-        <h3 className="font-bold">
-          <a href={citation.link ?? undefined}>
-            {(citation.metadata as any)?.title ??
-              (citation.metadata as any)?.parent_title}
-          </a>
-        </h3>
-        <p className="font-sm pb-4 italic">
-          by {(citation.metadata as any)?.by}
-        </p>
-        <p>{citation.chunk_html}</p>
-      </HoverCardContent>
-    </HoverCard>
-  );
-};
-
 function generateDummyCitations(citationCount: number) {
   return Array.from(
     { length: citationCount },
@@ -76,9 +35,18 @@ function generateDummyCitations(citationCount: number) {
   ).join("");
 }
 
-export const makeTrieveMarkdownText = (
-  options?: MarkdownTextPrimitiveProps,
-) => {
+export type TrieveMarkdownTextProps = Omit<
+  MakeMarkdownTextProps,
+  "components"
+> & {
+  components?: NonNullable<MakeMarkdownTextProps["components"]> & {
+    CitationHoverContent?: ComponentType<CitationHoverContentProps>;
+  };
+  smooth?: boolean;
+};
+
+export const makeTrieveMarkdownText = (options?: TrieveMarkdownTextProps) => {
+  const { CitationHoverContent, ...components } = options?.components ?? {};
   const MarkdownText = makeMarkdownText({
     ...options,
     remarkPlugins: [
@@ -90,8 +58,13 @@ export const makeTrieveMarkdownText = (
     ],
 
     components: {
-      sup: Citation,
-      ...options?.components,
+      sup: (props) => (
+        <TrieveCitation
+          CitationHoverContent={CitationHoverContent}
+          {...props}
+        />
+      ),
+      ...components,
     },
   });
 

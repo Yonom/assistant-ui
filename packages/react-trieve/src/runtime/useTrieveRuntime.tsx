@@ -12,7 +12,7 @@ import {
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toTrieveStream, TrieveStreamPart } from "../trieve/trieveStream";
-import { TrieveSDK } from "trieve-ts-sdk";
+import { ChunkMetadata, TrieveSDK } from "trieve-ts-sdk";
 import { TrieveMessage } from "../trieve/TrieveMessage";
 import { useCallbackRef } from "@radix-ui/react-use-callback-ref";
 
@@ -24,6 +24,7 @@ export type TrieveExtras = {
   tags: TrieveTag[] | undefined;
   selectedTag: string | undefined;
   setSelectedTag: (tag: string | undefined) => void;
+  trackLinkClick: (citation: ChunkMetadata, position: number) => void;
 };
 
 const convertMessage = (message: TrieveMessage): ThreadMessageLike => {
@@ -124,7 +125,7 @@ export const useTrieveRuntime = ({
     //   setMessages(data);
     // });
     fetchSuggestions(null);
-  }, [trieve]);
+  }, [fetchSuggestions]);
 
   const handleStream = useCallback(
     async (stream: AsyncIterable<TrieveStreamPart>) => {
@@ -155,6 +156,18 @@ export const useTrieveRuntime = ({
 
   const [selectedTag, setSelectedTag] = useState<string | undefined>();
 
+  const trackLinkClick = useCallbackRef(
+    (citation: ChunkMetadata, position: number) => {
+      trieve.sendCTRAnalytics({
+        ctr_type: "search",
+        position: position,
+        request_id: "",
+        clicked_chunk_id: citation.id,
+        clicked_chunk_tracking_id: citation.tracking_id ?? null,
+      });
+    },
+  );
+
   const runtime = useExternalStoreRuntime({
     isRunning,
     messages,
@@ -166,8 +179,9 @@ export const useTrieveRuntime = ({
           tags,
           selectedTag,
           setSelectedTag,
+          trackLinkClick,
         }) satisfies TrieveExtras,
-      [title, tags, selectedTag],
+      [title, tags, selectedTag, trackLinkClick],
     ),
     convertMessage,
     onNew: async ({ content }) => {
