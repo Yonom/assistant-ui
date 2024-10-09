@@ -36,6 +36,30 @@ function rehypeWrapFirstHeading(
         parent.children[index] = linkNode as any;
       }
     });
+
+    if (!firstHeadingFound) {
+      // If no heading was found, insert a "Source" link at the top of the document
+      const sourceHeadingNode = {
+        type: "element",
+        tagName: "h2",
+        children: [
+          {
+            type: "element",
+            tagName: "a",
+            properties: {
+              href: headerUrl,
+            },
+            children: [
+              {
+                type: "text",
+                value: "Source",
+              },
+            ],
+          },
+        ],
+      };
+      tree.children.unshift(sourceHeadingNode as any);
+    }
   };
 }
 
