@@ -13,3 +13,7 @@
 .aui-trieve-composer-tag-selector-tag[data-selected] {
   @apply text-aui-foreground border-aui-foreground -mb-[1px] border-b;
 }
+
+.aui-trieve-thread-welcome-refresh-suggestions {
+  @apply self-end;
+}

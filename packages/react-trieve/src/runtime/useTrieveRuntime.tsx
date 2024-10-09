@@ -25,6 +25,7 @@ export type TrieveExtras = {
   selectedTag: string | undefined;
   setSelectedTag: (tag: string | undefined) => void;
   trackLinkClick: (citation: ChunkMetadata, position: number) => void;
+  refreshSuggestions: () => Promise<void>;
 };
 
 const convertMessage = (message: TrieveMessage): ThreadMessageLike => {
@@ -168,6 +169,10 @@ export const useTrieveRuntime = ({
     },
   );
 
+  const refreshSuggestions = useCallbackRef(async () => {
+    await fetchSuggestions(null);
+  });
+
   const runtime = useExternalStoreRuntime({
     isRunning,
     messages,
@@ -180,8 +185,9 @@ export const useTrieveRuntime = ({
           selectedTag,
           setSelectedTag,
           trackLinkClick,
+          refreshSuggestions,
         }) satisfies TrieveExtras,
-      [title, tags, selectedTag, trackLinkClick],
+      [title, tags, selectedTag, trackLinkClick, refreshSuggestions],
     ),
     convertMessage,
     onNew: async ({ content }) => {
