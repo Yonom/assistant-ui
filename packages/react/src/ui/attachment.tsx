@@ -17,7 +17,6 @@ import {
 import { AttachmentPrimitive } from "../primitives";
 import { useAttachment } from "../context/react/AttachmentContext";
 import {
-  Avatar,
   AvatarImage,
   AvatarRoot,
   Tooltip,
