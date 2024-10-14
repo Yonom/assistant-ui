@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- 359db5c: fix: depenency array of react-langgraph useLangGraphMessages hook
+- 359db5c: fix: hook dependency array inside useLangGraphMessages
 
 ## 0.0.20
 
