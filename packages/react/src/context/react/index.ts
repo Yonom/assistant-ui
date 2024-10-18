@@ -84,7 +84,9 @@ export {
   useMessageRuntime,
   useMessage,
   useEditComposer,
+  // TODO move out of runtime context after 0.6.0
   useMessageUtils,
+  // TODO move out of runtime context after 0.6.0
   useMessageUtilsStore,
 
   /**
