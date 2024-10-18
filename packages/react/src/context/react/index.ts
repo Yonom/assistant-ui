@@ -1,5 +1,6 @@
 export {
   useAssistantRuntime,
+  useThreadManager,
   useToolUIs,
   useToolUIsStore,
 
