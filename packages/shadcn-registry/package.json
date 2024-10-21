@@ -21,7 +21,7 @@
     "clsx": "^2.1.1",
     "eslint": "^8",
     "lucide-react": "^0.453.0",
-    "react": "^18.3.1",
+    "react": "19.0.0-rc-65a56d0e-20241020",
     "react-resizable-panels": "^2.1.4",
     "react-syntax-highlighter": "^15.6.1",
     "remark-gfm": "^4.0.0",

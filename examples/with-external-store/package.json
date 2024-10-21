@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -12,8 +12,8 @@
     "@ai-sdk/openai": "^0.0.68",
     "@assistant-ui/react": "^0.5",
     "next": "15.0.0",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "19.0.0-rc-65a56d0e-20241020",
+    "react-dom": "19.0.0-rc-65a56d0e-20241020",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
