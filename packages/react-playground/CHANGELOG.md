@@ -1,5 +1,13 @@
 # @assistant-ui/react-playground
 
+## 0.0.42
+
+### Patch Changes
+
+- b89ebd5: feat: loosen parsing strictness, add new converter strict mode flag
+- Updated dependencies [be04b5b]
+  - @assistant-ui/react@0.5.90
+
 ## 0.0.41
 
 ### Patch Changes

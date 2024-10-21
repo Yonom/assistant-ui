@@ -1,5 +1,11 @@
 # @assistant-ui/react
 
+## 0.5.90
+
+### Patch Changes
+
+- be04b5b: feat: Unstable_AudioContentPart (wip)
+
 ## 0.5.89
 
 ### Patch Changes
