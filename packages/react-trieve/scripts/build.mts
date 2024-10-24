@@ -18,14 +18,13 @@ const replaceNullWithObject = (obj: object) => {
   );
 };
 
-fs.mkdirSync("./src/tailwindcss/data", { recursive: true });
+fs.mkdirSync("./generated", { recursive: true });
 for (const file of files) {
   const cssContent = fs.readFileSync(file, "utf8");
   const root = postcss.parse(cssContent);
   const formattedComponents = replaceNullWithObject(postcssJs.objectify(root));
 
-  const outputFile =
-    "./src/tailwindcss/data/" + file.split("/").pop() + ".json";
+  const outputFile = "./generated/" + file.split("/").pop() + ".json";
   const outputContent = JSON.stringify(formattedComponents, null, 2);
   fs.writeFileSync(outputFile, outputContent);
 }
