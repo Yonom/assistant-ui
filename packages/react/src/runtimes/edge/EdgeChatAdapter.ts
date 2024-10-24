@@ -57,7 +57,7 @@ export class EdgeChatAdapter implements ChatModelAdapter {
       body: JSON.stringify({
         system: config.system,
         messages: toCoreMessages(messages, {
-          includeId: this.options.unstable_sendMessageIds,
+          unstable_includeId: this.options.unstable_sendMessageIds,
         }),
         tools: config.tools ? toLanguageModelTools(config.tools) : [],
         unstable_assistantMessageId,
