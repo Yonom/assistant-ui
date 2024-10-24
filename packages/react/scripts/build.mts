@@ -1,6 +1,5 @@
 import { build } from "tsup";
-import { copyFileSync, mkdirSync } from "node:fs";
-import fs from "fs";
+import fs from "node:fs";
 import postcss from "postcss";
 import postcssJs from "postcss-js";
 
@@ -24,7 +23,7 @@ const replaceNullWithObject = (obj: object) => {
   );
 };
 
-mkdirSync("./src/tailwindcss/data", { recursive: true });
+fs.mkdirSync("./src/tailwindcss/data", { recursive: true });
 for (const file of files) {
   const cssContent = fs.readFileSync(file, "utf8");
   const root = postcss.parse(cssContent);
@@ -38,30 +37,15 @@ for (const file of files) {
 
 // JS
 await build({
-  entry: ["src/index.ts", "src/edge.ts", "src/tailwindcss/index.ts"],
+  entry: ["./src/**/*.{ts,tsx,js,jsx}", "!./src/**/*.test.{ts,tsx}"],
   format: ["cjs", "esm"],
+  bundle: false,
+  minify: false,
   dts: true,
   sourcemap: true,
   clean: true,
   splitting: true,
-  esbuildOptions: (options, { format }) => {
-    if (format === "esm") {
-      options.banner = {
-        js: '"use client";',
-      };
-    }
-  },
 });
-
-// TODO find a way to bundle edge with the rest of the package
-await build({
-  entry: ["src/edge.ts"],
-  format: ["cjs", "esm"],
-  dts: true,
-  sourcemap: true,
-});
-
-// css
 
 await build({
   entry: ["src/styles/index.css", "src/styles/modal.css"],
@@ -70,19 +54,22 @@ await build({
   sourcemap: true,
 });
 
-mkdirSync("dist/styles/tailwindcss", { recursive: true });
-copyFileSync(
+fs.mkdirSync("dist/styles/tailwindcss", { recursive: true });
+fs.copyFileSync(
   "src/styles/tailwindcss/base-components.css",
   "dist/styles/tailwindcss/base-components.css",
 );
-copyFileSync(
+fs.copyFileSync(
   "src/styles/tailwindcss/thread.css",
   "dist/styles/tailwindcss/thread.css",
 );
-copyFileSync(
+fs.copyFileSync(
   "src/styles/tailwindcss/modal.css",
   "dist/styles/tailwindcss/modal.css",
 );
 
-mkdirSync("dist/styles/themes", { recursive: true });
-copyFileSync("src/styles/themes/default.css", "dist/styles/themes/default.css");
+fs.mkdirSync("dist/styles/themes", { recursive: true });
+fs.copyFileSync(
+  "src/styles/themes/default.css",
+  "dist/styles/themes/default.css",
+);

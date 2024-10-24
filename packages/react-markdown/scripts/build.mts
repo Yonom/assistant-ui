@@ -1,6 +1,5 @@
 import { build } from "tsup";
-import { copyFileSync, mkdirSync } from "node:fs";
-import fs from "fs";
+import fs from "node:fs";
 import postcss from "postcss";
 import postcssJs from "postcss-js";
 
@@ -19,7 +18,7 @@ const replaceNullWithObject = (obj: object) => {
   );
 };
 
-mkdirSync("./src/tailwindcss/data", { recursive: true });
+fs.mkdirSync("./src/tailwindcss/data", { recursive: true });
 for (const file of files) {
   const cssContent = fs.readFileSync(file, "utf8");
   const root = postcss.parse(cssContent);
@@ -33,26 +32,13 @@ for (const file of files) {
 
 // JS
 await build({
-  entry: ["src/index.ts"],
+  entry: ["./src/**/*.{ts,tsx,js,jsx}", "!./src/**/*.test.{ts,tsx}"],
   format: ["cjs", "esm"],
+  bundle: false,
+  minify: false,
   dts: true,
   sourcemap: true,
   clean: true,
-  esbuildOptions: (options, { format }) => {
-    if (format === "esm") {
-      options.banner = {
-        js: '"use client";',
-      };
-    }
-  },
-});
-
-await build({
-  entry: ["src/tailwindcss/index.ts"],
-  outDir: "dist/tailwindcss",
-  format: ["cjs", "esm"],
-  dts: true,
-  sourcemap: true,
 });
 
 // css
@@ -62,8 +48,8 @@ await build({
   outDir: "dist/styles",
 });
 
-mkdirSync("dist/styles/tailwindcss", { recursive: true });
-copyFileSync(
+fs.mkdirSync("dist/styles/tailwindcss", { recursive: true });
+fs.copyFileSync(
   "src/styles/tailwindcss/markdown.css",
   "dist/styles/tailwindcss/markdown.css",
 );
