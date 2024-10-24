@@ -1,10 +1,25 @@
 import { ThreadMessage, CoreMessage } from "../../../types";
 
-export const toCoreMessages = (message: ThreadMessage[]): CoreMessage[] => {
-  return message.map(toCoreMessage);
+type ToCoreMessageOptions = {
+  includeId?: boolean | undefined;
 };
 
-export const toCoreMessage = (message: ThreadMessage): CoreMessage => {
+type CoreMessageWithConditionalId<T extends boolean> = T extends true
+  ? CoreMessage & { id?: string }
+  : CoreMessage;
+
+export const toCoreMessages = <T extends boolean = false>(
+  messages: ThreadMessage[],
+  options: ToCoreMessageOptions & { includeId?: T | undefined } = {},
+): CoreMessageWithConditionalId<T>[] => {
+  return messages.map((message) => toCoreMessage(message, options));
+};
+
+export const toCoreMessage = <T extends boolean = false>(
+  message: ThreadMessage,
+  options: ToCoreMessageOptions & { includeId?: T | undefined } = {},
+): CoreMessageWithConditionalId<T> => {
+  const includeId = options.includeId ?? false;
   const role = message.role;
   switch (role) {
     case "assistant":
@@ -18,6 +33,7 @@ export const toCoreMessage = (message: ThreadMessage): CoreMessage => {
           }
           return part;
         }),
+        ...(includeId ? { id: message.id } : {}),
       };
 
     case "user":
@@ -31,12 +47,14 @@ export const toCoreMessage = (message: ThreadMessage): CoreMessage => {
           }),
           ...message.attachments.map((a) => a.content).flat(),
         ],
+        ...(includeId ? { id: message.id } : {}),
       };
 
     case "system":
       return {
         role,
         content: message.content,
+        ...(includeId ? { id: message.id } : {}),
       };
 
     default: {
