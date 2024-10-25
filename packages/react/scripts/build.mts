@@ -29,8 +29,7 @@ for (const file of files) {
   const root = postcss.parse(cssContent);
   const formattedComponents = replaceNullWithObject(postcssJs.objectify(root));
 
-  const outputFile =
-    "./generated/" + file.split("/").pop() + ".json";
+  const outputFile = "./generated/" + file.split("/").pop() + ".json";
   const outputContent = JSON.stringify(formattedComponents, null, 2);
   fs.writeFileSync(outputFile, outputContent);
 }
@@ -41,16 +40,15 @@ await build({
   format: ["cjs", "esm"],
   bundle: false,
   minify: false,
-  dts: true,
   sourcemap: true,
   clean: true,
-  splitting: true,
 });
+
+// css
 
 await build({
   entry: ["src/styles/index.css", "src/styles/modal.css"],
   outDir: "dist/styles",
-  dts: true,
   sourcemap: true,
 });
 

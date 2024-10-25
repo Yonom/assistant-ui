@@ -35,7 +35,6 @@ await build({
   format: ["cjs", "esm"],
   bundle: false,
   minify: false,
-  dts: true,
   sourcemap: true,
   clean: true,
 });
@@ -45,6 +44,7 @@ await build({
 await build({
   entry: ["src/styles/tailwindcss/markdown.css"],
   outDir: "dist/styles",
+  sourcemap: true,
 });
 
 fs.mkdirSync("dist/styles/tailwindcss", { recursive: true });
