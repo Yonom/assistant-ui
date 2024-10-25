@@ -31,26 +31,13 @@ for (const file of files) {
 
 // JS
 await build({
-  entry: ["src/index.ts"],
+  entry: ["./src/**/*.{ts,tsx,js,jsx}", "!./src/**/*.test.{ts,tsx}"],
   format: ["cjs", "esm"],
+  bundle: false,
+  minify: false,
   dts: true,
   sourcemap: true,
   clean: true,
-  esbuildOptions: (options, { format }) => {
-    if (format === "esm") {
-      options.banner = {
-        js: '"use client";',
-      };
-    }
-  },
-});
-
-await build({
-  entry: ["src/tailwindcss/index.ts"],
-  outDir: "dist/tailwindcss",
-  format: ["cjs", "esm"],
-  dts: true,
-  sourcemap: true,
 });
 
 // css
