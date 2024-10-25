@@ -29,7 +29,8 @@ for (const file of files) {
   const root = postcss.parse(cssContent);
   const formattedComponents = replaceNullWithObject(postcssJs.objectify(root));
 
-  const outputFile = "./generated/" + file.split("/").pop() + ".json";
+  const outputFile =
+    "./generated/" + file.split("/").pop() + ".json";
   const outputContent = JSON.stringify(formattedComponents, null, 2);
   fs.writeFileSync(outputFile, outputContent);
 }
