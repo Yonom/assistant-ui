@@ -172,7 +172,7 @@ importers:
         specifier: ^5.6.3
         version: 5.6.3
 
-  apps/shadcn-registry:
+  apps/registry:
     devDependencies:
       '@ai-sdk/openai':
         specifier: ^0.0.68

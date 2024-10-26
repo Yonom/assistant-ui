@@ -2,7 +2,8 @@
   "rewrites": [
     {
       "source": "/:name",
-      "destination": "/dist/:name.json"
+      "destination": "/:name.json"
     }
-  ]
+  ],
+  "outputDirectory": "dist"
 }
