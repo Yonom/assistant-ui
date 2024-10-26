@@ -134,6 +134,12 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.14)
+      trieve-search-component:
+        specifier: ^0.0.55
+        version: 0.0.55(@types/react@18.3.12)(react-dom@19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021))(react@19.0.0-rc-69d4b800-20241021)
+      trieve-ts-sdk:
+        specifier: ^0.0.13
+        version: 0.0.13
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -141,6 +147,9 @@ importers:
       '@types/mdx':
         specifier: ^2.0.13
         version: 2.0.13
+      '@types/node':
+        specifier: ^22.8.0
+        version: 22.8.0
       '@types/react':
         specifier: ^18.3.12
         version: 18.3.12
@@ -2671,6 +2680,15 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
+  '@r2wc/core@1.1.0':
+    resolution: {integrity: sha512-pEgtPXhfgg8mv/MooU83cb5sXC2aQOXPLm9UX7E7Oz/OXmrnP5r8hD/nJL1empWxC4wo1YeBXvrFu8fXsMgGZQ==}
+
+  '@r2wc/react-to-web-component@2.0.3':
+    resolution: {integrity: sha512-nlDJ0LHiWLG/EFB5tBtA+9KLF2oMBeDSAXL08NUzAuj/ac+V0NkMl/RvCFdDFnyrPQqpzpD9uOvOY2E5IFpdCQ==}
+    peerDependencies:
+      react: ^18.0.0
+      react-dom: ^18.0.0
+
   '@radix-ui/colors@3.0.0':
     resolution: {integrity: sha512-FUOsGBkHrYJwCSEtWRCIfQbZG7q1e6DgxCIOe1SUQzDe/7rXXeA47s8yCn6fuTNQAj1Zq4oTFi9Yjp3wzElcxg==}
 
@@ -3792,6 +3810,9 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20'
 
+  '@thumbmarkjs/thumbmarkjs@0.14.8':
+    resolution: {integrity: sha512-J+/HnYBv24ufFCoyqbFhtZk1zTGKWzHfyN15sc6kJq/1D/6H1oaKt+W1yWxkUwzclMS1n36EaoHbNjFeiuDqDg==}
+
   '@ts-morph/common@0.19.0':
     resolution: {integrity: sha512-Unz/WHmd4pGax91rdIKWi51wnVUW11QttMEPpBiBgIewnc9UQIX7UDLxr5vRlqeByXCwhkF6VabSsI0raWcyAQ==}
 
@@ -3860,6 +3881,9 @@ packages:
 
   '@types/node@22.7.9':
     resolution: {integrity: sha512-jrTfRC7FM6nChvU7X2KqcrgquofrWLFDeYC1hKfwNWomVvrn7JIksqf344WN2X/y8xrgqBd2dJATZV4GbatBfg==}
+
+  '@types/node@22.8.0':
+    resolution: {integrity: sha512-84rafSBHC/z1i1E3p0cJwKA+CfYDNSXX9WSZBRopjIzLET8oNt6ht2tei4C7izwDeEiLLfdeSVBv1egOH916hg==}
 
   '@types/prismjs@1.26.5':
     resolution: {integrity: sha512-AUZTa7hQ2KY5L7AmtSiqxlhWxb4ina0yd8hNbl4TWuqnv/pFP0nDMb3YrfSBf4hJVGLh2YEIBfKaBW/9UEl6IQ==}
@@ -6858,6 +6882,12 @@ packages:
     resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
     hasBin: true
 
+  trieve-search-component@0.0.55:
+    resolution: {integrity: sha512-Hf55Zc1tIY6OEJ/A4bvY06cLIxffTFZbrcyGeOykVkE5ZoBQnLykfQNr+TUHGIlychaOGt+DQ8j8g3jaegZFCA==}
+    peerDependencies:
+      react: ^18.3.1
+      react-dom: ^18.3.1
+
   trieve-ts-sdk@0.0.13:
     resolution: {integrity: sha512-yS3lQqjQWNAN6gzn6A5ajT/b19Wru2Daj2VvFNheo7r14LgeotCsXdK3k8e5USaZWi05CcTjCW3tt86W+F/bww==}
 
@@ -8207,6 +8237,14 @@ snapshots:
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
+
+  '@r2wc/core@1.1.0': {}
+
+  '@r2wc/react-to-web-component@2.0.3(react-dom@19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021))(react@19.0.0-rc-69d4b800-20241021)':
+    dependencies:
+      '@r2wc/core': 1.1.0
+      react: 19.0.0-rc-69d4b800-20241021
+      react-dom: 19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021)
 
   '@radix-ui/colors@3.0.0': {}
 
@@ -9692,6 +9730,8 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.14
 
+  '@thumbmarkjs/thumbmarkjs@0.14.8': {}
+
   '@ts-morph/common@0.19.0':
     dependencies:
       fast-glob: 3.3.2
@@ -9753,7 +9793,7 @@ snapshots:
 
   '@types/node-fetch@2.6.11':
     dependencies:
-      '@types/node': 22.7.9
+      '@types/node': 22.8.0
       form-data: 4.0.1
 
   '@types/node@12.20.55': {}
@@ -9767,6 +9807,10 @@ snapshots:
       undici-types: 6.19.8
 
   '@types/node@22.7.9':
+    dependencies:
+      undici-types: 6.19.8
+
+  '@types/node@22.8.0':
     dependencies:
       undici-types: 6.19.8
 
@@ -13662,6 +13706,18 @@ snapshots:
       punycode: 2.3.1
 
   tree-kill@1.2.2: {}
+
+  trieve-search-component@0.0.55(@types/react@18.3.12)(react-dom@19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021))(react@19.0.0-rc-69d4b800-20241021):
+    dependencies:
+      '@r2wc/react-to-web-component': 2.0.3(react-dom@19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021))(react@19.0.0-rc-69d4b800-20241021)
+      '@thumbmarkjs/thumbmarkjs': 0.14.8
+      react: 19.0.0-rc-69d4b800-20241021
+      react-dom: 19.0.0-rc-69d4b800-20241021(react@19.0.0-rc-69d4b800-20241021)
+      react-markdown: 9.0.1(@types/react@18.3.12)(react@19.0.0-rc-69d4b800-20241021)
+      trieve-ts-sdk: 0.0.13
+    transitivePeerDependencies:
+      - '@types/react'
+      - supports-color
 
   trieve-ts-sdk@0.0.13: {}
 
