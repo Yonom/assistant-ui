@@ -2,6 +2,14 @@ export type ThreadManagerRuntimePath = {
   ref: string;
 };
 
+export type ThreadManagerItemRuntimePath = {
+  ref: string;
+  threadSelector:
+    | { type: "main" }
+    | { type: "index"; index: number }
+    | { type: "archive-index"; index: number };
+};
+
 export type ThreadRuntimePath = {
   ref: string;
   threadSelector: { type: "main" };

@@ -5,6 +5,11 @@ import {
 } from "../runtimes/core/ThreadManagerRuntimeCore";
 import { Unsubscribe } from "../types";
 import { ThreadManagerRuntimePath } from "./RuntimePathTypes";
+import {
+  ThreadManagerItemRuntime,
+  ThreadManagerItemRuntimeImpl,
+} from "./ThreadManagerItemRuntime";
+import { SKIP_UPDATE } from "./subscribable/SKIP_UPDATE";
 
 export type ThreadManagerState = Readonly<{
   threads: readonly ThreadManagerMetadata[];
@@ -21,6 +26,9 @@ export type ThreadManagerRuntime = Readonly<{
   delete(threadId: string): Promise<void>;
 
   subscribe(callback: () => void): Unsubscribe;
+
+  getThreadManagerItemByIndex(idx: number): ThreadManagerItemRuntime;
+  getThreadManagerArchivedItemByIndex(idx: number): ThreadManagerItemRuntime;
 }>;
 
 const getThreadManagerState = (
@@ -76,5 +84,43 @@ export class ThreadManagerRuntimeImpl implements ThreadManagerRuntime {
 
   public subscribe(callback: () => void): Unsubscribe {
     return this._core.subscribe(callback);
+  }
+
+  public getThreadManagerItemByIndex(idx: number) {
+    return new ThreadManagerItemRuntimeImpl(
+      new LazyMemoizeSubject({
+        path: {
+          ref: this.path.ref + `${this.path.ref}.threadItem[${idx}]`,
+          threadSelector: { type: "index", index: idx },
+        },
+        getState: () => {
+          const threads = this.getState().threads;
+          const thread = threads[idx];
+          if (!thread) return SKIP_UPDATE;
+          return thread;
+        },
+        subscribe: (callback) => this._core.subscribe(callback),
+      }),
+      this._core,
+    );
+  }
+
+  public getThreadManagerArchivedItemByIndex(idx: number) {
+    return new ThreadManagerItemRuntimeImpl(
+      new LazyMemoizeSubject({
+        path: {
+          ref: this.path.ref + `${this.path.ref}.threadItem[${idx}]`,
+          threadSelector: { type: "archive-index", index: idx },
+        },
+        getState: () => {
+          const threads = this.getState().archivedThreads;
+          const thread = threads[idx];
+          if (!thread) return SKIP_UPDATE;
+          return thread;
+        },
+        subscribe: (callback) => this._core.subscribe(callback),
+      }),
+      this._core,
+    );
   }
 }
