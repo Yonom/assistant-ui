@@ -43,6 +43,7 @@ const transpileTypescript = async () => {
     minify: false,
     sourcemap: true,
     splitting: false,
+    silent: true,
 
     esbuildPlugins: [esbuildPluginFilePathExtensions()],
   });
