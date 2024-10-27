@@ -7,7 +7,8 @@ export type ThreadManagerItemRuntimePath = {
   threadSelector:
     | { type: "main" }
     | { type: "index"; index: number }
-    | { type: "archive-index"; index: number };
+    | { type: "archiveIndex"; index: number }
+    | { type: "threadId"; threadId: string };
 };
 
 export type ThreadRuntimePath = {

@@ -12,6 +12,8 @@ export type ThreadManagerRuntimeCore = {
   threads: readonly ThreadManagerMetadata[];
   archivedThreads: readonly ThreadManagerMetadata[];
 
+  getThreadMetadataById(threadId: string): ThreadManagerMetadata | undefined;
+
   switchToThread(threadId: string): void;
   switchToNewThread(): void;
 
