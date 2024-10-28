@@ -1,21 +1,29 @@
-import { ChunkReqPayload, TrieveSDK } from "trieve-ts-sdk";
+import { TrieveFetchClient, TrieveSDK } from "trieve-ts-sdk";
 import * as fs from "node:fs";
-import { DocumentRecord } from "fumadocs-core/search/algolia";
 import { env } from "node:process";
 import "dotenv/config";
 
 let trieve = new TrieveSDK({
-  apiKey: env["NEXT_PUBLIC_TRIEVE_API_KEY"] as string,
-  datasetId: env["NEXT_PUBLIC_TRIEVE_DATASET_ID"] as string,
+  apiKey: env["TRIEVE_ADMIN_API_KEY"],
+  datasetId: env["TRIEVE_DATASET_ID"],
 });
 
 const content = fs.readFileSync(".next/server/app/static.json.body");
 
-const pages = JSON.parse(content.toString()) as DocumentRecord[];
+const pages = JSON.parse(content.toString());
 
 sync(trieve, pages);
 
-async function sync(trieve: TrieveSDK, pages: DocumentRecord[]) {
+async function sync(trieve, pages) {
+  // Clear Dataset Chunks
+  await trieve.trieve.fetch(
+    `/api/dataset/clear/${env["TRIEVE_DATASET_ID"]}`,
+    "put",
+    {
+      datasetId: env["TRIEVE_DATASET_ID"],
+    },
+  );
+
   let documents = pages.flatMap(toTrievePayload);
   const chunkSize = 120;
   const chunks = [];
@@ -24,20 +32,16 @@ async function sync(trieve: TrieveSDK, pages: DocumentRecord[]) {
     chunks.push(chunk);
   }
   for (const chunk of chunks) {
-    trieve.createChunk(chunk);
+    await trieve.createChunk(chunk);
   }
 }
 
-function toTrievePayload(page: DocumentRecord) {
+function toTrievePayload(page) {
   let id = 0;
-  const chunks: ChunkReqPayload[] = [];
-  const scannedHeadings = new Set<string>();
+  const chunks = [];
+  const scannedHeadings = new Set();
 
-  function createPayload(
-    section: string | undefined,
-    sectionId: string | undefined,
-    content: string,
-  ): ChunkReqPayload {
+  function createPayload(section, sectionId, content) {
     return {
       tracking_id: `${page._id}-${(id++).toString()}`,
       chunk_html: content,
