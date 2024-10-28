@@ -67,41 +67,9 @@ function groupResults(results: GroupChunk[]): SortedResult[] {
 }
 
 export default function TrieveSearchDialog(props: SharedProps) {
-  const trieveSDK = new TrieveSDK({
-    apiKey: process.env["NEXT_PUBLIC_TRIEVE_API_KEY"] as string,
-    datasetId: process.env["NEXT_PUBLIC_TRIEVE_DATASET_ID"] as string,
-  });
-
   const [results, setResults] = useState<SortedResult[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  function groupResults(results: GroupChunk[]): SortedResult[] {
-    const grouped: SortedResult[] = [];
-
-    for (const result of results) {
-      grouped.push({
-        id: result.group.id,
-        type: "page",
-        url: result.chunks[0]?.chunk.link || "",
-        content: result.group.name,
-      });
-
-      for (const c of result.chunks) {
-        const chunk = c.chunk;
-        grouped.push({
-          id: chunk.tracking_id || "",
-          type:
-            chunk.chunk_html === chunk.metadata["section"] ? "heading" : "text",
-          url: chunk.metadata["section_id"]
-            ? `${chunk.link}#${chunk.metadata["section_id"]}`
-            : chunk.link || "",
-          content: chunk.chunk_html || "",
-        });
-      }
-    }
-    return grouped;
-  }
 
   useEffect(() => {
     if (!search) {
