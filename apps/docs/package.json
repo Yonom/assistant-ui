@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "pnpm build:docs && next build && tsx ./lib/update-index.mts",
+    "build": "pnpm build:docs && next build",
     "build:docs": "tsx ./scripts/generate-docs.mts",
     "dev": "next dev --turbo",
     "start": "next start",

@@ -88,7 +88,7 @@ export default function TrieveSearchDialog(props: SharedProps) {
       });
 
       for (const c of result.chunks) {
-        let chunk = c.chunk;
+        const chunk = c.chunk;
         grouped.push({
           id: chunk.tracking_id || "",
           type:
