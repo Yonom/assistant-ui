@@ -69,13 +69,27 @@ export const useLangGraphRuntime = ({
   });
 
   return useExternalStoreRuntime({
-    threadId,
     isRunning,
     messages: threadMessages,
     adapters: {
       attachments: unstable_allowImageAttachments
         ? new SimpleImageAttachmentAdapter()
         : undefined,
+      threadList: {
+        threadId,
+        onSwitchToNewThread: !onSwitchToNewThread
+          ? undefined
+          : async () => {
+              await onSwitchToNewThread();
+              setMessages([]);
+            },
+        onSwitchToThread: !onSwitchToThread
+          ? undefined
+          : async (threadId) => {
+              const { messages } = await onSwitchToThread(threadId);
+              setMessages(messages);
+            },
+      },
     },
     onNew: (msg) => {
       const cancellations =
@@ -133,17 +147,5 @@ export const useLangGraphRuntime = ({
         },
       ]);
     },
-    onSwitchToNewThread: !onSwitchToNewThread
-      ? undefined
-      : async () => {
-          await onSwitchToNewThread();
-          setMessages([]);
-        },
-    onSwitchToThread: !onSwitchToThread
-      ? undefined
-      : async (threadId) => {
-          const { messages } = await onSwitchToThread(threadId);
-          setMessages(messages);
-        },
   });
 };

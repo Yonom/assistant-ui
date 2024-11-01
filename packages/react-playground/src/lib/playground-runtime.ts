@@ -81,11 +81,11 @@ class PlaygroundThreadListRuntimeCore
     throw new Error("Method not implemented.");
   }
 
-  public switchToThread(): void {
+  public switchToThread(): Promise<void> {
     throw new Error("Method not implemented.");
   }
 
-  public switchToNewThread(): void {
+  public async switchToNewThread(): Promise<void> {
     this._mainThread = this.threadFactory(generateId());
     this.notifySubscribers();
   }
@@ -118,7 +118,10 @@ class PlaygroundThreadListRuntimeCore
 class PlaygroundRuntimeCore extends BaseAssistantRuntimeCore {
   public readonly threadList;
 
-  constructor(adapter: ChatModelAdapter, initialMessages: CoreMessage[]) {
+  constructor(
+    adapter: ChatModelAdapter,
+    initialMessages: readonly CoreMessage[],
+  ) {
     super();
 
     this.threadList = new PlaygroundThreadListRuntimeCore((threadId) => {
@@ -276,7 +279,6 @@ export class PlaygroundThreadRuntimeCore implements INTERNAL.ThreadRuntimeCore {
         messages,
         abortSignal: this.abortController.signal,
         config: this.configProvider.getModelConfig(),
-        onUpdate: updateMessage,
       });
 
       if (Symbol.asyncIterator in promiseOrGenerator) {
@@ -633,19 +635,12 @@ class PlaygroundRuntimeImpl
 }
 
 export const usePlaygroundRuntime = ({
-  initialMessages,
-  maxToolRoundtrips,
-  maxSteps,
-  ...runtimeOptions
-}: EdgeRuntimeOptions & {
-  initialMessages: CoreMessage[];
-}) => {
+  initialMessages = [],
+  ...options
+}: EdgeRuntimeOptions) => {
   const [runtime] = useState(
     () =>
-      new PlaygroundRuntimeCore(
-        new EdgeChatAdapter(runtimeOptions),
-        initialMessages,
-      ),
+      new PlaygroundRuntimeCore(new EdgeChatAdapter(options), initialMessages),
   );
 
   return useMemo(() => PlaygroundRuntimeImpl.create(runtime), [runtime]);
