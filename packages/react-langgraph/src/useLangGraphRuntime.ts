@@ -107,7 +107,7 @@ export const useLangGraphRuntime = ({
 
       const allContent = [
         ...msg.content,
-        ...(msg.attachments?.flatMap((a) => a.content) ?? []),
+        ...msg.attachments.flatMap((a) => a.content),
       ];
 
       return handleSendMessage([

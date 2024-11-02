@@ -33,6 +33,7 @@ export type ThreadMessageLike = {
   createdAt?: Date | undefined;
   status?: MessageStatus | undefined;
   attachments?: CompleteAttachment[] | undefined;
+  // TODO metadata
 };
 
 export const fromThreadMessageLike = (
