@@ -50,7 +50,7 @@
     "@types/react": "*",
     "react": "^18 || ^19 || ^19.0.0-rc",
     "tailwindcss": "^3.4.4",
-    "trieve-ts-sdk": "^0.0.15"
+    "trieve-ts-sdk": ">= 0.0.14"
   },
   "peerDependenciesMeta": {
     "@types/react": {
