@@ -1,8 +1,8 @@
 # @assistant-ui/react
 
-## 0.6.0
+## 0.7.0
 
-### Minor Changes
+### Breaking Changes
 
 - c6e886b: refactor!: drop deprecated features
 
