@@ -50,8 +50,8 @@ const getMessageContent = (msg: AppendMessage) => {
     }
   });
 
-  if (content.length === 1 && content[0]!.type === "text") {
-    return content[0]!.text!;
+  if (content.length === 1 && content[0]?.type === "text") {
+    return content[0].text ?? "";
   }
 
   return content;
