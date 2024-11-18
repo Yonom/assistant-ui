@@ -1,0 +1,27 @@
+name: TestDriver.ai
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: "TestDriver"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: testdriverai/action@main
+        with:
+          key: ${{secrets.TESTDRIVER_API_KEY}}
+          prompt: |
+            1. /run testdriver/test.yml
+          prerun: |
+            cd $env:TEMP
+            npm init -y
+            npm install dashcam-chrome
+            Start-Process "C:/Program Files/Google/Chrome/Application/chrome.exe" -ArgumentList "--start-maximized", "--load-extension=$(pwd)/node_modules/dashcam-chrome/build", "https://www.assistant-ui.com/"
+            exit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORCE_COLOR: "3"

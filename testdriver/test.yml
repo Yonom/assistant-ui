@@ -1,0 +1,141 @@
+version: 4.1.27
+steps:
+  - prompt: focus chrome
+    commands:
+      - command: focus-application
+        name: Google Chrome
+  - prompt: >-
+      click on the moon icon in the header section and check if the theme
+      changes to dark, if yes click on the sun icon next to it and check if the
+      theme changes to light
+    commands:
+      - command: focus-application
+        name: Google Chrome
+      - command: hover-image
+        description: moon icon in the header section
+        action: click
+      - command: assert
+        expect: the theme changes to dark
+      - command: hover-image
+        description: sun icon next to the moon icon
+        action: click
+      - command: assert
+        expect: the theme changes to light
+  - prompt: >-
+      scroll down just a bit and click on "write a poem" and expect a valid
+      response
+    commands:
+      - command: focus-application
+        name: Google Chrome
+      - command: scroll
+        direction: down
+      - command: hover-text
+        text: write a poem
+        description: button to generate a poem
+        action: click
+      - command: assert
+        expect: a valid poem is displayed
+  - prompt: >-
+      focus chrome, click on the pen icon, then click on chatgpt 3.5 and select
+      codellama, click on write a message and ask a programming question and
+      validate the response
+    commands:
+      - command: focus-application
+        name: Google Chrome
+      - command: hover-image
+        description: pen icon next to the new chat button
+        action: click
+      - command: hover-text
+        text: ChatGPT 3.5
+        description: chatgpt 3.5 option in the dropdown
+        action: click
+      - command: hover-text
+        text: CodeLlama
+        description: codellama option in the dropdown
+        action: click
+      - command: hover-text
+        text: Write a message
+        description: write a message input field
+        action: click
+      - command: type
+        text: What is a binary search algorithm?
+      - command: press-keys
+        keys:
+          - enter
+      - command: assert
+        expect: the response explains binary search algorithm
+  - prompt: >-
+      focus chrome, click on "Modal", a chatbot icon will appear at the bottom
+      right click on it, ask a physics question and press enter and validate the
+      reponse, if the response is correct then close the assistant by clicking
+    commands:
+      - command: focus-application
+        name: Google Chrome
+      - command: hover-text
+        text: Modal
+        description: modal button in the webpage
+        action: click
+      - command: hover-image
+        description: chatbot icon in the bottom right
+        action: click
+      - command: type
+        text: What is the speed of light?
+      - command: press-keys
+        keys:
+          - enter
+      - command: assert
+        expect: the response is correct
+  - prompt: >-
+      focus chrome, click on "ChatGPT Theme" and click on reload button and
+      verify the answer, click on Message Chatgpt, ask a chemistry ques, press
+      enter and validate the response
+    commands:
+      - command: focus-application
+        name: Google Chrome
+      - command: hover-text
+        text: ChatGPT Theme
+        description: theme selection option
+        action: click
+      - command: hover-image
+        description: reload icon in the chat window
+        action: click
+      - command: assert
+        expect: the response is reloaded
+      - command: hover-text
+        text: Message ChatGPT
+        description: chat input area
+        action: click
+      - command: type
+        text: What is the chemical formula for water?
+      - command: press-keys
+        keys:
+          - enter
+      - command: assert
+        expect: ChatGPT provides a response
+  - prompt: >-
+      focus chrome, click on "Claude Theme", click on Retry button and verify
+      the answer, click on Reply to Claude ask a math question and verify the
+      response.
+    commands:
+      - command: focus-application
+        name: Google Chrome
+      - command: hover-text
+        text: Claude Theme
+        description: theme selection option
+        action: click
+      - command: hover-text
+        text: Retry
+        description: retry button for verification
+        action: click
+      - command: assert
+        expect: the answer is verified
+      - command: hover-text
+        text: Reply to Claude
+        description: reply option to interact with Claude
+        action: click
+      - command: type
+        text: What is 2 + 2?
+      - command: press-keys
+        keys: [enter]
+      - command: assert
+        expect: the response is correct
