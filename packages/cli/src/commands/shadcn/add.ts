@@ -1,8 +1,8 @@
 import { Command } from "commander";
 import { spawn } from "cross-spawn";
 
-const REGISTRY_BASE_URL = "https://r.assistant-ui.com/";
-const SHADCN_COMPONENT_BASE_URL = `${REGISTRY_BASE_URL}shadcn`;
+const REGISTRY_BASE_URL = "https://r.assistant-ui.com";
+const SHADCN_COMPONENT_BASE_URL = `${REGISTRY_BASE_URL}/shadcn`;
 
 export const shadcnAdd = new Command()
   .name("add")
@@ -17,9 +17,12 @@ export const shadcnAdd = new Command()
   )
   .option("-p, --path <path>", "the path to add the component to.")
   .action((components: string[], opts) => {
-    const componentsToAdd = components.map(
-      (c) => `${SHADCN_COMPONENT_BASE_URL}${c}`,
-    );
+    const componentsToAdd = components.map((c) => {
+      if (!/^[a-zA-Z0-9-\/]+$/.test(c)) {
+        throw new Error(`Invalid component name: ${c}`);
+      }
+      return `${SHADCN_COMPONENT_BASE_URL}/${encodeURIComponent(c)}`;
+    });
 
     const args = [`shadcn@latest`, "add", ...componentsToAdd];
 
