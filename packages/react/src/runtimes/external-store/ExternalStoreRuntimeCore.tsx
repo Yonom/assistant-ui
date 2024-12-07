@@ -22,6 +22,7 @@ export class ExternalStoreRuntimeCore extends BaseAssistantRuntimeCore {
   }
 
   public setStore(store: ExternalStoreAdapter<any>) {
+    // Update the thread list adapter and propagate store changes to the main thread
     this.threadList.__internal_setAdapter(getThreadListAdapter(store));
     this.threadList.getMainThreadRuntimeCore().__internal_setStore(store);
   }
