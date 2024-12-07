@@ -83,11 +83,15 @@ export class LocalThreadRuntimeCore
     if (hasUpdates) this._notifySubscribers();
   }
 
-  public async append(message: AppendMessage): Promise<void> {
+  private _ensureInitialized() {
     if (!this._isInitialized) {
       this._isInitialized = true;
       this._notifyEventSubscribers("initialize");
     }
+  }
+
+  public async append(message: AppendMessage): Promise<void> {
+    this._ensureInitialized();
 
     const newMessage = fromCoreMessage(message, {
       attachments: message.attachments,
@@ -104,10 +108,7 @@ export class LocalThreadRuntimeCore
   }
 
   public async startRun(parentId: string | null): Promise<void> {
-    if (!this._isInitialized) {
-      this._isInitialized = true;
-      this._notifyEventSubscribers("initialize");
-    }
+    this._ensureInitialized();
 
     this.repository.resetHead(parentId);
 

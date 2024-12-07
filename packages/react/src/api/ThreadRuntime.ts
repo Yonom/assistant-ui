@@ -86,7 +86,7 @@ export type ThreadListItemRuntimeBinding = SubscribableWithState<
 export type ThreadState = {
   /**
    * The thread ID.
-   * @deprecated This field is deprecated and will be removed in 0.8.0. Use `metadata.threadId` instead.
+   * @deprecated This field is deprecated and will be removed in 0.8.0. Use `useThreadListItem().id` instead.
    */
   readonly threadId: string;
 
@@ -139,7 +139,7 @@ export const getThreadState = (
 ): ThreadState => {
   const lastMessage = runtime.messages.at(-1);
   return Object.freeze({
-    threadId: threadListItemState.threadId,
+    threadId: threadListItemState.id,
     metadata: threadListItemState,
     capabilities: runtime.capabilities,
     isDisabled: runtime.isDisabled,

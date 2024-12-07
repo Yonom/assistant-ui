@@ -123,9 +123,10 @@ export class LocalThreadListRuntimeCore implements ThreadListRuntimeCore {
         );
         break;
 
-      default:
+      default: {
         const _exhaustiveCheck: never = lastState;
         throw new Error(`Unsupported state: ${_exhaustiveCheck}`);
+      }
     }
 
     // newState
@@ -143,9 +144,10 @@ export class LocalThreadListRuntimeCore implements ThreadListRuntimeCore {
         data.dispose();
         break;
 
-      default:
+      default: {
         const _exhaustiveCheck: never = newState;
         throw new Error(`Unsupported state: ${_exhaustiveCheck}`);
+      }
     }
 
     if (newState !== "deleted") {

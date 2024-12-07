@@ -24,7 +24,7 @@ export type ThreadListRuntimeCore = {
 
   // getLoadThreadsPromise(): Promise<void>;
   // getLoadArchivedThreadsPromise(): Promise<void>;
-  // create(): Promise<ThreadListItemCoreState>;
+
   rename(threadId: string, newTitle: string): Promise<void>;
   archive(threadId: string): Promise<void>;
   unarchive(threadId: string): Promise<void>;
