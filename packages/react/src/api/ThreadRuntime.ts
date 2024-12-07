@@ -4,7 +4,6 @@ import {
   ThreadRuntimeCore,
   SpeechState,
   ThreadRuntimeEventType,
-  ThreadMetadata,
 } from "../runtimes/core/ThreadRuntimeCore";
 import { ExportedMessageRepository } from "../runtimes/utils/MessageRepository";
 import {
@@ -30,7 +29,12 @@ import {
 } from "./ComposerRuntime";
 import { LazyMemoizeSubject } from "./subscribable/LazyMemoizeSubject";
 import { SKIP_UPDATE } from "./subscribable/SKIP_UPDATE";
-import { MessageRuntimePath, ThreadRuntimePath } from "./RuntimePathTypes";
+import {
+  MessageRuntimePath,
+  ThreadListItemRuntimePath,
+  ThreadRuntimePath,
+} from "./RuntimePathTypes";
+import { ThreadListItemState } from "./ThreadListItemRuntime";
 
 export type CreateAppendMessage =
   | string
@@ -74,6 +78,11 @@ export type ThreadRuntimeCoreBinding = SubscribableWithState<
   outerSubscribe(callback: () => void): Unsubscribe;
 };
 
+export type ThreadListItemRuntimeBinding = SubscribableWithState<
+  ThreadListItemState,
+  ThreadListItemRuntimePath
+>;
+
 export type ThreadState = {
   /**
    * The thread ID.
@@ -83,8 +92,10 @@ export type ThreadState = {
 
   /**
    * The thread metadata.
+   *
+   * @deprecated Use `useThreadListItem()` instead. This field is deprecated and will be removed in 0.8.0.
    */
-  readonly metadata: ThreadMetadata;
+  readonly metadata: ThreadListItemState;
 
   /**
    * Whether the thread is disabled. Disabled threads cannot receive new messages.
@@ -122,11 +133,14 @@ export type ThreadState = {
   readonly speech: SpeechState | undefined;
 };
 
-export const getThreadState = (runtime: ThreadRuntimeCore): ThreadState => {
+export const getThreadState = (
+  runtime: ThreadRuntimeCore,
+  threadListItemState: ThreadListItemState,
+): ThreadState => {
   const lastMessage = runtime.messages.at(-1);
   return Object.freeze({
-    threadId: runtime.metadata.threadId,
-    metadata: runtime.metadata,
+    threadId: threadListItemState.threadId,
+    metadata: threadListItemState,
     capabilities: runtime.capabilities,
     isDisabled: runtime.isDisabled,
     isRunning:
@@ -208,11 +222,25 @@ export class ThreadRuntimeImpl implements ThreadRuntime {
     getStateState(): ThreadState;
   };
 
-  constructor(threadBinding: ThreadRuntimeCoreBinding) {
+  constructor(
+    threadBinding: ThreadRuntimeCoreBinding,
+    threadListItemBinding: ThreadListItemRuntimeBinding,
+  ) {
     const stateBinding = new LazyMemoizeSubject({
       path: threadBinding.path,
-      getState: () => getThreadState(threadBinding.getState()),
-      subscribe: (callback) => threadBinding.subscribe(callback),
+      getState: () =>
+        getThreadState(
+          threadBinding.getState(),
+          threadListItemBinding.getState(),
+        ),
+      subscribe: (callback) => {
+        const sub1 = threadBinding.subscribe(callback);
+        const sub2 = threadListItemBinding.subscribe(callback);
+        return () => {
+          sub1();
+          sub2();
+        };
+      },
     });
 
     this._threadBinding = {

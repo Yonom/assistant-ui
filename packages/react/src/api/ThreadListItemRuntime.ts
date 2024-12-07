@@ -1,11 +1,16 @@
-import { ThreadMetadata } from "../runtimes/core/ThreadRuntimeCore";
 import { Unsubscribe } from "../types";
 import { ThreadListItemRuntimePath } from "./RuntimePathTypes";
 import { SubscribableWithState } from "./subscribable/Subscribable";
 import { ThreadListRuntimeCoreBinding } from "./ThreadListRuntime";
 
-export type ThreadListItemState = ThreadMetadata & {
+export type ThreadListItemEventType = "switched-to" | "switched-away";
+
+export type ThreadListItemState = {
   readonly isMain: boolean;
+
+  readonly threadId: string;
+  readonly state: "archived" | "regular" | "new" | "deleted";
+  readonly title?: string | undefined;
 };
 
 export type ThreadListItemRuntime = {
@@ -19,6 +24,11 @@ export type ThreadListItemRuntime = {
   delete(): Promise<void>;
 
   subscribe(callback: () => void): Unsubscribe;
+
+  unstable_on(
+    event: ThreadListItemEventType,
+    callback: () => void,
+  ): Unsubscribe;
 };
 
 export type ThreadListItemStateBinding = SubscribableWithState<
@@ -67,6 +77,17 @@ export class ThreadListItemRuntimeImpl implements ThreadListItemRuntime {
     const state = this._core.getState();
 
     return this._threadListBinding.delete(state.threadId);
+  }
+
+  public unstable_on(event: ThreadListItemEventType, callback: () => void) {
+    const isMain = this._core.getState().isMain;
+    return this.subscribe(() => {
+      const newIsMain = this._core.getState().isMain;
+      if (isMain === newIsMain) return;
+      if (event === "switched-to" && newIsMain) return;
+      if (event === "switched-away" && !newIsMain) return;
+      callback();
+    });
   }
 
   public subscribe(callback: () => void): Unsubscribe {

@@ -14,12 +14,13 @@ import {
   ThreadRuntimeCore,
 } from "../core/ThreadRuntimeCore";
 import { BaseThreadRuntimeCore } from "../core/BaseThreadRuntimeCore";
-import { LocalThreadMetadataRuntimeCore } from "./LocalThreadMetadataRuntimeCore";
 
 export class LocalThreadRuntimeCore
   extends BaseThreadRuntimeCore
   implements ThreadRuntimeCore
 {
+  private _isInitialized = false;
+
   public readonly capabilities = {
     switchToBranch: true,
     edit: true,
@@ -42,11 +43,10 @@ export class LocalThreadRuntimeCore
 
   constructor(
     configProvider: ModelConfigProvider,
-    threadId: string,
     options: LocalRuntimeOptionsBase,
   ) {
-    super(configProvider, new LocalThreadMetadataRuntimeCore(threadId));
-    this.setOptions(options);
+    super(configProvider);
+    this.__internal_setOptions(options);
   }
 
   private _options!: LocalRuntimeOptionsBase;
@@ -55,7 +55,7 @@ export class LocalThreadRuntimeCore
     return undefined;
   }
 
-  public setOptions(options: LocalRuntimeOptionsBase) {
+  public __internal_setOptions(options: LocalRuntimeOptionsBase) {
     if (this._options === options) return;
 
     this._options = options;
@@ -83,14 +83,11 @@ export class LocalThreadRuntimeCore
     if (hasUpdates) this._notifySubscribers();
   }
 
-  private _transitionAwayFromNewState() {
-    if (this.metadata.state === "new") {
-      this.metadata.create();
-    }
-  }
-
   public async append(message: AppendMessage): Promise<void> {
-    this._transitionAwayFromNewState();
+    if (!this._isInitialized) {
+      this._isInitialized = true;
+      this._notifyEventSubscribers("initialize");
+    }
 
     const newMessage = fromCoreMessage(message, {
       attachments: message.attachments,
@@ -107,7 +104,10 @@ export class LocalThreadRuntimeCore
   }
 
   public async startRun(parentId: string | null): Promise<void> {
-    this._transitionAwayFromNewState();
+    if (!this._isInitialized) {
+      this._isInitialized = true;
+      this._notifyEventSubscribers("initialize");
+    }
 
     this.repository.resetHead(parentId);
 
