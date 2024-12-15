@@ -3,7 +3,7 @@ import { useCallback, useRef } from "react";
 export const useManagedRef = <TNode>(
   callback: (node: TNode) => (() => void) | void,
 ) => {
-  const cleanupRef = useRef<(() => void) | void>(undefined);
+  const cleanupRef = useRef<(() => void) | undefined>(undefined);
 
   const ref = useCallback(
     (el: TNode | null) => {
