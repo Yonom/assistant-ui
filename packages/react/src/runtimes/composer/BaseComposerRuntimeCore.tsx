@@ -137,14 +137,14 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
     return () => this._subscriptions.delete(callback);
   }
 
-  public _notifyEventSubscribers(event: ComposerRuntimeEventType) {
+  private _eventSubscribers = new Map<string, Set<() => void>>();
+
+  protected _notifyEventSubscribers(event: ComposerRuntimeEventType) {
     const subscribers = this._eventSubscribers.get(event);
     if (!subscribers) return;
 
     for (const callback of subscribers) callback();
   }
-
-  private _eventSubscribers = new Map<string, Set<() => void>>();
 
   public unstable_on(event: ComposerRuntimeEventType, callback: () => void) {
     const subscribers = this._eventSubscribers.get(event);
