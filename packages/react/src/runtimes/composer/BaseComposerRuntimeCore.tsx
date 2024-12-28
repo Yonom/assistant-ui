@@ -155,7 +155,8 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
     }
 
     return () => {
-      const subscribers = this._eventSubscribers.get(event)!;
+      const subscribers = this._eventSubscribers.get(event);
+      if (!subscribers) return;
       subscribers.delete(callback);
     };
   }
