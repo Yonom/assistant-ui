@@ -128,6 +128,7 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
   }
 
   private _subscriptions = new Set<() => void>();
+
   protected notifySubscribers() {
     for (const callback of this._subscriptions) callback();
   }
@@ -137,7 +138,10 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
     return () => this._subscriptions.delete(callback);
   }
 
-  private _eventSubscribers = new Map<string, Set<() => void>>();
+  private _eventSubscribers = new Map<
+    ComposerRuntimeEventType,
+    Set<() => void>
+  >();
 
   protected _notifyEventSubscribers(event: ComposerRuntimeEventType) {
     const subscribers = this._eventSubscribers.get(event);
