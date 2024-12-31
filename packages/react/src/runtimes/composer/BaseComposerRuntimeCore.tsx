@@ -58,21 +58,27 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
   }
 
   public setText(value: string) {
+    if (this._text === value) return;
+
     this._text = value;
     this.notifySubscribers();
   }
 
   public setRole(role: MessageRole) {
+    if (this._role === role) return;
+
     this._role = role;
     this.notifySubscribers();
   }
 
   public setRunConfig(runConfig: RunConfig) {
+    if (this._runConfig === runConfig) return;
+
     this._runConfig = runConfig;
     this.notifySubscribers();
   }
 
-  private async _resetInternal() {
+  private _resetInternal() {
     // TODO attachmentAdapter.remove should be called here
     this._attachments = [];
     this._text = "";

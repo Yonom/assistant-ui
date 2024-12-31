@@ -90,7 +90,7 @@ const getEditComposerState = (
     text: runtime?.text ?? "",
     role: runtime?.role ?? "user",
     attachments: runtime?.attachments ?? EMPTY_ARRAY,
-    runConfig: runtime?.runConfig ?? {},
+    runConfig: runtime?.runConfig ?? EMPTY_OBJECT,
 
     value: runtime?.text ?? "",
   });

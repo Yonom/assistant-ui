@@ -51,6 +51,8 @@ export class LocalThreadRuntimeCore
 
   private _options!: LocalRuntimeOptionsBase;
 
+  private _lastRunConfig: RunConfig = {};
+
   public get extras() {
     return undefined;
   }
@@ -194,9 +196,10 @@ export class LocalThreadRuntimeCore
     }
 
     try {
+      this._lastRunConfig = runConfig ?? {};
       const promiseOrGenerator = this.adapters.chatModel.run({
         messages,
-        runConfig: runConfig ?? {},
+        runConfig: this._lastRunConfig,
         abortSignal: this.abortController.signal,
         config: this.getModelConfig(),
         unstable_assistantMessageId: message.id,
@@ -277,8 +280,7 @@ export class LocalThreadRuntimeCore
     this.repository.addOrUpdateMessage(parentId, message);
 
     if (added && shouldContinue(message)) {
-      // TODO mechanism for setting runConfig here
-      this.performRoundtrip(parentId, message, {});
+      this.performRoundtrip(parentId, message, this._lastRunConfig);
     }
   }
 }

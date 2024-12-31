@@ -147,6 +147,7 @@ export type ThreadAssistantMessage = MessageCommonProps & {
 };
 
 export type RunConfig = {
+  // TODO allow user customization via global type overrides
   custom?: unknown;
 };
 
