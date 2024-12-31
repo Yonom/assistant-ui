@@ -9,7 +9,7 @@ import {
   ComposerRuntimeCore,
   ComposerRuntimeEventType,
 } from "../core/ComposerRuntimeCore";
-import { MessageRole } from "../../types/AssistantTypes";
+import { MessageRole, RunConfig } from "../../types/AssistantTypes";
 
 const isAttachmentComplete = (a: Attachment): a is CompleteAttachment =>
   a.status.type === "complete";
@@ -51,9 +51,10 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
     return this._role;
   }
 
-  public setRole(role: MessageRole) {
-    this._role = role;
-    this.notifySubscribers();
+  private _runConfig: RunConfig = {};
+
+  get runConfig() {
+    return this._runConfig;
   }
 
   public setText(value: string) {
@@ -61,15 +62,27 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
     this.notifySubscribers();
   }
 
-  private _resetInternal() {
-    this._text = "";
-    this._role = "user";
-    this._attachments = [];
+  public setRole(role: MessageRole) {
+    this._role = role;
     this.notifySubscribers();
   }
 
-  public reset() {
-    this._resetInternal();
+  public setRunConfig(runConfig: RunConfig) {
+    this._runConfig = runConfig;
+    this.notifySubscribers();
+  }
+
+  private async _resetInternal() {
+    // TODO attachmentAdapter.remove should be called here
+    this._attachments = [];
+    this._text = "";
+    this._role = "user";
+    this._runConfig = {};
+    this.notifySubscribers();
+  }
+
+  public async reset() {
+    return this._resetInternal();
   }
 
   public async send() {
@@ -89,6 +102,7 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
       role: this.role,
       content: this.text ? [{ type: "text", text: this.text }] : [],
       attachments,
+      runConfig: this.runConfig,
     };
     this._resetInternal();
 
