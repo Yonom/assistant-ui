@@ -242,7 +242,7 @@ export class RemoteThreadListThreadListRuntimeCore
     if (threadId === undefined) {
       do {
         threadId = `__LOCALID_${generateId()}`;
-      } while (!!state.threadData[threadId]);
+      } while (state.threadData[threadId]);
 
       this._state.update({
         ...state,
