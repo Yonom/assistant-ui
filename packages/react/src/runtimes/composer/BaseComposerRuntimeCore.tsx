@@ -78,17 +78,33 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
     this.notifySubscribers();
   }
 
-  private _resetInternal() {
+  private _sendOrReset() {
     // TODO attachmentAdapter.remove should be called here
     this._attachments = [];
     this._text = "";
-    this._role = "user";
-    this._runConfig = {};
     this.notifySubscribers();
   }
 
   public async reset() {
-    return this._resetInternal();
+    if (
+      this._attachments.length === 0 &&
+      this._text === "" &&
+      this._role === "user" &&
+      Object.keys(this._runConfig).length === 0
+    ) {
+      return;
+    }
+
+    const attachments = this._attachments;
+    this._role = "user";
+    this._runConfig = {};
+
+    this._sendOrReset();
+
+    const adapter = this.getAttachmentAdapter();
+    if (adapter) {
+      await Promise.all(attachments.map((a) => adapter.remove(a)));
+    }
   }
 
   public async send() {
@@ -110,7 +126,7 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
       attachments,
       runConfig: this.runConfig,
     };
-    this._resetInternal();
+    this._sendOrReset();
 
     this.handleSend(message);
     this._notifyEventSubscribers("send");
