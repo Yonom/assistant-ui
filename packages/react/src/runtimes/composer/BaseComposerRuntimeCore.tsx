@@ -79,7 +79,6 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
   }
 
   private _sendOrReset() {
-    // TODO attachmentAdapter.remove should be called here
     this._attachments = [];
     this._text = "";
     this.notifySubscribers();
