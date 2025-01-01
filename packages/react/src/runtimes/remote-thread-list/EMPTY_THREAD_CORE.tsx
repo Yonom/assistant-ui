@@ -1,7 +1,7 @@
 import { ThreadRuntimeCore } from "../../internal";
 
 const EMPTY_THREAD_ERROR = new Error(
-  "This is the empty thread, a placeholder for the main thread. You cannot perform any actions on this thread instance. This error is probably because you tried to call a thread method in your render function. Call the method inside a `useEffect` hoolk instead.",
+  "This is the empty thread, a placeholder for the main thread. You cannot perform any actions on this thread instance. This error is probably because you tried to call a thread method in your render function. Call the method inside a `useEffect` hook instead.",
 );
 export const EMPTY_THREAD_CORE: ThreadRuntimeCore = {
   getMessageById() {
