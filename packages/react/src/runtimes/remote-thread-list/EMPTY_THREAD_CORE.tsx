@@ -144,7 +144,9 @@ export const EMPTY_THREAD_CORE: ThreadRuntimeCore = {
     return () => {};
   },
 
-  import() {},
+  import() {
+    throw EMPTY_THREAD_ERROR;
+  },
 
   export() {
     return { messages: [] };

@@ -11,13 +11,15 @@ type RemoteThreadListHookInstance = {
   runtime?: ThreadRuntimeCore;
 };
 export class RemoteThreadListHookInstanceManager extends BaseSubscribable {
-  private useRuntimeHook: UseBoundStore<StoreApi<RemoteThreadListHook>>;
+  private useRuntimeHook: UseBoundStore<
+    StoreApi<{ useRuntime: RemoteThreadListHook }>
+  >;
   private instances = new Map<string, RemoteThreadListHookInstance>();
   private useAliveThreadsKeysChanged = create(() => ({}));
 
   constructor(runtimeHook: RemoteThreadListHook) {
     super();
-    this.useRuntimeHook = create(() => runtimeHook);
+    this.useRuntimeHook = create(() => ({ useRuntime: runtimeHook }));
   }
 
   public startThreadRuntime(threadId: string) {
@@ -59,16 +61,16 @@ export class RemoteThreadListHookInstanceManager extends BaseSubscribable {
   }
 
   public setRuntimeHook(newRuntimeHook: RemoteThreadListHook) {
-    const prevRuntimeHook = this.useRuntimeHook.getState();
+    const prevRuntimeHook = this.useRuntimeHook.getState().useRuntime;
     if (prevRuntimeHook !== newRuntimeHook) {
-      this.useRuntimeHook.setState(newRuntimeHook, true);
+      this.useRuntimeHook.setState({ useRuntime: newRuntimeHook }, true);
     }
   }
 
   private _InnerActiveThreadProvider: FC = () => {
     const { id } = useThreadListItem();
 
-    const useRuntime = this.useRuntimeHook();
+    const { useRuntime } = this.useRuntimeHook();
     const runtime = useRuntime();
 
     const threadBinding = (runtime.thread as ThreadRuntimeImpl)

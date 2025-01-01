@@ -30,7 +30,7 @@ const ThreadListItemImpl: FC<ThreadListItemProps> = ({
       archived
         ? assistantRuntime.threadList.getArchivedItemByIndex(partIndex)
         : assistantRuntime.threadList.getItemByIndex(partIndex),
-    [assistantRuntime, partIndex],
+    [assistantRuntime, partIndex, archived],
   );
 
   const ThreadListItemComponent = components.ThreadListItem;

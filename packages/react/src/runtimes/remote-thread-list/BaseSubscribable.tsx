@@ -18,6 +18,21 @@ export class BaseSubscribable {
   }
 
   protected _notifySubscribers() {
-    for (const callback of this._subscribers) callback();
+    const errors = [];
+    for (const callback of this._subscribers) {
+      try {
+        callback();
+      } catch (error) {
+        errors.push(error);
+      }
+    }
+
+    if (errors.length > 0) {
+      if (errors.length === 1) {
+        throw errors[0];
+      } else {
+        throw new AggregateError(errors);
+      }
+    }
   }
 }

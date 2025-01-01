@@ -206,7 +206,7 @@ export class LocalThreadListRuntimeCore implements ThreadListRuntimeCore {
     const data = this._threadData.get(threadId);
     if (!data) throw new Error("Thread not found");
     if (data.status !== "regular" && data.status !== "archived")
-      throw new Error("Thread is not yet initalized");
+      throw new Error("Thread is not yet initialized");
 
     this._stateOp(threadId, "deleted");
     return Promise.resolve();

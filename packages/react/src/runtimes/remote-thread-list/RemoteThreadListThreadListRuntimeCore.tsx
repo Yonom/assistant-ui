@@ -5,7 +5,8 @@ import { RemoteThreadListHookInstanceManager } from "./RemoteThreadListHookInsta
 import { BaseSubscribable } from "./BaseSubscribable";
 import { EMPTY_THREAD_CORE } from "./EMPTY_THREAD_CORE";
 import { OptimisticState } from "./OptimisticState";
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, useEffect, useId } from "react";
+import { create } from "zustand";
 
 type RemoteThreadData = {
   readonly threadId: string;
@@ -367,7 +368,7 @@ export class RemoteThreadListThreadListRuntimeCore
     const data = this.getItemById(threadId);
     if (!data) throw new Error("Thread not found");
     if (data.status !== "regular" && data.status !== "archived")
-      throw new Error("Thread is not yet initalized");
+      throw new Error("Thread is not yet initialized");
 
     return this._state.optimisticUpdate({
       execute: async () => {
@@ -380,7 +381,22 @@ export class RemoteThreadListThreadListRuntimeCore
     });
   }
 
+  private useBoundIds = create<string[]>(() => []);
+
   public __internal_RenderThreadRuntimes: FC<PropsWithChildren> = () => {
+    const id = useId();
+    useEffect(() => {
+      this.useBoundIds.setState((s) => [...s, id], true);
+      return () => {
+        this.useBoundIds.setState((s) => s.filter((i) => i !== id), true);
+      };
+    }, []);
+
+    const boundIds = this.useBoundIds();
+
+    // only render if the component is the first one mounted
+    if (boundIds.length > 0 && boundIds[0] !== id) return;
+
     return <this._hookManager.__internal_RenderThreadRuntimes />;
   };
 }
