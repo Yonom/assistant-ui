@@ -78,7 +78,7 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
     this.notifySubscribers();
   }
 
-  private _sendOrReset() {
+  private _clearMessageState() {
     this._attachments = [];
     this._text = "";
     this.notifySubscribers();
@@ -98,7 +98,7 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
     this._role = "user";
     this._runConfig = {};
 
-    this._sendOrReset();
+    this._clearMessageState();
 
     const adapter = this.getAttachmentAdapter();
     if (adapter) {
@@ -125,7 +125,7 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
       attachments,
       runConfig: this.runConfig,
     };
-    this._sendOrReset();
+    this._clearMessageState();
 
     this.handleSend(message);
     this._notifyEventSubscribers("send");
