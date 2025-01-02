@@ -65,7 +65,7 @@ export const useCloudThreadListRuntime = (adapter: CloudThreadListAdapter) => {
           status: t.is_archived ? "archived" : "regular",
           remoteId: t.id,
           title: t.title,
-          externalId: t.external_id,
+          externalId: t.external_id ?? undefined,
         })),
       };
     },
