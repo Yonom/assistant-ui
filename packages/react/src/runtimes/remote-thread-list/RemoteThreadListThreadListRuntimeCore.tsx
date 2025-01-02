@@ -7,20 +7,27 @@ import { EMPTY_THREAD_CORE } from "./EMPTY_THREAD_CORE";
 import { OptimisticState } from "./OptimisticState";
 import { FC, PropsWithChildren, useEffect, useId } from "react";
 import { create } from "zustand";
+import { CloudInitializeResponse } from "./cloud/CloudContext";
 
 type RemoteThreadData =
   | {
       readonly threadId: string;
       readonly remoteId?: undefined;
+      readonly externalId?: undefined;
       readonly status: "new";
       readonly title: undefined;
     }
   | {
       readonly threadId: string;
       readonly remoteId: string;
+      readonly externalId: string | undefined;
       readonly status: "regular" | "archived";
       readonly title?: string | undefined;
     };
+
+const DEFAULT_RENDER_COMPONENT: FC<PropsWithChildren> = ({ children }) => {
+  return children;
+};
 
 type THREAD_MAPPING_ID = string & { __brand: "THREAD_MAPPING_ID" };
 function createThreadMappingId(id: string): THREAD_MAPPING_ID {
@@ -188,6 +195,7 @@ export class RemoteThreadListThreadListRuntimeCore
             newThreadData[mappingId] = {
               threadId: thread.remoteId,
               remoteId: thread.remoteId,
+              externalId: thread.externalId,
               status: thread.status,
               title: thread.title,
             };
@@ -213,10 +221,24 @@ export class RemoteThreadListThreadListRuntimeCore
     this.switchToNewThread();
   }
 
+  private useRenderComponent = create(() => ({
+    RenderComponent: DEFAULT_RENDER_COMPONENT,
+  }));
+
   public __internal_setAdapter(adapter: RemoteThreadListAdapter) {
+    if (this._adapter === adapter) return;
+
     this._adapter = adapter;
     this._disposeOldAdapter?.();
     this._disposeOldAdapter = this._adapter.onInitialize(this._onInitialize);
+
+    const RenderComponent =
+      adapter.__internal_RenderComponent ?? DEFAULT_RENDER_COMPONENT;
+    if (
+      RenderComponent !== this.useRenderComponent.getState().RenderComponent
+    ) {
+      this.useRenderComponent.setState({ RenderComponent }, true);
+    }
 
     this._hookManager.setRuntimeHook(adapter.runtimeHook);
   }
@@ -303,7 +325,7 @@ export class RemoteThreadListThreadListRuntimeCore
     return this.switchToThread(threadId);
   }
 
-  private _onInitialize = async (task: Promise<{ remoteId: string }>) => {
+  private _onInitialize = async (task: Promise<CloudInitializeResponse>) => {
     const threadId = this._state.value.newThreadId;
     if (!threadId)
       throw new Error(
@@ -317,7 +339,7 @@ export class RemoteThreadListThreadListRuntimeCore
       optimistic: (state) => {
         return updateStatusReducer(state, threadId, "regular");
       },
-      then: (state, { remoteId }) => {
+      then: (state, { remoteId, externalId }) => {
         const data = getThreadData(state, threadId);
         if (!data) return state;
 
@@ -333,6 +355,7 @@ export class RemoteThreadListThreadListRuntimeCore
             [threadId]: {
               ...data,
               remoteId,
+              externalId,
             },
           },
         };
@@ -435,7 +458,7 @@ export class RemoteThreadListThreadListRuntimeCore
 
   private useBoundIds = create<string[]>(() => []);
 
-  public __internal_RenderThreadRuntimes: FC<PropsWithChildren> = () => {
+  public __internal_RenderComponent: FC<PropsWithChildren> = ({ children }) => {
     const id = useId();
     useEffect(() => {
       this.useBoundIds.setState((s) => [...s, id], true);
@@ -445,10 +468,17 @@ export class RemoteThreadListThreadListRuntimeCore
     }, []);
 
     const boundIds = this.useBoundIds();
+    const { RenderComponent } = this.useRenderComponent();
 
-    // only render if the component is the first one mounted
-    if (boundIds.length > 0 && boundIds[0] !== id) return;
+    return (
+      <RenderComponent>
+        {(boundIds.length === 0 || boundIds[0] === id) && (
+          // only render if the component is the first one mounted
+          <this._hookManager.__internal_RenderThreadRuntimes />
+        )}
 
-    return <this._hookManager.__internal_RenderThreadRuntimes />;
+        {children}
+      </RenderComponent>
+    );
   };
 }
