@@ -36,21 +36,24 @@ type RemoteThreadState = {
   readonly threadData: Readonly<Record<THREAD_MAPPING_ID, RemoteThreadData>>;
 };
 
-const getThreadData = (state: RemoteThreadState, threadId: string) => {
-  const idx = state.threadIdMap[threadId];
+const getThreadData = (
+  state: RemoteThreadState,
+  threadIdOrRemoteId: string,
+) => {
+  const idx = state.threadIdMap[threadIdOrRemoteId];
   if (idx === undefined) return undefined;
   return state.threadData[idx];
 };
 
 const updateStatusReducer = (
   state: RemoteThreadState,
-  threadId: string,
+  threadIdOrRemoteId: string,
   newStatus: "regular" | "archived" | "deleted",
 ) => {
-  const data = getThreadData(state, threadId);
+  const data = getThreadData(state, threadIdOrRemoteId);
   if (!data) return state;
 
-  const { remoteId, status: lastStatus } = data;
+  const { threadId, remoteId, status: lastStatus } = data;
   if (lastStatus === newStatus) return state;
 
   const newState = { ...state };
@@ -257,7 +260,7 @@ export class RemoteThreadListThreadListRuntimeCore
       task.then(() => this._notifySubscribers());
     }
 
-    if (data.status === "archived") void this.unarchive(data.threadId);
+    if (data.status === "archived") await this.unarchive(data.threadId);
     this._mainThreadId = data.threadId;
 
     this._notifySubscribers();
