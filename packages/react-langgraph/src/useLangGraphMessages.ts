@@ -7,7 +7,7 @@ export type LangGraphCommand = {
   resume: string;
 };
 
-export type LangGraphStreamConfig = {
+export type LangGraphSendMessageConfig = {
   command?: LangGraphCommand;
   runConfig?: unknown;
 };
@@ -17,7 +17,7 @@ export const useLangGraphMessages = <TMessage>({
 }: {
   stream: (
     messages: TMessage[],
-    config: LangGraphStreamConfig,
+    config: LangGraphSendMessageConfig,
   ) => Promise<
     AsyncGenerator<{
       event: string;
@@ -28,7 +28,7 @@ export const useLangGraphMessages = <TMessage>({
   const [messages, setMessages] = useState<TMessage[]>([]);
 
   const sendMessage = useCallback(
-    async (newMessages: TMessage[], config: LangGraphStreamConfig) => {
+    async (newMessages: TMessage[], config: LangGraphSendMessageConfig) => {
       const optimisticMessages = [...messages, ...newMessages];
       if (newMessages.length > 0) {
         setMessages(optimisticMessages);

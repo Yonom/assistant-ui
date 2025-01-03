@@ -8,7 +8,7 @@ import {
 import { convertLangchainMessages } from "./convertLangchainMessages";
 import {
   LangGraphCommand,
-  LangGraphStreamConfig as LangGraphSendMessageConfig,
+  LangGraphSendMessageConfig,
   useLangGraphMessages,
 } from "./useLangGraphMessages";
 import { SimpleImageAttachmentAdapter } from "@assistant-ui/react";
@@ -64,15 +64,30 @@ const getMessageContent = (msg: AppendMessage) => {
   return content;
 };
 
+const symbolLangGraphRuntimeExtras = Symbol("langgraph-runtime-extras");
 type LangGraphRuntimeExtras = {
+  [symbolLangGraphRuntimeExtras]: true;
   send: (
     messages: LangChainMessage[],
     config: LangGraphSendMessageConfig,
   ) => Promise<void>;
 };
 
+const asLangGraphRuntimeExtras = (extras: unknown): LangGraphRuntimeExtras => {
+  if (
+    typeof extras !== "object" ||
+    extras == null ||
+    !(symbolLangGraphRuntimeExtras in extras)
+  )
+    throw new Error(
+      "This method can only be called when you are using useLangGraphRuntime",
+    );
+
+  return extras as LangGraphRuntimeExtras;
+};
+
 export const useLangGraphRuntimeSend = () => {
-  const { send } = useThread((t) => t.extras as LangGraphRuntimeExtras);
+  const { send } = useThread((t) => asLangGraphRuntimeExtras(t.extras));
   return send;
 };
 
@@ -195,6 +210,7 @@ export const useLangGraphRuntime = ({
       threadList,
     },
     extras: {
+      [symbolLangGraphRuntimeExtras]: true,
       send: handleSendMessage,
     } satisfies LangGraphRuntimeExtras,
     onNew: (msg) => {
@@ -225,6 +241,7 @@ export const useLangGraphRuntime = ({
       );
     },
     onAddToolResult: async ({ toolCallId, toolName, result }) => {
+      // TODO parallel human in the loop calls
       await handleSendMessage(
         [
           {
@@ -234,6 +251,7 @@ export const useLangGraphRuntime = ({
             content: JSON.stringify(result),
           },
         ],
+        // TODO reuse runconfig here!
         {},
       );
     },
