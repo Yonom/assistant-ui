@@ -47,11 +47,11 @@ export class DefaultEditComposerRuntimeCore extends BaseComposerRuntimeCore {
     }
 
     this.endEditCallback();
-    this.notifySubscribers();
+    this._notifySubscribers();
   }
 
   public handleCancel() {
     this.endEditCallback();
-    this.notifySubscribers();
+    this._notifySubscribers();
   }
 }
