@@ -1,5 +1,11 @@
 # @assistant-ui/react-langgraph
 
+## 0.1.10
+
+### Patch Changes
+
+- 18c21b2: feat: cancellation support
+
 ## 0.1.9
 
 ### Patch Changes
