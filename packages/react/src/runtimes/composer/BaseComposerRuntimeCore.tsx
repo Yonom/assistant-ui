@@ -116,7 +116,6 @@ export abstract class BaseComposerRuntimeCore
   public async clearAttachments() {
     const task = this._onClearAttachments();
     this.setAttachments([]);
-    this._notifySubscribers();
 
     await task;
   }
