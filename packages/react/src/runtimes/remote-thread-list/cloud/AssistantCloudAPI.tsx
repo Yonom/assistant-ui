@@ -39,7 +39,7 @@ export class AssistantCloudAPI {
   public async makeRequest(
     endpoint: string,
     options: {
-      method?: string;
+      method?: "POST" | "PUT" | "DELETE" | undefined;
       query?: Record<string, string | number | boolean> | undefined;
       body?: object | undefined;
     } = {},
@@ -53,7 +53,7 @@ export class AssistantCloudAPI {
     const queryParams = new URLSearchParams();
     if (options.query) {
       for (const [key, value] of Object.entries(options.query)) {
-        if (!value) continue;
+        if (value === false) continue;
         if (value === true) {
           queryParams.set(key, "true");
         } else {
@@ -72,6 +72,7 @@ export class AssistantCloudAPI {
     });
 
     if (!response.ok) {
+      // TODO better error handling
       throw new Error(`Request failed with status ${response.status}`);
     }
 

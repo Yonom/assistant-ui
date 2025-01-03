@@ -19,7 +19,7 @@ export class AssistantCloudJWTAuthStrategy
     this.#authTokenCallback = authTokenCallback;
   }
 
-  private getJwtExpiry(jwt: string): number | null {
+  private getJwtExpiry(jwt: string): number {
     try {
       const bodyPart = jwt.split(".").at(1);
       if (!bodyPart) {
@@ -27,7 +27,10 @@ export class AssistantCloudJWTAuthStrategy
       }
 
       // Base64Url decode
-      const payload = atob(bodyPart.replace(/-/g, "+").replace(/_/g, "/"));
+      const payload = Buffer.from(
+        bodyPart.replace(/-/g, "+").replace(/_/g, "/"),
+        "base64",
+      ).toString();
       const payloadObj = JSON.parse(payload);
 
       const exp = payloadObj.exp;
@@ -38,8 +41,7 @@ export class AssistantCloudJWTAuthStrategy
       // Convert exp to milliseconds
       return exp * 1000;
     } catch (error) {
-      console.error("Failed to extract JWT expiry:", error);
-      return null;
+      throw new Error("Unable to determine the token expiry " + error);
     }
   }
 
@@ -61,10 +63,6 @@ export class AssistantCloudJWTAuthStrategy
     // Fetch a new token
     const newToken = await this.#authTokenCallback();
     const expiry = this.getJwtExpiry(newToken);
-
-    if (!expiry) {
-      throw new Error("Unable to determine the token expiry");
-    }
 
     this.cachedToken = newToken;
     this.tokenExpiry = expiry;
