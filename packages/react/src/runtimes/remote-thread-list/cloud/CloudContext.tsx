@@ -2,7 +2,7 @@ import { createContext } from "react";
 
 export type CloudInitializeResponse = {
   remoteId: string;
-  externalId: string;
+  externalId: string | undefined;
 };
 
 type CloudContextValue = {

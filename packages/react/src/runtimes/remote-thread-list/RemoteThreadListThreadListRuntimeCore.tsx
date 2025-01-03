@@ -156,6 +156,10 @@ export class RemoteThreadListThreadListRuntimeCore
     this._hookManager = new RemoteThreadListHookInstanceManager(
       adapter.runtimeHook,
     );
+    this.useRenderComponent = create(() => ({
+      RenderComponent:
+        adapter.__internal_RenderComponent ?? DEFAULT_RENDER_COMPONENT,
+    }));
     this.__internal_setAdapter(adapter);
 
     this._loadThreadsPromise = this._state
@@ -221,9 +225,7 @@ export class RemoteThreadListThreadListRuntimeCore
     this.switchToNewThread();
   }
 
-  private useRenderComponent = create(() => ({
-    RenderComponent: DEFAULT_RENDER_COMPONENT,
-  }));
+  private useRenderComponent;
 
   public __internal_setAdapter(adapter: RemoteThreadListAdapter) {
     if (this._adapter === adapter) return;

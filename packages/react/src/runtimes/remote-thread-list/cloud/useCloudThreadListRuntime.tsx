@@ -15,8 +15,8 @@ type CloudThreadListAdapter = {
 
   runtimeHook: () => AssistantRuntime;
 
-  create(): Promise<ThreadData>;
-  delete(threadId: string): Promise<void>;
+  create?(): Promise<ThreadData>;
+  delete?(threadId: string): Promise<void>;
 };
 
 export const useCloudThreadListRuntime = (adapter: CloudThreadListAdapter) => {
@@ -31,14 +31,15 @@ export const useCloudThreadListRuntime = (adapter: CloudThreadListAdapter) => {
     >();
     return {
       initialize: async () => {
-        const task = adapterRef.current.create().then(async (t) => {
+        const createTask = adapterRef.current.create?.() ?? Promise.resolve();
+        const task = createTask.then(async (t) => {
+          const external_id = t ? t.externalId : undefined;
           const { thread_id } = await adapterRef.current.cloud.threads.create({
             title: "New Thread",
             last_message_at: new Date(),
-            metadata: {},
-            external_id: t.externalId,
+            external_id,
           });
-          return { externalId: t.externalId, remoteId: thread_id };
+          return { externalId: external_id, remoteId: thread_id };
         });
         for (const subscriber of subscribers) {
           subscriber(task);
@@ -79,13 +80,14 @@ export const useCloudThreadListRuntime = (adapter: CloudThreadListAdapter) => {
       return adapter.cloud.threads.update(threadId, { is_archived: false });
     },
     delete: async (threadId) => {
-      await adapter.delete(threadId);
+      await adapter.delete?.(threadId);
       return adapter.cloud.threads.delete(threadId);
     },
     onInitialize: (callback) => {
       return cloudContextValue.subscribe(callback);
     },
     __internal_RenderComponent: ({ children }: PropsWithChildren) => {
+      console.log("RENDER COMPONENT");
       return (
         <CloudContext.Provider value={cloudContextValue}>
           {children}

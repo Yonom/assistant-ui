@@ -6,7 +6,9 @@ import {
 
 export type AssistantCloudConfig =
   | {
-      projectId: string;
+      baseUrl: string;
+      // TODO use baseUrl to construct the projectId
+      unstable_projectId: string;
       authToken(): Promise<string>;
     }
   | {
@@ -16,15 +18,17 @@ export type AssistantCloudConfig =
 
 export class AssistantCloudAPI {
   private _tokenManager: AssistantCloudAuthStrategy;
-  private _baseUrl = "https://api.assistant-ui.com";
+  private _baseUrl;
 
   constructor(config: AssistantCloudConfig) {
-    if ("projectId" in config) {
+    if ("authToken" in config) {
+      this._baseUrl = config.baseUrl;
       this._tokenManager = new AssistantCloudJWTAuthStrategy(
-        config.projectId,
+        config.unstable_projectId,
         config.authToken,
       );
     } else {
+      this._baseUrl = "https://api.assistant-ui.com";
       this._tokenManager = new AssistantCloudAPIKeyAuthStrategy(
         config.apiKey,
         config.workspaceId,

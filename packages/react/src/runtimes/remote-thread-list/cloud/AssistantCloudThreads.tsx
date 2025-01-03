@@ -26,7 +26,7 @@ type AssistantCloudThreadsListResponse = {
 type AssistantCloudThreadsCreateBody = {
   title: string;
   last_message_at: Date;
-  metadata: unknown;
+  metadata?: unknown | undefined;
   external_id?: string | undefined;
 };
 
@@ -51,14 +51,14 @@ export class AssistantCloudThreads {
   }
 
   public async create(
-    body?: AssistantCloudThreadsCreateBody,
+    body: AssistantCloudThreadsCreateBody,
   ): Promise<AssistantCloudThreadsCreateResponse> {
     return this.cloud.makeRequest("/threads", { method: "POST", body });
   }
 
   public async update(
     threadId: string,
-    body?: AssistantCloudThreadsUpdateBody,
+    body: AssistantCloudThreadsUpdateBody,
   ): Promise<void> {
     return this.cloud.makeRequest(`/threads/${threadId}`, {
       method: "PUT",
