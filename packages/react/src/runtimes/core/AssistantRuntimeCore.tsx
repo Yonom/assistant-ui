@@ -8,5 +8,12 @@ export type AssistantRuntimeCore = {
 
   registerModelConfigProvider: (provider: ModelConfigProvider) => Unsubscribe;
 
-  __internal_RenderComponent?: React.FC<PropsWithChildren>;
+  /**
+   * A Provider component that wraps the app via `AssistantRuntimeProvider`.
+   *
+   * Note: This field is expected to never change.
+   * Refer to the source implementation of `ExternalStoreRuntimeCore`
+   * for an example of updating the provider via a zustand store.
+   */
+  readonly Provider: React.FC<PropsWithChildren> | undefined;
 };
