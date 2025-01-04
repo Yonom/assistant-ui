@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import { ComponentType, PropsWithChildren } from "react";
 import type { ModelConfigProvider } from "../../types/ModelConfigTypes";
 import type { Unsubscribe } from "../../types/Unsubscribe";
 import { ThreadListRuntimeCore } from "./ThreadListRuntimeCore";
@@ -15,5 +15,5 @@ export type AssistantRuntimeCore = {
    * Refer to the source implementation of `ExternalStoreRuntimeCore`
    * for an example of updating the provider via a zustand store.
    */
-  readonly Provider: React.FC<PropsWithChildren> | undefined;
+  readonly Provider: ComponentType<PropsWithChildren> | undefined;
 };
