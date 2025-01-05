@@ -1,5 +1,6 @@
 "use client";
 
+import { JSONValue } from "@ai-sdk/provider";
 import type {
   MessageStatus,
   RunConfig,
@@ -18,6 +19,7 @@ export type ChatModelRunResult = {
   content?: ThreadAssistantContentPart[] | undefined;
   status?: MessageStatus | undefined;
   metadata?: {
+    unstable_data?: JSONValue[] | undefined;
     steps?: ThreadStep[] | undefined;
     custom?: Record<string, unknown> | undefined;
   };

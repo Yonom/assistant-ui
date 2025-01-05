@@ -34,8 +34,15 @@ export function runResultStream() {
         }
 
         case "tool-call":
+        // ignoring tool call events because they are converted to tool-call-delta as well
         case "response-metadata":
           break;
+
+        case "data": {
+          message = appendData(message, chunk);
+          controller.enqueue(message);
+          break;
+        }
 
         case "tool-result": {
           message = appendOrUpdateToolResult(
@@ -48,7 +55,7 @@ export function runResultStream() {
           break;
         }
         case "step-finish": {
-          message = appendOrUpdateStepFinish(message, chunk);
+          message = appendStepFinish(message, chunk);
           controller.enqueue(message);
           break;
         }
@@ -184,7 +191,20 @@ const appendOrUpdateToolResult = (
   };
 };
 
-const appendOrUpdateStepFinish = (
+const appendData = (
+  message: ChatModelRunResult,
+  chunk: ToolResultStreamPart & { type: "data" },
+): ChatModelRunResult => {
+  return {
+    ...message,
+    metadata: {
+      ...message.metadata,
+      unstable_data: [...(message.metadata?.unstable_data ?? []), chunk.data],
+    },
+  };
+};
+
+const appendStepFinish = (
   message: ChatModelRunResult,
   chunk: ToolResultStreamPart & { type: "step-finish" },
 ): ChatModelRunResult => {
