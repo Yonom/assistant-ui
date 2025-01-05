@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { CompleteAttachment } from "./AttachmentTypes";
+import { JSONValue } from "@ai-sdk/provider";
 
 export type MessageRole = "user" | "assistant" | "system";
 
@@ -141,7 +142,7 @@ export type ThreadAssistantMessage = MessageCommonProps & {
   readonly content: readonly ThreadAssistantContentPart[];
   readonly status: MessageStatus;
   readonly metadata: {
-    readonly unstable_data: readonly Record<string, unknown>[];
+    readonly unstable_data: readonly unknown[];
     readonly steps: readonly ThreadStep[];
     readonly custom: Record<string, unknown>;
   };
@@ -163,7 +164,7 @@ export type AppendMessage = CoreMessage & {
 type BaseThreadMessage = {
   readonly status?: ThreadAssistantMessage["status"];
   readonly metadata: {
-    readonly unstable_data?: readonly Record<string, unknown>[];
+    readonly unstable_data?: readonly unknown[];
     readonly steps?: readonly ThreadStep[];
     readonly custom: Record<string, unknown>;
   };
