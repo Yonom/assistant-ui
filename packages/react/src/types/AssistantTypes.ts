@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { CompleteAttachment } from "./AttachmentTypes";
-import { JSONValue } from "@ai-sdk/provider";
 
 export type MessageRole = "user" | "assistant" | "system";
 

@@ -3,9 +3,11 @@
 import type {
   MessageStatus,
   RunConfig,
+  TextContentPart,
   ThreadAssistantContentPart,
   ThreadMessage,
   ThreadStep,
+  ToolCallContentPart,
 } from "../../types/AssistantTypes";
 import type { ModelConfig } from "../../types/ModelConfigTypes";
 
@@ -22,6 +24,10 @@ export type ChatModelRunResult = {
     steps?: ThreadStep[] | undefined;
     custom?: Record<string, unknown> | undefined;
   };
+};
+
+export type CoreChatModelRunResult = Omit<ChatModelRunResult, "content"> & {
+  content: (TextContentPart | ToolCallContentPart)[];
 };
 
 export type ChatModelRunOptions = {
