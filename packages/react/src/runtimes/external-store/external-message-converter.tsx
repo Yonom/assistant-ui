@@ -89,7 +89,7 @@ const joinExternalMessages = (
             }
 
             if (output.metadata) {
-              assistantMessage.metadata = {};
+              assistantMessage.metadata ??= {};
               if (output.metadata.unstable_data) {
                 assistantMessage.metadata.unstable_data = [
                   ...(assistantMessage.metadata.unstable_data ?? []),
