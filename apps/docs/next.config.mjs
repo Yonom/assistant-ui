@@ -17,6 +17,10 @@ const config = {
       },
     ],
   }),
+  env: {
+    ASTERAI_APP_ID: process.env.ASTERAI_APP_ID,
+    ASTERAI_PUBLIC_QUERY_KEY: process.env.ASTERAI_PUBLIC_QUERY_KEY,
+  }
 };
 
 const withMDX = createMDX();

@@ -7,10 +7,8 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useChat } from "ai/react";
 import {
   AssistantRuntimeProvider,
-  CompositeAttachmentAdapter,
-  SimpleImageAttachmentAdapter,
-  SimpleTextAttachmentAdapter,
-  useEdgeRuntime,
+  ChatModelAdapter,
+  useLocalRuntime,
 } from "@assistant-ui/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -19,10 +17,15 @@ import { GenUI } from "../../components/genui/GenUI";
 import { Artifacts } from "../../components/artifacts/Artifacts";
 import { ModalChat } from "../../components/modal/ModalChat";
 import { TESTIMONIALS } from "@/components/testimonials/testimonials";
+import { Gaqno } from "@/components/gaqno/Gaqno";
 import { ChatBubbleIcon } from "@radix-ui/react-icons";
 import { TestimonialContainer } from "../../components/testimonials/TestimonialContainer";
 
 const supportedModels = [
+  {
+    name: "Gabriel Aquino",
+    component: Gaqno,
+  },
   {
     name: "Standalone",
     component: Shadcn,
@@ -135,21 +138,49 @@ export type AssistantProps = {
   chat: ReturnType<typeof useChat>;
 };
 
-const MyRuntimeProvider = ({ children }: { children: React.ReactNode }) => {
-  const runtime = useEdgeRuntime({
-    api: "/api/chat",
-    adapters: {
-      attachments: new CompositeAttachmentAdapter([
-        new SimpleImageAttachmentAdapter(),
-        new SimpleTextAttachmentAdapter(),
-      ]),
-      feedback: {
-        submit: ({ message, type }) => {
-          console.log({ message, type });
-        },
+const CustomModelAdapter: ChatModelAdapter = {
+  async run({ messages }) {
+    const query = messages[messages.length - 1]?.content;
+    const appId = process.env['ASTERAI_APP_ID'] as string;
+    const queryKey = process.env['ASTERAI_PUBLIC_QUERY_KEY'] as string;
+
+    const response = await fetch(`https://api.asterai.io/app/${appId}/query/sse`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${queryKey}`,
       },
-    },
-  });
+      body: JSON.stringify({ query }),
+    });
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    let result = '';
+    while (true) {
+      const { done, value } = await reader?.read() ?? {};
+      if (done) break;
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+      for (const line of lines) {
+        if (line.startsWith('data: llm-token: ')) {
+          result += line.replace('data: llm-token: ', '');
+        }
+      }
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: result || "Error: No response from Asterai",
+        },
+      ],
+    };
+  },
+};
+
+const MyRuntimeProvider = ({ children }: { children: React.ReactNode }) => {
+  const runtime = useLocalRuntime(CustomModelAdapter);
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       {children}
