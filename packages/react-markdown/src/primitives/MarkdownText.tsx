@@ -86,15 +86,17 @@ export const MarkdownTextPrimitive: ForwardRefExoticComponent<MarkdownTextPrimit
   ) => {
     const { text, status } = useSmooth(useContentPartText(), smooth);
 
-    const {
-      pre = DefaultPre,
-      code = DefaultCode,
-      SyntaxHighlighter = DefaultCodeBlockContent,
-      CodeHeader = DefaultCodeHeader,
-      by_language,
-      ...componentsRest
-    } = userComponents ?? {};
-    const components: Options["components"] = {
+    const components: Options["components"] = useMemo(() => {
+      const {
+        pre = DefaultPre,
+        code = DefaultCode,
+        SyntaxHighlighter = DefaultCodeBlockContent,
+        CodeHeader = DefaultCodeHeader,
+        by_language,
+        ...componentsRest
+      } = userComponents ?? {};
+
+      return {
       ...componentsRest,
       pre: PreOverride,
       code: useCallbackRef((props) => (
@@ -109,7 +111,7 @@ export const MarkdownTextPrimitive: ForwardRefExoticComponent<MarkdownTextPrimit
           {...props}
         />
       )),
-    };
+    }}, [userComponents]);
 
     const blocks = useMemo(() => {
       const tokens = marked.lexer(text);
