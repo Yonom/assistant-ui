@@ -1,21 +1,26 @@
-import { customAlphabet } from "nanoid/non-secure";
+import { customAlphabet } from "nanoid";
 import { cookies } from "next/headers";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { AssistantCloud } from "@assistant-ui/react";
 
 export const generateId = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
-  7,
+  32,
 );
 const randomUserId = () => {
-  const userId = "usr_anon_" + generateId(32);
+  const userId = "usr_anon_" + generateId();
   return userId;
 };
 
-const getJwtForNewUser = () => {
-  const userId = randomUserId();
-  const token = jwt.sign({ sub: userId }, process.env["JWT_SECRET"]!);
-  return { token, userId };
+const getJwtForUser = (userId: string) => {
+  return jwt.sign(
+    {
+      sub: userId,
+      iat: Date.now(),
+      exp: Date.now() + 60 * 60 * 24 * 7, // 1 week
+    },
+    process.env["JWT_SECRET"]!,
+  );
 };
 
 const getUserIdFromJwt = (token: string) => {
@@ -28,13 +33,18 @@ export const POST = async () => {
   const jwt = cookieStore.get("jwt");
   let userId;
   if (!jwt) {
-    // create a new anonymous user
-    const { userId: newUserId, token } = getJwtForNewUser();
-    cookieStore.set("jwt", token, { path: "/" });
-    userId = newUserId;
+    userId = randomUserId();
   } else {
     userId = getUserIdFromJwt(jwt.value);
   }
+
+  cookieStore.set("jwt", getJwtForUser(userId), {
+    path: "/",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
   const client = new AssistantCloud({
     apiKey: process.env["ASSISTANT_API_KEY"]!,
     workspaceId: userId,
