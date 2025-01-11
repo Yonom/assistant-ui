@@ -19,6 +19,7 @@ import {
   DefaultCodeBlockContent,
   DefaultCodeHeader,
 } from "../overrides/defaultComponents";
+import { useCallbackRef } from "@radix-ui/react-use-callback-ref";
 import { CodeOverride } from "../overrides/CodeOverride";
 import { Primitive } from "@radix-ui/react-primitive";
 import classNames from "classnames";
@@ -85,22 +86,30 @@ export const MarkdownTextPrimitive: ForwardRefExoticComponent<MarkdownTextPrimit
   ) => {
     const { text, status } = useSmooth(useContentPartText(), smooth);
 
-    const components = useMemo(() => ({
-      ...userComponents,
+    const {
+      pre = DefaultPre,
+      code = DefaultCode,
+      SyntaxHighlighter = DefaultCodeBlockContent,
+      CodeHeader = DefaultCodeHeader,
+      by_language,
+      ...componentsRest
+    } = userComponents ?? {};
+    const components: Options["components"] = {
+      ...componentsRest,
       pre: PreOverride,
-      code: (props: any) => (
+      code: useCallbackRef((props) => (
         <CodeOverride
           components={{
-            Pre: userComponents?.pre ?? DefaultPre,
-            Code: userComponents?.code ?? DefaultCode,
-            SyntaxHighlighter: userComponents?.SyntaxHighlighter ?? DefaultCodeBlockContent,
-            CodeHeader: userComponents?.CodeHeader ?? DefaultCodeHeader,
+            Pre: pre,
+            Code: code,
+            SyntaxHighlighter,
+            CodeHeader,
           }}
           componentsByLanguage={componentsByLanguage}
           {...props}
         />
-      ),
-    }), [userComponents, componentsByLanguage]);
+      )),
+    };
 
     const blocks = useMemo(() => {
       const tokens = marked.lexer(text);
