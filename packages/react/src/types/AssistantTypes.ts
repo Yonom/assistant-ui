@@ -21,6 +21,12 @@ export type Unstable_AudioContentPart = {
   };
 };
 
+export type FileContentPart = {
+  readonly type: "file";
+  readonly data: string;
+  readonly mimeType: string;
+};
+
 /**
  * @deprecated UI content parts are deprecated and will be removed in v0.8.0.
  * Migration guide for external-store users using UI content parts:
@@ -85,6 +91,7 @@ export type ToolCallContentPart<
 export type ThreadUserContentPart =
   | TextContentPart
   | ImageContentPart
+  | FileContentPart
   | Unstable_AudioContentPart
   | UIContentPart;
 
@@ -215,6 +222,7 @@ export type ThreadMessage = BaseThreadMessage &
 export type CoreUserContentPart =
   | TextContentPart
   | ImageContentPart
+  | FileContentPart
   | Unstable_AudioContentPart;
 export type CoreAssistantContentPart =
   | TextContentPart
