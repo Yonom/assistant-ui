@@ -13,18 +13,18 @@ export type ImageContentPart = {
   readonly image: string;
 };
 
+export type FileContentPart = {
+  readonly type: "file";
+  readonly data: string;
+  readonly mimeType: string;
+};
+
 export type Unstable_AudioContentPart = {
   readonly type: "audio";
   readonly audio: {
     readonly data: string;
     readonly format: "mp3" | "wav";
   };
-};
-
-export type FileContentPart = {
-  readonly type: "file";
-  readonly data: string;
-  readonly mimeType: string;
 };
 
 /**

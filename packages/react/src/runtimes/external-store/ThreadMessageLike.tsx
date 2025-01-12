@@ -11,12 +11,12 @@ import {
   ThreadUserMessage,
   ThreadSystemMessage,
   CompleteAttachment,
+  FileContentPart,
+  Unstable_AudioContentPart,
 } from "../../types";
 import {
   CoreToolCallContentPart,
-  FileContentPart,
   ThreadStep,
-  Unstable_AudioContentPart,
 } from "../../types/AssistantTypes";
 
 export type ThreadMessageLike = {
