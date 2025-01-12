@@ -1,5 +1,3 @@
-"use client";
-
 import { useActionBarEdit } from "../../primitive-hooks/actionBar/useActionBarEdit";
 import {
   ActionButtonElement,

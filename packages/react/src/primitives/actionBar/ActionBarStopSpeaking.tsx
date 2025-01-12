@@ -1,5 +1,3 @@
-"use client";
-
 import { forwardRef } from "react";
 import { useActionBarStopSpeaking } from "../../primitive-hooks/actionBar/useActionBarStopSpeaking";
 import { ActionButtonProps } from "../../utils/createActionButton";

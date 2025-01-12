@@ -1,5 +1,3 @@
-"use client";
-
 import { forwardRef, type FC } from "react";
 import { PencilIcon } from "lucide-react";
 
