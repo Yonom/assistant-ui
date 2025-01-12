@@ -1,3 +1,5 @@
+"use client";
+
 import { forwardRef } from "react";
 import { useActionBarFeedbackNegative } from "../../primitive-hooks/actionBar/useActionBarFeedbackNegative";
 import { ActionButtonProps } from "../../utils/createActionButton";

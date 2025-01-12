@@ -1,1 +1,2 @@
-export * from "./index.client";
+export { useSmooth } from "./useSmooth";
+export { useSmoothStatus, withSmoothContextProvider } from "./SmoothContext";

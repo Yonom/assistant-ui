@@ -1,3 +1,5 @@
+"use client";
+
 import { forwardRef, type FC } from "react";
 import {
   AudioLinesIcon,
