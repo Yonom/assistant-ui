@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback } from "react";
 import {
   useMessage,
@@ -6,7 +8,7 @@ import {
 } from "../../context/react/MessageContext";
 import { useComposerRuntime } from "../../context";
 
-namespace useActionBarCopy {
+export namespace useActionBarCopy {
   export interface Options {
     copiedDuration?: number | undefined;
   }

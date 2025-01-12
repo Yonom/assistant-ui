@@ -1,6 +1,7 @@
 "use client";
+
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
-import { useEffect, useRef } from "react";
+import { RefCallback, useEffect, useRef } from "react";
 import {
   useThreadRuntime,
   useThreadViewportStore,
@@ -10,7 +11,7 @@ import { useOnScrollToBottom } from "../../utils/hooks/useOnScrollToBottom";
 import { useManagedRef } from "../../utils/hooks/useManagedRef";
 import { writableStore } from "../../context/ReadonlyStore";
 
-namespace useThreadViewportAutoScroll {
+export namespace useThreadViewportAutoScroll {
   export type Options = {
     autoScroll?: boolean | undefined;
     unstable_scrollToBottomOnRunStart?: boolean | undefined;
@@ -20,7 +21,7 @@ namespace useThreadViewportAutoScroll {
 export const useThreadViewportAutoScroll = <TElement extends HTMLElement>({
   autoScroll = true,
   unstable_scrollToBottomOnRunStart = true,
-}: useThreadViewportAutoScroll.Options): React.RefCallback<TElement> => {
+}: useThreadViewportAutoScroll.Options): RefCallback<TElement> => {
   const divRef = useRef<TElement>(null);
 
   const threadViewportStore = useThreadViewportStore();
