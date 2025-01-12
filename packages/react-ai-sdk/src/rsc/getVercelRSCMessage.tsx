@@ -3,8 +3,9 @@ import {
   type ThreadMessage,
 } from "@assistant-ui/react";
 
-export const symbolInnerRSCMessage = Symbol("innerVercelRSCMessage");
-
+/**
+ * @deprecated Use `getExternalStoreMessage` instead.
+ */
 export const getVercelRSCMessage = (message: ThreadMessage) => {
   return getExternalStoreMessage(message);
 };
