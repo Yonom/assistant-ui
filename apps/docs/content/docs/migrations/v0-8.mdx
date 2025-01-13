@@ -9,8 +9,6 @@ import { Callout } from "fumadocs-ui/components/callout";
   v0.8.0 is released.
 </Callout>
 
-This guide serves as a reference for users facing breaking changes during upgrade to v0.8. You do not need to read this guide to upgrade to v0.8.
-
 ## Vercel AI SDK RSC requires additional setup
 
 Built-in RSC support in assistant-ui has been removed, so an additional setup step is required.
@@ -40,7 +38,7 @@ First, reconsider your approach.
 Creating UI components in the `convertMessage` callback is considered an anti-pattern.
 The recommended alternative approach is to pass tool-call content parts, and use `makeAssistantToolUI` to map these tool calls to UI components.
 
-This ensures that the the data layer is separate and decoupled from the UI layer.
+This ensures that the data layer is separate and decoupled from the UI layer.
 
 #### Example
 
@@ -155,4 +153,4 @@ We pass this component to our Thread:
 
 (if you are using unstyled primitives, update MyThread.tsx, and pass the component to MessagePrimitive.Content)
 
-Now, the UI_PLACEHORDER content part is replaced with the UI component we defined earlier.
+Now, the `UI_PLACEHOLDER` content part is replaced with the UI component we defined earlier.
