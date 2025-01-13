@@ -212,6 +212,10 @@ export type ThreadRuntime = {
    * @deprecated pass an object with `parentId` instead. This will be removed in 0.8.0.
    */
   startRun(parentId: string | null): void;
+  /**
+   * Start a new run with the given configuration.
+   * @param config The configuration for starting the run
+   */
   startRun(config: CreateStartRunConfig): void;
   subscribe(callback: () => void): Unsubscribe;
   cancelRun(): void;
