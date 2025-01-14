@@ -56,7 +56,7 @@ export const useLangGraphMessages = <TMessage extends { id?: string }>({
 
       for await (const chunk of response) {
         if (
-          chunk.event === "messages/ partial" ||
+          chunk.event === "messages/partial" ||
           chunk.event === "messages/complete"
         ) {
           // TODO verify bugfix - if there are messages without IDs, they appear duplicated
