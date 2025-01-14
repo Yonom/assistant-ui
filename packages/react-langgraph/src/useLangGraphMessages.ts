@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { INTERNAL } from "@assistant-ui/react";
+import { v4 as uuidv4 } from "uuid";
 
 const { generateId } = INTERNAL;
 
@@ -12,15 +13,10 @@ export type LangGraphSendMessageConfig = {
   runConfig?: unknown;
 };
 
-type LangGraphMessagesEvent<TMessage> =
-  | {
-      event: "messages/partial" | "messages/complete";
-      data: TMessage[];
-    }
-  | {
-      event: "__other__";
-      data: unknown;
-    };
+type LangGraphMessagesEvent<TMessage> = {
+  event: "messages/partial" | "messages/complete" | string;
+  data: TMessage[] | any;
+};
 export type LangGraphStreamCallback<TMessage> = (
   messages: TMessage[],
   config: LangGraphSendMessageConfig & { abortSignal: AbortSignal },
@@ -38,6 +34,9 @@ export const useLangGraphMessages = <TMessage extends { id?: string }>({
 
   const sendMessage = useCallback(
     async (newMessages: TMessage[], config: LangGraphSendMessageConfig) => {
+      // ensure all messages have an ID
+      newMessages = newMessages.map((m) => (m.id ? m : { ...m, id: uuidv4() }));
+
       const messagesMap = new Map<string, TMessage>();
       const addMessages = (newMessages: TMessage[]) => {
         if (newMessages.length === 0) return;
