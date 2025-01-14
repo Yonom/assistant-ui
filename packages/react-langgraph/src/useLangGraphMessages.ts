@@ -12,20 +12,21 @@ export type LangGraphSendMessageConfig = {
   runConfig?: unknown;
 };
 
+type LangGraphMessagesEvent<TMessage> =
+  | {
+      event: "messages/partial" | "messages/complete";
+      data: TMessage[];
+    }
+  | {
+      event: "__other__";
+      data: unknown;
+    };
 export type LangGraphStreamCallback<TMessage> = (
   messages: TMessage[],
   config: LangGraphSendMessageConfig & { abortSignal: AbortSignal },
 ) =>
-  | Promise<
-      AsyncGenerator<{
-        event: string;
-        data: any;
-      }>
-    >
-  | AsyncGenerator<{
-      event: string;
-      data: any;
-    }>;
+  | Promise<AsyncGenerator<LangGraphMessagesEvent<TMessage>>>
+  | AsyncGenerator<LangGraphMessagesEvent<TMessage>>;
 
 export const useLangGraphMessages = <TMessage extends { id?: string }>({
   stream,
