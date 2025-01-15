@@ -43,7 +43,7 @@ class CloudThreadListItemRuntimeImpl implements CloudThreadListItemRuntime {
     this.threadListItemRuntime = threadListItemRuntime;
   }
 
-  public async getOrCreateThread() {
+  public async getOrCreateThread(): Promise<CloudInitializeResponse> {
     let threadData = this.threadListItemRuntime.getState();
     if (threadData.remoteId)
       return threadData as RemoteThreadInitializeResponse;
