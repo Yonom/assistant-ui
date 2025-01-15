@@ -371,31 +371,27 @@ export class RemoteThreadListThreadListRuntimeCore
     begin: () => Promise<AssistantStream>,
   ) => {
     const data = this.getItemById(remoteId);
-    console.log("onGenerateTitle", remoteId, this._state.value, data);
     if (!data) throw new Error("Thread not found");
     if (data.status === "new") throw new Error("Thread is not yet initialized");
 
     const stream = await begin();
     const messageStream = AssistantMessageStream.fromAssistantStream(stream);
-    const result = await messageStream.unstable_result();
-    const newTitle =
-      result.content.filter((c) => c.type === "text")[0]?.text ?? "New Thread";
-
-    return this._state.optimisticUpdate({
-      execute: async () => {},
-      optimistic: (state) => {
-        return {
-          ...state,
-          threadData: {
-            ...state.threadData,
-            [data.threadId]: {
-              ...data,
-              title: newTitle,
-            },
+    for await (const result of messageStream) {
+      const newTitle =
+        result.content.filter((c) => c.type === "text")[0]?.text ??
+        "New Thread";
+      const state = this._state.baseValue;
+      this._state.update({
+        ...state,
+        threadData: {
+          ...state.threadData,
+          [data.threadId]: {
+            ...data,
+            title: newTitle,
           },
-        };
-      },
-    });
+        },
+      });
+    }
   };
 
   public rename(threadIdOrRemoteId: string, newTitle: string): Promise<void> {

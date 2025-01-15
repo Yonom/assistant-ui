@@ -26,6 +26,7 @@ const useMyLangGraphRuntime = () => {
         yield message;
       }
 
+      // TODO only call this once during initializationa
       await cloudRuntime.generateThreadTitle();
     },
     onSwitchToThread: async (externalId) => {

@@ -80,12 +80,11 @@ export class AssistantCloudAPI {
     });
 
     if (!response.ok) {
-      // TODO better error handling
       const text = await response.text();
       try {
         const body = JSON.parse(text);
         throw new CloudAPIError(body.message);
-      } catch (e) {
+      } catch {
         throw new Error(
           `Request failed with status ${response.status}, ${text}`,
         );

@@ -48,7 +48,6 @@ export const useCloudThreadListRuntime = (adapter: CloudThreadListAdapter) => {
   const cloudThreadListItemRuntimeAdapter = useMemo(() => {
     return {
       initialize: async (threadId: string) => {
-        console.log("INITIALIZE", threadId);
         const begin = beginnable(async () => {
           const createTask = adapterRef.current.create?.() ?? Promise.resolve();
           const t = await createTask;
@@ -70,7 +69,6 @@ export const useCloudThreadListRuntime = (adapter: CloudThreadListAdapter) => {
         return begin();
       },
       generateTitle: async (remoteId: string) => {
-        console.log("GENERATE_TITLE", remoteId);
         const messages = runtime.thread.getState().messages;
         const begin = beginnable(() => {
           return adapterRef.current.cloud.runs.stream({
@@ -79,13 +77,12 @@ export const useCloudThreadListRuntime = (adapter: CloudThreadListAdapter) => {
             messages: toCoreMessages(messages),
           });
         });
-        console.log(subscribers);
         for (const subscriber of subscribers) {
           subscriber.onGenerateTitle(remoteId, begin);
         }
       },
     };
-  }, []);
+  }, [subscribers]);
 
   const runtime = useRemoteThreadListRuntime({
     runtimeHook: adapter.runtimeHook,
