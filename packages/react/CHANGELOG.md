@@ -1,5 +1,13 @@
 # @assistant-ui/react
 
+## 0.7.39
+
+### Patch Changes
+
+- 22272e6: chore: update dependencies
+- Updated dependencies [22272e6]
+  - assistant-stream@0.0.18
+
 ## 0.7.38
 
 ### Patch Changes
