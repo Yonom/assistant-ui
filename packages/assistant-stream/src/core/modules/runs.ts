@@ -193,7 +193,7 @@ export function createAssistantRun(
   if (promiseOrVoid instanceof Promise) {
     promiseOrVoid
       .catch((e) => {
-        controller.addError(e.toString());
+        controller.addError(e instanceof Error ? e.message : String(e));
         throw e;
       })
       .finally(() => controller.close());
