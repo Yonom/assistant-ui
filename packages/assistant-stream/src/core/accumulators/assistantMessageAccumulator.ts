@@ -38,10 +38,7 @@ export const assistantMessageAccumulator = () => {
           break;
         }
         case "tool-result": {
-          const { toolCallId, result } = chunk as unknown as {
-            toolCallId: string;
-            result: unknown;
-          };
+          const { toolCallId, result } = chunk;
           message = setToolResult(message, toolCallId, result);
           controller.enqueue(message);
 
@@ -49,7 +46,7 @@ export const assistantMessageAccumulator = () => {
         }
 
         case "error": {
-          const { error } = chunk as unknown as { error: string };
+          const { error } = chunk;
           message = setError(message, error);
           controller.enqueue(message);
           break;

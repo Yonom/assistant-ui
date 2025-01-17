@@ -24,7 +24,6 @@ class DataStreamEncoder(StreamEncoder):
             return f"2:{json.dumps([chunk.data])}\n"
         elif chunk.type == "error":
             return f"3:{json.dumps(chunk.error)}\n"
-        pass
 
     def get_media_type(self) -> str:
         return "text/plain"
