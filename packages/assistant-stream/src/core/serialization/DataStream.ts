@@ -60,7 +60,7 @@ export class DataStreamEncoder {
               break;
 
             case "error":
-              controller.enqueue("3:" + JSON.stringify(chunk.error) + "\n");
+              controller.enqueue(`3:${JSON.stringify(chunk.error)}\n`);
               break;
 
             default:
