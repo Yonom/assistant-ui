@@ -22,6 +22,8 @@ class DataStreamEncoder(StreamEncoder):
             return f'a:{json.dumps({ "toolCallId": chunk.tool_call_id, "result": chunk.result })}\n'
         elif chunk.type == "data":
             return f"2:{json.dumps([chunk.data])}\n"
+        elif chunk.type == "error":
+            return f"3:{json.dumps(chunk.error)}\n"
         pass
 
     def get_media_type(self) -> str:
@@ -31,7 +33,10 @@ class DataStreamEncoder(StreamEncoder):
         self, stream: AsyncGenerator[AssistantStreamChunk, None]
     ) -> AsyncGenerator[str, None]:
         async for chunk in stream:
-            yield self.encode_chunk(chunk)
+            encoded = self.encode_chunk(chunk)
+            if encoded is None:
+                continue
+            yield encoded
 
 
 class DataStreamResponse(AssistantStreamResponse):
