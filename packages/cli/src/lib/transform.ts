@@ -1,4 +1,4 @@
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import debug from "debug";
 import fs from "fs";
 import path from "path";
@@ -20,32 +20,34 @@ function buildCommand(
   targetPath: string,
   jscodeshift: string,
   options: TransformOptions,
-): string {
-  // Ignoring everything under `.*/` covers `.next/` along with any other
-  // framework build related or otherwise intended-to-be-hidden directories.
-  let command = `${jscodeshift} -t ${codemodPath} ${targetPath} \
-    --parser tsx \
-    --ignore-pattern="**/node_modules/**" \
-    --ignore-pattern="**/.*/**" \
-    --ignore-pattern="**/dist/**" \
-    --ignore-pattern="**/build/**" \
-    --ignore-pattern="**/*.min.js" \
-    --ignore-pattern="**/*.bundle.js"`;
+): string[] {
+  const command = [
+    jscodeshift,
+    "-t", codemodPath,
+    targetPath,
+    "--parser", "tsx",
+    "--ignore-pattern=**/node_modules/**",
+    "--ignore-pattern=**/.*/**",
+    "--ignore-pattern=**/dist/**",
+    "--ignore-pattern=**/build/**",
+    "--ignore-pattern=**/*.min.js",
+    "--ignore-pattern=**/*.bundle.js"
+  ];
 
   if (options.dry) {
-    command += " --dry";
+    command.push("--dry");
   }
 
   if (options.print) {
-    command += " --print";
+    command.push("--print");
   }
 
   if (options.verbose) {
-    command += " --verbose";
+    command.push("--verbose");
   }
 
   if (options.jscodeshift) {
-    command += ` ${options.jscodeshift}`;
+    command.push(options.jscodeshift);
   }
 
   return command;
@@ -97,7 +99,7 @@ export function transform(
     jscodeshift,
     transformOptions,
   );
-  const stdout = execSync(command, { encoding: "utf8", stdio: "pipe" });
+  const stdout = execFileSync(command[0], command.slice(1), { encoding: "utf8", stdio: "pipe" });
   const errors = parseErrors(codemod, stdout);
   if (options.logStatus && errors.length > 0) {
     errors.forEach(({ transform, filename, summary }) => {
