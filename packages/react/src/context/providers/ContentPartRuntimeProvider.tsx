@@ -23,25 +23,12 @@ const useContentPartRuntimeStore = (runtime: ContentPartRuntime) => {
   return store;
 };
 
-export const useContentPartStore = (runtime: ContentPartRuntime) => {
-  const [store] = useState(() => create(() => runtime.getState()));
-  useEffect(() => {
-    const updateState = () =>
-      writableStore(store).setState(runtime.getState(), true);
-    updateState();
-    return runtime.subscribe(updateState);
-  }, [runtime, store]);
-
-  return store;
-};
-
 export const ContentPartRuntimeProvider: FC<
   ContentPartRuntimeProvider.Props
 > = ({ runtime, children }) => {
   const useContentPartRuntime = useContentPartRuntimeStore(runtime);
-  const useContentPart = useContentPartStore(runtime);
   const [context] = useState<ContentPartContextValue>(() => {
-    return { useContentPartRuntime, useContentPart };
+    return { useContentPartRuntime };
   });
 
   return (

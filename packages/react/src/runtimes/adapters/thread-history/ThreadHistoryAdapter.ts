@@ -3,7 +3,8 @@ import {
   ExportedMessageRepositoryItem,
 } from "../../utils/MessageRepository";
 
-export type ThreadHistoryAdapter = {
+// TODO external store - which version to save? how to restore?
+export type ThreadHistoryAdapter<TMessage> = {
   load(): Promise<ExportedMessageRepository>;
   append(item: ExportedMessageRepositoryItem): Promise<void>;
 };

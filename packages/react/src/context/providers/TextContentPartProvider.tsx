@@ -1,7 +1,7 @@
 "use client";
 
 import { FC, PropsWithChildren, useEffect, useState } from "react";
-import { create } from "zustand";
+import { create, StoreApi, UseBoundStore } from "zustand";
 import {
   ContentPartContext,
   ContentPartContextValue,
@@ -33,8 +33,14 @@ export const TextContentPartProvider: FC<TextContentPartProvider.Props> = ({
   text,
   isRunning,
 }) => {
-  const [context] = useState<ContentPartContextValue>(() => {
-    const useContentPart = create<ContentPartState>(() => ({
+  const [context] = useState<
+    ContentPartContextValue & {
+      useContentPart: UseBoundStore<
+        StoreApi<ContentPartState & { type: "text" }>
+      >;
+    }
+  >(() => {
+    const useContentPart = create<ContentPartState & { type: "text" }>(() => ({
       status: isRunning ? RUNNING_STATUS : COMPLETE_STATUS,
       type: "text",
       text,
@@ -58,10 +64,7 @@ export const TextContentPartProvider: FC<TextContentPartProvider.Props> = ({
   });
 
   useEffect(() => {
-    const state = context.useContentPart.getState() as ContentPartState & {
-      type: "text";
-    };
-
+    const state = context.useContentPart.getState();
     const textUpdated = (state as TextContentPart).text !== text;
     const targetStatus = isRunning ? RUNNING_STATUS : COMPLETE_STATUS;
     const statusUpdated = state.status !== targetStatus;

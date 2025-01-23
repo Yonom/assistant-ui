@@ -12,10 +12,6 @@ export function createContextHook<T>(
   context: Context<T | null>,
   providerName: string,
 ) {
-  function useContextHook(options?: { optional?: false | undefined }): T;
-  function useContextHook(options?: {
-    optional?: boolean | undefined;
-  }): T | null;
   function useContextHook(options?: { optional?: boolean | undefined }) {
     const contextValue = useContext(context);
     if (!options?.optional && !contextValue) {

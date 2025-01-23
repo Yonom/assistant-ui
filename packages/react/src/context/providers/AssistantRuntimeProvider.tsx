@@ -39,19 +39,6 @@ const useAssistantToolUIsStore = () => {
   return useMemo(() => makeAssistantToolUIsStore(), []);
 };
 
-const useThreadListStore = (runtime: AssistantRuntime) => {
-  const [store] = useState(() => create(() => runtime.threadList.getState()));
-
-  useEffect(() => {
-    const updateState = () =>
-      writableStore(store).setState(runtime.threadList.getState(), true);
-    updateState();
-    return runtime.threadList.subscribe(updateState);
-  }, [runtime, store]);
-
-  return store;
-};
-
 const getRenderComponent = (runtime: AssistantRuntime) => {
   return (runtime as { _core?: AssistantRuntimeCore })._core?.RenderComponent;
 };
@@ -61,14 +48,12 @@ export const AssistantRuntimeProviderImpl: FC<
 > = ({ children, runtime }) => {
   const useAssistantRuntime = useAssistantRuntimeStore(runtime);
   const useToolUIs = useAssistantToolUIsStore();
-  const useThreadList = useThreadListStore(runtime);
-  const context = useMemo(() => {
+  const [context] = useState(() => {
     return {
       useToolUIs,
       useAssistantRuntime,
-      useThreadList,
     };
-  }, [useAssistantRuntime, useToolUIs, useThreadList]);
+  });
 
   const RenderComponent = getRenderComponent(runtime);
 
