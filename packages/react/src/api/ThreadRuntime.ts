@@ -291,7 +291,6 @@ export class ThreadRuntimeImpl implements ThreadRuntime {
     this.startRun = this.startRun.bind(this);
     this.cancelRun = this.cancelRun.bind(this);
     this.stopSpeaking = this.stopSpeaking.bind(this);
-    this.getSubmittedFeedback = this.getSubmittedFeedback.bind(this);
     this.export = this.export.bind(this);
     this.import = this.import.bind(this);
     this.getMesssageByIndex = this.getMesssageByIndex.bind(this);

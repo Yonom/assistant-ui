@@ -12,7 +12,9 @@ export function createContextHook<T>(
   context: Context<T | null>,
   providerName: string,
 ) {
-  function useContextHook(options?: { optional?: boolean | undefined }) {
+  function useContextHook(options?: {
+    optional?: boolean | undefined;
+  }): T | null {
     const contextValue = useContext(context);
     if (!options?.optional && !contextValue) {
       throw new Error(`This component must be used within ${providerName}.`);

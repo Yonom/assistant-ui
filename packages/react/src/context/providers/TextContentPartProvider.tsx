@@ -58,7 +58,7 @@ export const TextContentPartProvider: FC<TextContentPartProvider.Props> = ({
       subscribe: useContentPart.subscribe,
     });
     ensureBinding(contentPartRuntime);
-    
+
     const useContentPartRuntime = create(() => contentPartRuntime);
 
     return { useContentPartRuntime, useContentPart };
@@ -66,7 +66,7 @@ export const TextContentPartProvider: FC<TextContentPartProvider.Props> = ({
 
   useEffect(() => {
     const state = context.useContentPart.getState();
-    const textUpdated = (state as TextContentPart).text !== text;
+    const textUpdated = state.text !== text;
     const targetStatus = isRunning ? RUNNING_STATUS : COMPLETE_STATUS;
     const statusUpdated = state.status !== targetStatus;
 

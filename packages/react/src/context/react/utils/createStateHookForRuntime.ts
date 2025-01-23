@@ -49,7 +49,7 @@ export function createStateHookForRuntime<TState>(
 
   // optional?, selector?
   function useStoreHook<TSelected>(options: {
-    optional?: false | undefined;
+    optional?: boolean | undefined;
     selector: ((state: TState) => TSelected) | undefined;
   }): TSelected | TState | null;
 

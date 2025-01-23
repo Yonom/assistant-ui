@@ -65,7 +65,7 @@ export function useEditComposerAttachmentRuntime(options?: {
   if (!attachmentRuntime) return null;
   if (attachmentRuntime.source !== "edit-composer")
     throw new Error(
-      "This component must be used within a messages's ComposerPrimitive.Attachments component.",
+      "This component must be used within a message's ComposerPrimitive.Attachments component.",
     );
 
   return attachmentRuntime as AttachmentRuntime<"edit-composer">;
