@@ -116,7 +116,7 @@ export class ThreadListRuntimeImpl implements ThreadListRuntime {
     );
   }
 
-  public __internal_bindMethods() {
+  protected __internal_bindMethods() {
     this.switchToThread = this.switchToThread.bind(this);
     this.switchToNewThread = this.switchToNewThread.bind(this);
     this.getState = this.getState.bind(this);

@@ -67,7 +67,7 @@ export class AssistantRuntimeImpl implements AssistantRuntime {
     this._thread = this.threadList.main;
   }
 
-  public __internal_bindMethods() {
+  protected __internal_bindMethods() {
     this.switchToNewThread = this.switchToNewThread.bind(this);
     this.switchToThread = this.switchToThread.bind(this);
     this.registerModelConfigProvider =

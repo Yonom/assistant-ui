@@ -286,7 +286,7 @@ export class ThreadRuntimeImpl implements ThreadRuntime {
     );
   }
 
-  public __internal_bindMethods() {
+  protected __internal_bindMethods() {
     this.append = this.append.bind(this);
     this.startRun = this.startRun.bind(this);
     this.cancelRun = this.cancelRun.bind(this);

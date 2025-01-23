@@ -174,7 +174,7 @@ export class MessageRuntimeImpl implements MessageRuntime {
     );
   }
 
-  public __internal_bindMethods() {
+  protected __internal_bindMethods() {
     this.reload = this.reload.bind(this);
     this.getState = this.getState.bind(this);
     this.subscribe = this.subscribe.bind(this);

@@ -127,7 +127,7 @@ export abstract class ComposerRuntimeImpl implements ComposerRuntime {
 
   constructor(protected _core: ComposerRuntimeCoreBinding) {}
 
-  public __internal_bindMethods() {
+  protected __internal_bindMethods() {
     this.setText = this.setText.bind(this);
     this.setRunConfig = this.setRunConfig.bind(this);
     this.getState = this.getState.bind(this);

@@ -34,7 +34,7 @@ export function useRuntimeState<TState, TSelected>(
 ): TSelected | TState;
 export function useRuntimeState<TState, TSelected>(
   runtime: SubscribableRuntime<TState>,
-  selector: ((state: TState) => TSelected) | undefined = identity as any,
+  selector?: ((state: TState) => TSelected) | undefined,
 ): TSelected | TState {
   // ensure that the runtime is bound
   ensureBinding(runtime);

@@ -45,7 +45,7 @@ export class ContentPartRuntimeImpl implements ContentPartRuntime {
     private threadApi?: ThreadRuntimeCoreBinding,
   ) {}
 
-  public __internal_bindMethods() {
+  protected __internal_bindMethods() {
     this.addToolResult = this.addToolResult.bind(this);
     this.getState = this.getState.bind(this);
     this.subscribe = this.subscribe.bind(this);
