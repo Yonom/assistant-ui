@@ -1,4 +1,7 @@
-import { SubscribableRuntime, useRuntimeState } from "./useRuntimeState";
+import {
+  SubscribableRuntime,
+  useRuntimeStateInternal,
+} from "./useRuntimeState";
 
 export function createStateHookForRuntime<TState>(
   useRuntime: (options: {
@@ -70,7 +73,7 @@ export function createStateHookForRuntime<TState>(
 
     const store = useRuntime({ optional });
     if (!store) return null;
-    return useRuntimeState(store, selector);
+    return useRuntimeStateInternal(store, selector);
   }
 
   return useStoreHook;

@@ -12,6 +12,7 @@ import {
   ContentPartRuntimeImpl,
   ContentPartState,
 } from "../../api/ContentPartRuntime";
+import { ensureBinding } from "../react/utils/ensureBinding";
 
 export namespace TextContentPartProvider {
   export type Props = PropsWithChildren<{
@@ -46,19 +47,19 @@ export const TextContentPartProvider: FC<TextContentPartProvider.Props> = ({
       text,
     }));
 
-    const useContentPartRuntime = create(
-      () =>
-        new ContentPartRuntimeImpl({
-          path: {
-            ref: "text",
-            threadSelector: { type: "main" },
-            messageSelector: { type: "messageId", messageId: "" },
-            contentPartSelector: { type: "index", index: 0 },
-          },
-          getState: useContentPart.getState,
-          subscribe: useContentPart.subscribe,
-        }),
-    );
+    const contentPartRuntime = new ContentPartRuntimeImpl({
+      path: {
+        ref: "text",
+        threadSelector: { type: "main" },
+        messageSelector: { type: "messageId", messageId: "" },
+        contentPartSelector: { type: "index", index: 0 },
+      },
+      getState: useContentPart.getState,
+      subscribe: useContentPart.subscribe,
+    });
+    ensureBinding(contentPartRuntime);
+    
+    const useContentPartRuntime = create(() => contentPartRuntime);
 
     return { useContentPartRuntime, useContentPart };
   });

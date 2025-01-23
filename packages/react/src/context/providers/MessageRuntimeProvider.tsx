@@ -7,6 +7,7 @@ import type { MessageContextValue } from "../react/MessageContext";
 import { makeMessageUtilsStore } from "../stores/MessageUtils";
 import { writableStore } from "../ReadonlyStore";
 import { MessageRuntime } from "../../api/MessageRuntime";
+import { ensureBinding } from "../react/utils/ensureBinding";
 
 export namespace MessageRuntimeProvider {
   export type Props = PropsWithChildren<{
@@ -18,6 +19,8 @@ const useMessageRuntimeStore = (runtime: MessageRuntime) => {
   const [store] = useState(() => create(() => runtime));
 
   useEffect(() => {
+    ensureBinding(runtime);
+
     writableStore(store).setState(runtime, true);
   }, [runtime, store]);
 

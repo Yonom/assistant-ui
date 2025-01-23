@@ -15,6 +15,7 @@ import { AssistantRuntime } from "../../api/AssistantRuntime";
 import { create } from "zustand";
 import { writableStore } from "../ReadonlyStore";
 import { AssistantRuntimeCore } from "../../runtimes/core/AssistantRuntimeCore";
+import { ensureBinding } from "../react/utils/ensureBinding";
 
 export namespace AssistantRuntimeProvider {
   export type Props = PropsWithChildren<{
@@ -29,6 +30,8 @@ const useAssistantRuntimeStore = (runtime: AssistantRuntime) => {
   const [store] = useState(() => create(() => runtime));
 
   useEffect(() => {
+    ensureBinding(runtime);
+ 
     writableStore(store).setState(runtime, true);
   }, [runtime, store]);
 

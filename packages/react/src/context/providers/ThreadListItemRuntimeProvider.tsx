@@ -8,6 +8,7 @@ import {
 } from "../react/ThreadListItemContext";
 import { writableStore } from "../ReadonlyStore";
 import { ThreadListItemRuntime } from "../../api/ThreadListItemRuntime";
+import { ensureBinding } from "../react/utils/ensureBinding";
 
 export namespace ThreadListItemRuntimeProvider {
   export type Props = PropsWithChildren<{
@@ -19,6 +20,7 @@ const useThreadListItemRuntimeStore = (runtime: ThreadListItemRuntime) => {
   const [store] = useState(() => create(() => runtime));
 
   useEffect(() => {
+    ensureBinding(runtime);
     writableStore(store).setState(runtime, true);
   }, [runtime, store]);
 

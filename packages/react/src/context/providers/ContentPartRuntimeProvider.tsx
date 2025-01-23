@@ -6,6 +6,7 @@ import { ContentPartContext } from "../react/ContentPartContext";
 import type { ContentPartContextValue } from "../react/ContentPartContext";
 import { writableStore } from "../ReadonlyStore";
 import { ContentPartRuntime } from "../../api/ContentPartRuntime";
+import { ensureBinding } from "../react/utils/ensureBinding";
 
 export namespace ContentPartRuntimeProvider {
   export type Props = PropsWithChildren<{
@@ -17,6 +18,8 @@ const useContentPartRuntimeStore = (runtime: ContentPartRuntime) => {
   const [store] = useState(() => create(() => runtime));
 
   useEffect(() => {
+    ensureBinding(runtime);
+
     writableStore(store).setState(runtime, true);
   }, [runtime, store]);
 

@@ -10,6 +10,7 @@ import { ThreadRuntime } from "../../api/ThreadRuntime";
 import { create } from "zustand";
 import { ThreadListItemRuntime } from "../../api/ThreadListItemRuntime";
 import { ThreadListItemRuntimeProvider } from "./ThreadListItemRuntimeProvider";
+import { ensureBinding } from "../react/utils/ensureBinding";
 
 type ThreadProviderProps = {
   listItemRuntime: ThreadListItemRuntime;
@@ -20,6 +21,9 @@ const useThreadRuntimeStore = (runtime: ThreadRuntime) => {
   const [store] = useState(() => create(() => runtime));
 
   useEffect(() => {
+    ensureBinding(runtime);
+    ensureBinding(runtime.composer);
+
     writableStore(store).setState(runtime, true);
   }, [runtime, store]);
 
