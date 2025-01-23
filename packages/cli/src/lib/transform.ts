@@ -86,11 +86,8 @@ export function transform(
   if (options.logStatus) {
     log(`Applying codemod '${codemod}': ${source}`);
   }
-  const codemodPath = path.resolve(
-    __dirname,
-    `../codemods/${codemod}.js`,
-  );
-  console.log(codemodPath);
+  const codemodPath = path.resolve(__dirname, `../codemods/${codemod}.js`);
+
   const targetPath = path.resolve(source);
   const jscodeshift = getJscodeshift();
   const command = buildCommand(
