@@ -191,7 +191,7 @@ const EmptyContent = memo(
 export const MessagePrimitiveContent: FC<MessagePrimitiveContent.Props> = ({
   components,
 }) => {
-  const contentLength = useMessage((s) => s.content.length) || 1;
+  const contentLength = useMessage((s) => s.content.length);
 
   if (contentLength === 0) {
     return <EmptyContent components={components} />;

@@ -66,7 +66,7 @@ const joinExternalMessages = (
           ...toolCall,
           ...{
             [symbolInnerMessage]: [
-              ...(toolCall as any)[symbolInnerMessage],
+              ...((toolCall as any)[symbolInnerMessage] ?? []),
               output,
             ],
           },
