@@ -20,8 +20,6 @@ export const useComposerSend = () => {
   );
 
   const callback = useCallback(() => {
-    if (!composerRuntime.getState().isEditing) return;
-
     composerRuntime.send();
   }, [composerRuntime]);
 

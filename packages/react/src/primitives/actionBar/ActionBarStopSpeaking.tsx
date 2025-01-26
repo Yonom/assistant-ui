@@ -15,7 +15,7 @@ const useActionBarStopSpeaking = () => {
   const messageRuntime = useMessageRuntime();
   const isSpeaking = useMessage((u) => u.speech != null);
 
-  const callback = useCallback(async () => {
+  const callback = useCallback(() => {
     messageRuntime.stopSpeaking();
   }, [messageRuntime]);
 
