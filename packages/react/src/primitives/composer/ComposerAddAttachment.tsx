@@ -36,7 +36,7 @@ const useComposerAddAttachment = ({
     };
 
     input.click();
-  }, [composerRuntime]);
+  }, [composerRuntime, multiple]);
 
   if (disabled) return null;
   return callback;

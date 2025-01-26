@@ -23,7 +23,7 @@ export const useComposerSend = () => {
     if (!composerRuntime.getState().isEditing) return;
 
     composerRuntime.send();
-  }, [threadRuntime]);
+  }, [composerRuntime]);
 
   if (disabled) return null;
   return callback;

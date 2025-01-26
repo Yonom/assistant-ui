@@ -18,7 +18,7 @@ const useThreadIf = (props: UseThreadIfProps) => {
     if (props.empty === false && thread.messages.length === 0) return false;
     if (props.running === true && !thread.isRunning) return false;
     if (props.running === false && thread.isRunning) return false;
-    if (props.disabled === true && thread.isDisabled) return false;
+    if (props.disabled === true && !thread.isDisabled) return false;
     if (props.disabled === false && thread.isDisabled) return false;
 
     return true;

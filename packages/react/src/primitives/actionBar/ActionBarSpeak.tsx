@@ -9,10 +9,10 @@ import {
 } from "../../utils/createActionButton";
 
 const useActionBarSpeak = () => {
-  const messageRunime = useMessageRuntime();
+  const messageRuntime = useMessageRuntime();
   const callback = useCallback(async () => {
-    messageRunime.speak();
-  }, [messageRunime]);
+    messageRuntime.speak();
+  }, [messageRuntime]);
 
   const hasSpeakableContent = useMessage((m) => {
     return (
