@@ -12,21 +12,26 @@ class AssistantCloudThreadHistoryAdapter implements ThreadHistoryAdapter {
     private threadListItemRuntime: ThreadListItemRuntime,
   ) {}
 
-  private _getIdForLocalId: Record<string, Promise<string>> = {};
+  private _getIdForLocalId: Record<string, string | Promise<string>> = {};
 
   async append({ parentId, message }: ExportedMessageRepositoryItem) {
     const { remoteId } = await this.threadListItemRuntime.initialize();
-    const task = this.cloudRef.current.threads.messages.create(remoteId, {
-      parent_id: parentId
-        ? ((await this._getIdForLocalId[parentId]) ?? parentId)
-        : null,
-      format: "aui/v0",
-      content: auiV0Encode(message),
-    });
-    this._getIdForLocalId[message.id] = task.then(({ message_id }) => {
-      this._getIdForLocalId[message.id] = Promise.resolve(message_id);
-      return message_id;
-    });
+    const task = this.cloudRef.current.threads.messages
+      .create(remoteId, {
+        parent_id: parentId
+          ? ((await this._getIdForLocalId[parentId]) ?? parentId)
+          : null,
+        format: "aui/v0",
+        content: auiV0Encode(message),
+      })
+      .then(({ message_id }) => {
+        this._getIdForLocalId[message.id] = message_id;
+        return message_id;
+      });
+
+    this._getIdForLocalId[message.id] = task;
+
+    return task.then(() => {});
   }
 
   async load() {

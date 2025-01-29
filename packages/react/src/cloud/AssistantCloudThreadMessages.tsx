@@ -1,10 +1,6 @@
 import { ReadonlyJSONObject } from "../utils/json/json-value";
 import { AssistantCloudAPI } from "./AssistantCloudAPI";
 
-type AssistantCloudThreadMessageListQuery = {
-  thread_id: string;
-};
-
 export type CloudMessage = {
   id: string;
   parent_id: string | null;
@@ -34,11 +30,9 @@ export class AssistantCloudThreadMessages {
 
   public async list(
     threadId: string,
-    query?: AssistantCloudThreadMessageListQuery,
   ): Promise<AssistantCloudThreadMessageListResponse> {
     return this.cloud.makeRequest(
       `/threads/${encodeURIComponent(threadId)}/messages`,
-      { query },
     );
   }
 

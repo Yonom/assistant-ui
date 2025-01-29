@@ -48,7 +48,7 @@ export const useLocalRuntime = (
         chatModel: adapter,
       },
     }),
-    [adapter, options],
+    [adapter, options, threadListAdapters],
   );
 
   const [runtime] = useState(() => new LocalRuntimeCore(opt, initialMessages));

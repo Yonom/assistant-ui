@@ -30,12 +30,12 @@ const getUserIdFromJwt = (token: string) => {
 
 export const POST = async () => {
   const cookieStore = await cookies();
-  const jwt = cookieStore.get("jwt");
+  const jwtCookie = cookieStore.get("jwt");
   let userId;
-  if (!jwt) {
+  if (!jwtCookie) {
     userId = randomUserId();
   } else {
-    userId = getUserIdFromJwt(jwt.value);
+    userId = getUserIdFromJwt(jwtCookie.value);
   }
 
   cookieStore.set("jwt", getJwtForUser(userId), {
@@ -43,6 +43,7 @@ export const POST = async () => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 7, // 1 week
   });
 
   const client = new AssistantCloud({

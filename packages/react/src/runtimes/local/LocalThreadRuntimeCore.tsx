@@ -294,7 +294,7 @@ export class LocalThreadRuntimeCore
         message.status.type === "complete" ||
         message.status.type === "incomplete"
       ) {
-        this._options.adapters.history?.append({
+        await this._options.adapters.history?.append({
           parentId,
           message: message,
         });
