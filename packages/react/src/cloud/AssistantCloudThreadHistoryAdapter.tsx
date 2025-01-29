@@ -4,18 +4,18 @@ import { ThreadHistoryAdapter } from "../runtimes/adapters/thread-history/Thread
 import { ExportedMessageRepositoryItem } from "../runtimes/utils/MessageRepository";
 import { AssistantCloud } from "./AssistantCloud";
 import { auiV0Decode, auiV0Encode } from "./auiV0";
+import { ThreadListItemRuntime } from "../api";
 
 class AssistantCloudThreadHistoryAdapter implements ThreadHistoryAdapter {
   constructor(
     private cloudRef: RefObject<AssistantCloud>,
-    private readonly threadId: string | undefined,
-    private readonly initialize: () => Promise<{ remoteId: string }>,
+    private threadListItemRuntime: ThreadListItemRuntime,
   ) {}
 
   private _getIdForLocalId: Record<string, Promise<string>> = {};
 
   async append({ parentId, message }: ExportedMessageRepositoryItem) {
-    const { remoteId } = await this.initialize();
+    const { remoteId } = await this.threadListItemRuntime.initialize();
     const task = this.cloudRef.current.threads.messages.create(remoteId, {
       parent_id: parentId
         ? ((await this._getIdForLocalId[parentId]) ?? parentId)
@@ -30,10 +30,10 @@ class AssistantCloudThreadHistoryAdapter implements ThreadHistoryAdapter {
   }
 
   async load() {
-    if (!this.threadId) return { messages: [] };
-    const { messages } = await this.cloudRef.current.threads.messages.list(
-      this.threadId,
-    );
+    const remoteId = this.threadListItemRuntime.getState().remoteId;
+    if (!remoteId) return { messages: [] };
+    const { messages } =
+      await this.cloudRef.current.threads.messages.list(remoteId);
     const payload = {
       messages: messages
         .filter(
@@ -52,11 +52,7 @@ export const useAssistantCloudThreadHistoryAdapter = (
   const threadListItemRuntime = useThreadListItemRuntime();
   const [adapter] = useState(
     () =>
-      new AssistantCloudThreadHistoryAdapter(
-        cloudRef,
-        threadListItemRuntime.getState().remoteId,
-        () => threadListItemRuntime.initialize(),
-      ),
+      new AssistantCloudThreadHistoryAdapter(cloudRef, threadListItemRuntime),
   );
 
   return adapter;

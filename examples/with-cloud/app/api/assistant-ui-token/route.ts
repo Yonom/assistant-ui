@@ -16,8 +16,8 @@ const getJwtForUser = (userId: string) => {
   return jwt.sign(
     {
       sub: userId,
-      iat: Date.now(),
-      exp: Date.now() + 60 * 60 * 24 * 7, // 1 week
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 1 week
     },
     process.env["JWT_SECRET"]!,
   );
