@@ -261,7 +261,7 @@ export class LocalThreadRuntimeCore
           status: {
             type: "incomplete",
             reason: "error",
-            error: e instanceof Error ? e.message : new String(e).toString(),
+            error: e instanceof Error ? e.message : `[${typeof e}] ${new String(e).toString()}`,
           },
         });
 
