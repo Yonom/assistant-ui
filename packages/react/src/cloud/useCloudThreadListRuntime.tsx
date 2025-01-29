@@ -1,6 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { AssistantCloud } from "./AssistantCloud";
 import { AssistantRuntime } from "../api";
 import { RemoteThreadListSubscriber } from "../runtimes/remote-thread-list/types";
@@ -106,7 +114,7 @@ export const useCloudThreadListRuntime = (adapter: CloudThreadListAdapter) => {
         subscribers.delete(callback);
       };
     },
-    unstable_Provider: useCallback(({ children }) => {
+    unstable_Provider: useCallback<FC<PropsWithChildren>>(({ children }) => {
       const history = useAssistantCloudThreadHistoryAdapter({
         get current() {
           return adapterRef.current.cloud;
