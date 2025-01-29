@@ -1,4 +1,5 @@
-import { JSONValue, LanguageModelV1StreamPart } from "@ai-sdk/provider";
+import { LanguageModelV1StreamPart } from "@ai-sdk/provider";
+import { JSONValue } from "../../../utils/json/json-value";
 
 export enum AssistantStreamChunkType {
   TextDelta = "0",

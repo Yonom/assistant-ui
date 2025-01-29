@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { CompleteAttachment } from "./AttachmentTypes";
+import { JSONObject, JSONValue } from "../utils/json/json-value";
 
 export type MessageRole = "user" | "assistant" | "system";
 
@@ -70,7 +71,7 @@ export type UIContentPart = {
 };
 
 export type CoreToolCallContentPart<
-  TArgs extends Record<string, unknown> = Record<string | number, unknown>,
+  TArgs extends JSONObject = JSONObject,
   TResult = unknown,
 > = {
   readonly type: "tool-call";
@@ -82,7 +83,7 @@ export type CoreToolCallContentPart<
 };
 
 export type ToolCallContentPart<
-  TArgs extends Record<string, unknown> = Record<string | number, unknown>,
+  TArgs extends JSONObject = JSONObject,
   TResult = unknown,
 > = CoreToolCallContentPart<TArgs, TResult> & {
   readonly argsText: string;
@@ -160,7 +161,7 @@ export type MessageStatus =
         | "content-filter"
         | "other"
         | "error";
-      readonly error?: unknown;
+      readonly error?: JSONValue;
     };
 
 export type ThreadSystemMessage = MessageCommonProps & {
@@ -185,8 +186,8 @@ export type ThreadAssistantMessage = MessageCommonProps & {
   readonly content: readonly ThreadAssistantContentPart[];
   readonly status: MessageStatus;
   readonly metadata: {
-    readonly unstable_annotations: readonly unknown[];
-    readonly unstable_data: readonly unknown[];
+    readonly unstable_annotations: readonly JSONValue[];
+    readonly unstable_data: readonly JSONValue[];
     readonly steps: readonly ThreadStep[];
     readonly custom: Record<string, unknown>;
   };
@@ -211,8 +212,8 @@ export type AppendMessage = CoreMessage & {
 type BaseThreadMessage = {
   readonly status?: ThreadAssistantMessage["status"];
   readonly metadata: {
-    readonly unstable_annotations?: readonly unknown[];
-    readonly unstable_data?: readonly unknown[];
+    readonly unstable_annotations?: readonly JSONValue[];
+    readonly unstable_data?: readonly JSONValue[];
     readonly steps?: readonly ThreadStep[];
     readonly custom: Record<string, unknown>;
   };

@@ -3,8 +3,9 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import { ToolCallContentPartProps } from "../types";
 import { create } from "zustand";
+import { JSONObject } from "../utils/json/json-value";
 
-export const useInlineRender = <TArgs extends Record<string, unknown>, TResult>(
+export const useInlineRender = <TArgs extends JSONObject, TResult>(
   toolUI: FC<ToolCallContentPartProps<TArgs, TResult>>,
 ): FC<ToolCallContentPartProps<TArgs, TResult>> => {
   const [useToolUI] = useState(() => create(() => toolUI));
