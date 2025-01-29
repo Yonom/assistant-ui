@@ -43,7 +43,7 @@ type AssistantCloudThreadsUpdateBody = {
 };
 
 export class AssistantCloudThreads {
-  public readonly messages;
+  public readonly messages: AssistantCloudThreadMessages;
 
   constructor(private cloud: AssistantCloudAPI) {
     this.messages = new AssistantCloudThreadMessages(cloud);
