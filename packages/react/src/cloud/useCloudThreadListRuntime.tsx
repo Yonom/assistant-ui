@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRemoteThreadListRuntime } from "../useRemoteThreadListRuntime";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AssistantCloud } from "./AssistantCloud";
-import { AssistantRuntime } from "../../../api";
-import { RemoteThreadListSubscriber } from "../types";
-import { toCoreMessages } from "../../edge";
+import { AssistantRuntime } from "../api";
+import { RemoteThreadListSubscriber } from "../runtimes/remote-thread-list/types";
+import { toCoreMessages } from "../runtimes/edge";
+import { useRemoteThreadListRuntime } from "../runtimes/remote-thread-list/useRemoteThreadListRuntime";
+import { RuntimeAdapterProvider } from "../runtimes/adapters/RuntimeAdapterProvider";
+import { useAssistantCloudThreadHistoryAdapter } from "./AssistantCloudThreadHistoryAdapter";
 
 type ThreadData = {
   externalId: string;
@@ -104,6 +106,20 @@ export const useCloudThreadListRuntime = (adapter: CloudThreadListAdapter) => {
         subscribers.delete(callback);
       };
     },
+    unstable_Provider: useCallback(({ children }) => {
+      const history = useAssistantCloudThreadHistoryAdapter({
+        get current() {
+          return adapterRef.current.cloud;
+        },
+      });
+      const adapters = useMemo(() => ({ history }), [history]);
+
+      return (
+        <RuntimeAdapterProvider adapters={adapters}>
+          {children}
+        </RuntimeAdapterProvider>
+      );
+    }, []),
   });
 
   return runtime;
