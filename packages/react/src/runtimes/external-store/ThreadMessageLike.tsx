@@ -18,7 +18,7 @@ import {
   CoreToolCallContentPart,
   ThreadStep,
 } from "../../types/AssistantTypes";
-import { JSONValue } from "../../utils/json/json-value";
+import { ReadonlyJSONValue } from "../../utils/json/json-value";
 import { parsePartialJson } from "../../utils/json/parse-partial-json";
 
 export type ThreadMessageLike = {
@@ -48,8 +48,10 @@ export type ThreadMessageLike = {
   readonly attachments?: readonly CompleteAttachment[] | undefined;
   readonly metadata?:
     | {
-        readonly unstable_annotations?: readonly JSONValue[] | undefined;
-        readonly unstable_data?: readonly JSONValue[] | undefined;
+        readonly unstable_annotations?:
+          | readonly ReadonlyJSONValue[]
+          | undefined;
+        readonly unstable_data?: readonly ReadonlyJSONValue[] | undefined;
         readonly steps?: readonly ThreadStep[] | undefined;
         readonly custom?: Record<string, unknown> | undefined;
       }

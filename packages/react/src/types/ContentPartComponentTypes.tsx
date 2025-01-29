@@ -9,7 +9,7 @@ import type {
   Unstable_AudioContentPart,
 } from "./AssistantTypes";
 import { ContentPartState } from "../api/ContentPartRuntime";
-import { JSONObject } from "../utils/json/json-value";
+import { ReadonlyJSONObject } from "../utils/json/json-value";
 
 export type EmptyContentPartProps = {
   status: ContentPartStatus;
@@ -34,7 +34,7 @@ export type UIContentPartProps = ContentPartState & UIContentPart;
 export type UIContentPartComponent = ComponentType<UIContentPartProps>;
 
 export type ToolCallContentPartProps<
-  TArgs extends JSONObject = any,
+  TArgs extends ReadonlyJSONObject = any,
   TResult = unknown,
 > = ContentPartState &
   ToolCallContentPart<TArgs, TResult> & {
@@ -42,6 +42,6 @@ export type ToolCallContentPartProps<
   };
 
 export type ToolCallContentPartComponent<
-  TArgs extends JSONObject = any,
+  TArgs extends ReadonlyJSONObject = any,
   TResult = any,
 > = ComponentType<ToolCallContentPartProps<TArgs, TResult>>;

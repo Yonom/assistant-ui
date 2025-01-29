@@ -1,5 +1,5 @@
 import { LanguageModelV1StreamPart } from "@ai-sdk/provider";
-import { JSONValue } from "../../../utils/json/json-value";
+import { ReadonlyJSONValue } from "../../../utils/json/json-value";
 
 export enum AssistantStreamChunkType {
   TextDelta = "0",
@@ -18,8 +18,8 @@ export enum AssistantStreamChunkType {
 
 export type AssistantStreamChunk = {
   [AssistantStreamChunkType.TextDelta]: string;
-  [AssistantStreamChunkType.Data]: JSONValue[];
-  [AssistantStreamChunkType.Annotation]: JSONValue[];
+  [AssistantStreamChunkType.Data]: ReadonlyJSONValue[];
+  [AssistantStreamChunkType.Annotation]: ReadonlyJSONValue[];
   [AssistantStreamChunkType.ToolCall]: {
     toolCallId: string;
     toolName: string;

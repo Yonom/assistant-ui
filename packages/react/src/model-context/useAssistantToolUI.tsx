@@ -3,9 +3,9 @@
 import { useEffect } from "react";
 import { useToolUIsStore } from "../context/react/AssistantContext";
 import type { ToolCallContentPartComponent } from "../types/ContentPartComponentTypes";
-import { JSONObject } from "../utils/json/json-value";
+import { ReadonlyJSONObject } from "../utils/json/json-value";
 
-export type AssistantToolUIProps<TArgs extends JSONObject, TResult> = {
+export type AssistantToolUIProps<TArgs extends ReadonlyJSONObject, TResult> = {
   toolName: string;
   render: ToolCallContentPartComponent<TArgs, TResult>;
 };

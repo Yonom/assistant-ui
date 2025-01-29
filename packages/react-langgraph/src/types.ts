@@ -1,4 +1,4 @@
-import { JSONObject } from "../../react/src/utils/json/json-value";
+import { ReadonlyJSONObject } from "../../react/src/utils/json/json-value";
 
 export type LangChainToolCallChunk = {
   id: string;
@@ -9,7 +9,7 @@ export type LangChainToolCallChunk = {
 export type LangChainToolCall = {
   id: string;
   name: string;
-  args: JSONObject;
+  args: ReadonlyJSONObject;
 };
 
 type MessageContentText = {

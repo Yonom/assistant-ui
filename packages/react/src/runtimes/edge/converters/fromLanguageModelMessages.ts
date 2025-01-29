@@ -1,7 +1,7 @@
 import { LanguageModelV1Message } from "@ai-sdk/provider";
 import { CoreMessage, ToolCallContentPart } from "../../../types";
 import { Writable } from "stream";
-import { JSONObject } from "../../../utils/json/json-value";
+import { ReadonlyJSONObject } from "../../../utils/json/json-value";
 
 type fromLanguageModelMessagesOptions = {
   mergeSteps: boolean;
@@ -77,7 +77,7 @@ export const fromLanguageModelMessages = (
               toolCallId: part.toolCallId,
               toolName: part.toolName,
               argsText: JSON.stringify(part.args),
-              args: part.args as JSONObject,
+              args: part.args as ReadonlyJSONObject,
             } satisfies ToolCallContentPart;
           }
           return part;

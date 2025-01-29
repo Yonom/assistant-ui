@@ -1,6 +1,10 @@
-import { JSONArray, JSONObject, JSONValue } from "./json-value";
+import {
+  ReadonlyJSONArray,
+  ReadonlyJSONObject,
+  ReadonlyJSONValue,
+} from "./json-value";
 
-export function isJSONValue(value: unknown): value is JSONValue {
+export function isJSONValue(value: unknown): value is ReadonlyJSONValue {
   if (
     value === null ||
     typeof value === "string" ||
@@ -23,11 +27,11 @@ export function isJSONValue(value: unknown): value is JSONValue {
   return false;
 }
 
-export function isJSONArray(value: unknown): value is JSONArray {
+export function isJSONArray(value: unknown): value is ReadonlyJSONArray {
   return Array.isArray(value) && value.every(isJSONValue);
 }
 
-export function isJSONObject(value: unknown): value is JSONObject {
+export function isJSONObject(value: unknown): value is ReadonlyJSONObject {
   return (
     value != null &&
     typeof value === "object" &&

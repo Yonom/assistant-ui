@@ -1,13 +1,13 @@
-export type JSONValue =
+export type ReadonlyJSONValue =
   | null
   | string
   | number
   | boolean
-  | JSONObject
-  | JSONArray;
+  | ReadonlyJSONObject
+  | ReadonlyJSONArray;
 
-export type JSONObject = {
-  [key: string]: JSONValue;
+export type ReadonlyJSONObject = {
+  readonly [key: string]: ReadonlyJSONValue;
 };
 
-export type JSONArray = readonly JSONValue[];
+export type ReadonlyJSONArray = readonly ReadonlyJSONValue[];

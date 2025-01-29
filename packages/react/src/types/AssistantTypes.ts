@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import { CompleteAttachment } from "./AttachmentTypes";
-import { JSONObject, JSONValue } from "../utils/json/json-value";
+import {
+  ReadonlyJSONObject,
+  ReadonlyJSONValue,
+} from "../utils/json/json-value";
 
 export type MessageRole = "user" | "assistant" | "system";
 
@@ -71,7 +74,7 @@ export type UIContentPart = {
 };
 
 export type CoreToolCallContentPart<
-  TArgs extends JSONObject = JSONObject,
+  TArgs extends ReadonlyJSONObject = ReadonlyJSONObject,
   TResult = unknown,
 > = {
   readonly type: "tool-call";
@@ -83,7 +86,7 @@ export type CoreToolCallContentPart<
 };
 
 export type ToolCallContentPart<
-  TArgs extends JSONObject = JSONObject,
+  TArgs extends ReadonlyJSONObject = ReadonlyJSONObject,
   TResult = unknown,
 > = CoreToolCallContentPart<TArgs, TResult> & {
   readonly argsText: string;
@@ -161,7 +164,7 @@ export type MessageStatus =
         | "content-filter"
         | "other"
         | "error";
-      readonly error?: JSONValue;
+      readonly error?: ReadonlyJSONValue;
     };
 
 export type ThreadSystemMessage = MessageCommonProps & {
@@ -186,8 +189,8 @@ export type ThreadAssistantMessage = MessageCommonProps & {
   readonly content: readonly ThreadAssistantContentPart[];
   readonly status: MessageStatus;
   readonly metadata: {
-    readonly unstable_annotations: readonly JSONValue[];
-    readonly unstable_data: readonly JSONValue[];
+    readonly unstable_annotations: readonly ReadonlyJSONValue[];
+    readonly unstable_data: readonly ReadonlyJSONValue[];
     readonly steps: readonly ThreadStep[];
     readonly custom: Record<string, unknown>;
   };
@@ -212,8 +215,8 @@ export type AppendMessage = CoreMessage & {
 type BaseThreadMessage = {
   readonly status?: ThreadAssistantMessage["status"];
   readonly metadata: {
-    readonly unstable_annotations?: readonly JSONValue[];
-    readonly unstable_data?: readonly JSONValue[];
+    readonly unstable_annotations?: readonly ReadonlyJSONValue[];
+    readonly unstable_data?: readonly ReadonlyJSONValue[];
     readonly steps?: readonly ThreadStep[];
     readonly custom: Record<string, unknown>;
   };

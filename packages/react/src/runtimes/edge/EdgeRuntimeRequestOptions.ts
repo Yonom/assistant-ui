@@ -4,7 +4,7 @@ import {
   LanguageModelV1CallSettingsSchema,
 } from "../../model-context/ModelContextTypes";
 import { z } from "zod";
-import { JSONObject } from "../../utils/json/json-value";
+import { ReadonlyJSONObject } from "../../utils/json/json-value";
 
 const LanguageModelV1FunctionToolSchema = z.object({
   type: z.literal("function"),
@@ -43,7 +43,9 @@ const CoreToolCallContentPartSchema = z.object({
   type: z.literal("tool-call"),
   toolCallId: z.string(),
   toolName: z.string(),
-  args: z.record(z.unknown()).refine((c): c is JSONObject => c !== undefined),
+  args: z
+    .record(z.unknown())
+    .refine((c): c is ReadonlyJSONObject => c !== undefined),
   result: z.unknown().optional(),
   isError: z.boolean().optional(),
 });
