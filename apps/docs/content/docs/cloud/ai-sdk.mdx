@@ -72,6 +72,8 @@ export async function POST(req: Request) {
 ```
 
 ```tsx twoslash {1-2,5-6,19,27,29-36,38-45} title="/app/MyRuntimeProvider.tsx"
+// @errors: 2307
+
 "use client";
 
 import {
@@ -124,7 +126,7 @@ export function MyRuntimeProvider({
 ```
 
 <Callout emoji="💡">
-  Observe that the `useMyAISDKRuntime` hook is extracted into a separate
+  Observe that the `useMyLangGraphRuntime` hook is extracted into a separate
   function. This hook will be mounted multiple times, once per active thread.
 </Callout>
 
