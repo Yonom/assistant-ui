@@ -88,7 +88,7 @@ const AttachmentPreview: FC<AttachmentPreviewProps> = ({ src }) => {
         overflow: "clip",
       }}
       onLoad={() => setIsLoaded(true)}
-      alt="Image Preview"
+      alt="Preview"
     />
   );
 };
