@@ -121,7 +121,7 @@ const AttachmentThumb: FC = () => {
       <AvatarFallback delayMs={isImage ? 200 : 0}>
         <FileIcon />
       </AvatarFallback>
-      <AvatarImage src={src}></AvatarImage>
+      <AvatarImage src={src} />
     </AvatarRoot>
   );
 };
