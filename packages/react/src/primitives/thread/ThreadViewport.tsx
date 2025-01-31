@@ -7,8 +7,10 @@ import { useThreadViewportAutoScroll } from "./useThreadViewportAutoScroll";
 
 export namespace ThreadPrimitiveViewport {
   export type Element = ComponentRef<typeof Primitive.div>;
-  export type Props = ComponentPropsWithoutRef<typeof Primitive.div> &
-    useThreadViewportAutoScroll.Options;
+  export type Props = ComponentPropsWithoutRef<typeof Primitive.div> & {
+    autoScroll?: boolean | undefined;
+    unstable_scrollToBottomOnRunStart?: boolean | undefined;
+  };
 }
 
 export const ThreadPrimitiveViewport = forwardRef<

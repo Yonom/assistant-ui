@@ -1,1 +1,1 @@
-export * from "@/registry/components/shadcn/markdown-text";
+export * from "@/registry/components/assistant-ui/markdown-text";

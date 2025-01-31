@@ -1,1 +1,1 @@
-export * from "@/registry/components/shadcn/syntax-highlighter";
+export * from "@/registry/components/assistant-ui/syntax-highlighter";

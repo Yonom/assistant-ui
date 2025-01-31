@@ -1,1 +1,1 @@
-export * from "@/registry/components/shadcn/tooltip-icon-button";
+export * from "@/registry/components/assistant-ui/tooltip-icon-button";
