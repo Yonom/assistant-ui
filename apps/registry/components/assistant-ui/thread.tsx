@@ -112,15 +112,6 @@ const ThreadWelcomeSuggestions: FC = () => {
 const Composer: FC = () => {
   return (
     <ComposerPrimitive.Root className="aui-composer-root">
-      {/* <ComposerPrimitive.AddAttachment asChild>
-        <TooltipIconButton
-          tooltip="Send"
-          variant="default"
-          className="aui-composer-send"
-        >
-          <SendHorizontalIcon />
-        </TooltipIconButton>
-      </ComposerPrimitive.AddAttachment> */}
       <ComposerPrimitive.Input
         autoFocus
         placeholder="Write a message..."
