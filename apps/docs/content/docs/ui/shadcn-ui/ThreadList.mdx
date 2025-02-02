@@ -3,7 +3,6 @@ title: ThreadList
 ---
 
 import { Steps, Step } from "fumadocs-ui/components/steps";
-import { Callout } from "fumadocs-ui/components/callout";
 
 ## Overview
 
@@ -27,8 +26,8 @@ This adds a `/components/assistant-ui/thread-list.tsx` file to your project, whi
 
 ### Use in your application
 
-
 ```tsx title="/app/page.tsx" {1,5-6}
+import { Thread } from "@/components/assistant-ui/thread";
 import { ThreadList } from "@/components/assistant-ui/thread-list";
 
 export default function Home() {
