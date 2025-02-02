@@ -290,7 +290,7 @@ If you aren't using Next.js, you can also deploy this endpoint to Cloudflare Wor
 <Tabs items={["Thread", "AssistantModal"]}>
 
 ```tsx title="/app/page.tsx" tab="Thread"
-import { useEdgeRuntime } from "@assistant-ui/react";
+import { useEdgeRuntime, AssistantRuntimeProvider } from "@assistant-ui/react";
 import { Thread } from "@/components/assistant-ui/thread";
 
 const MyApp = () => {
@@ -311,7 +311,7 @@ const MyApp = () => {
 ```tsx title="/app/page.tsx" tab="AssistantModal"
 // run `npx shadcn@latest add "https://r.assistant-ui.com/assistant-modal"`
 
-import { useEdgeRuntime } from "@assistant-ui/react";
+import { useEdgeRuntime, AssistantRuntimeProvider } from "@assistant-ui/react";
 import { AssistantModal } from "@/components/assistant-ui/assistant-modal";
 
 const MyApp = () => {

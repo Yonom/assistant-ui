@@ -112,7 +112,7 @@ import { MessagePrimitive } from "@assistant/react";
 This is a helper context provider to allow you to reuse the content part components outside a message content part.
 
 ```tsx
-import { TextContentPartProvider } from "@assistant/react";
+import { TextContentPartProvider } from "@assistant-ui/react";
 
 <TextContentPartProvider text="Hello world" isRunning={false}>
   <ContentPart.Text />
@@ -124,7 +124,7 @@ import { TextContentPartProvider } from "@assistant/react";
 ### `useContentPartRuntime`
 
 ```tsx
-import { useContentPartRuntime } from "@assistant/react";
+import { useContentPartRuntime } from "@assistant-ui/react";
 
 const contentPartRuntime = useContentPartRuntime();
 ```
@@ -134,7 +134,7 @@ const contentPartRuntime = useContentPartRuntime();
 ### `useContentPart`
 
 ```tsx
-import { useContentPart } from "@assistant/react";
+import { useContentPart } from "@assistant-ui/react";
 
 const contentPart = useContentPart();
 ```
@@ -146,7 +146,7 @@ const contentPart = useContentPart();
 ### `useContentPartText`
 
 ```tsx
-import { useContentPartText } from "@assistant/react";
+import { useContentPartText } from "@assistant-ui/react";
 
 const contentPartText = useContentPartText();
 ```
