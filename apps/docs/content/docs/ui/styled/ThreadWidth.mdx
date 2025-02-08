@@ -1,0 +1,29 @@
+---
+title: Thread Width
+---
+
+You can modify the max width of the thread via the CSS variable `--aui-thread-max-width`. This variable affects all thread-related components, including:
+- Thread viewport and footer
+- Thread welcome screen
+- User messages
+- Assistant messages
+- Edit composer
+- Message attachments
+
+## Wider Thread
+
+```css title="@/app/globals.css"
+:root {
+  --aui-thread-max-width: 600px;
+}
+```
+
+## Take up the whole screen
+
+```css title="@/app/globals.css"
+:root {
+  --aui-thread-max-width: infinity;
+}
+```
+
+The width setting is consistently applied across all thread components to maintain a uniform layout throughout the conversation interface.
