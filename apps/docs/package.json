@@ -50,6 +50,7 @@
     "openai": "^4.83.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "react-resizable-panels": "^2.1.7",
     "react-syntax-highlighter": "^15.6.1",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
@@ -57,15 +58,16 @@
     "remark-stringify": "^11.0.0",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.24.1"
+    "zod": "^3.24.1",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/mdx": "^2.0.13",
     "@types/node": "^22.13.1",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
-    "autoprefixer": "^10.4.20",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8.5.1",
