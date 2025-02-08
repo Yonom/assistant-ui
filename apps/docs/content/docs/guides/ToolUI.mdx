@@ -140,7 +140,7 @@ const searchTool = {
     console.log(`Executing search with ID: ${toolCallId}`);
     
     // Use abortSignal to handle cancellation
-    const response = await fetch(`/api/search?q=${args.query}`, {
+    const response = await fetch(`/api/search?q=${encodeURIComponent(args.query)}`, {
       signal: abortSignal,
     });
     
