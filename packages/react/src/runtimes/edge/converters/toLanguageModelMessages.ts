@@ -160,7 +160,7 @@ export function toLanguageModelMessages(
               break;
             }
             default: {
-              const unhandledType:  "ui" = type;
+              const unhandledType: "ui" = type;
               throw new Error(`Unhandled content part type: ${unhandledType}`);
             }
           }
