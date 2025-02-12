@@ -2,6 +2,7 @@ import { CheckIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShineBorder } from "@/components/magicui/shine-border";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const pricingOptions = [
   {
@@ -72,9 +73,10 @@ export default function PricingSection() {
               </div>
               <Button
                 className="mt-auto w-full"
-                variant={option.title === "Pro" ? "default" : "outline"}
+                variant={isPro ? "default" : "outline"}
+                asChild
               >
-                {option.button}
+                <Link href={option.buttonLink}>{option.button}</Link>
               </Button>
             </Wrapper>
           );
