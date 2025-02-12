@@ -5,9 +5,9 @@ export default function OpenSourceCard() {
     <div className="mx-auto mb-12 w-full max-w-[1000px]">
       <div className="flex flex-col rounded-lg border-2 p-6">
         <div className="flex-grow">
-          <div className="flex gap-2">
-            <GithubIcon className="mb-4 h-6 w-6" />
-            <h3 className="mb-2 text-xl font-semibold">
+          <div className="mb-4 flex gap-3">
+            <GithubIcon className="h-6 w-6" />
+            <h3 className="text-xl font-semibold">
               Forever Free & Open Source (MIT License)
             </h3>
           </div>
