@@ -1,11 +1,8 @@
 import { AssistantStream, AssistantStreamChunk } from "../AssistantStream";
-import { UnderlyingReadable } from "../utils/UnderlyingReadable";
+import { UnderlyingReadable } from "../utils/stream/UnderlyingReadable";
 import { createTextStream, TextStreamController } from "./text";
 
 export type ToolCallStreamController = {
-  readonly toolCallId: string;
-  readonly toolName: string;
-
   argsText: TextStreamController;
 
   setResult(result: unknown): void;
@@ -13,24 +10,9 @@ export type ToolCallStreamController = {
 };
 
 class ToolCallStreamControllerImpl implements ToolCallStreamController {
-  public get toolCallId() {
-    return this._options.toolCallId;
-  }
-
-  public get toolName() {
-    return this._options.toolName;
-  }
-
   constructor(
     private _controller: ReadableStreamDefaultController<AssistantStreamChunk>,
-    private _options: { toolCallId: string; toolName: string },
   ) {
-    this._controller.enqueue({
-      type: "tool-call-begin",
-      toolCallId: this._options.toolCallId,
-      toolName: this._options.toolName,
-    });
-
     const stream = createTextStream({
       start: (c) => {
         this._argsTextController = c;
@@ -42,11 +24,7 @@ class ToolCallStreamControllerImpl implements ToolCallStreamController {
           if (chunk.type !== "text-delta")
             throw new Error("Unexpected chunk type");
 
-          this._controller.enqueue({
-            type: "tool-call-delta",
-            toolCallId: this._options.toolCallId,
-            argsTextDelta: chunk.textDelta,
-          });
+          this._controller.enqueue(chunk);
         },
       }),
     );
@@ -58,11 +36,12 @@ class ToolCallStreamControllerImpl implements ToolCallStreamController {
 
   private _argsTextController!: TextStreamController;
 
-  setResult(result: unknown) {
+  setResult(result: unknown, isError?: boolean) {
     this._controller.enqueue({
-      type: "tool-result",
-      toolCallId: this._options.toolCallId,
+      type: "result",
+      path: [],
       result,
+      isError: isError ?? false,
     });
   }
 
@@ -71,28 +50,28 @@ class ToolCallStreamControllerImpl implements ToolCallStreamController {
   }
 }
 
-type UnderlyingToolCallStreamReadable =
-  UnderlyingReadable<ToolCallStreamController> & {
-    toolCallId: string;
-    toolName: string;
-  };
-
 export const createToolCallStream = (
-  readable: UnderlyingToolCallStreamReadable,
+  readable: UnderlyingReadable<ToolCallStreamController>,
 ): AssistantStream => {
-  const options = {
-    toolCallId: readable.toolCallId,
-    toolName: readable.toolName,
-  };
   return new ReadableStream({
     start(c) {
-      return readable.start?.(new ToolCallStreamControllerImpl(c, options));
+      return readable.start?.(new ToolCallStreamControllerImpl(c));
     },
     pull(c) {
-      return readable.pull?.(new ToolCallStreamControllerImpl(c, options));
+      return readable.pull?.(new ToolCallStreamControllerImpl(c));
     },
     cancel(c) {
       return readable.cancel?.(c);
     },
   });
+};
+
+export const createToolCallStreamController = () => {
+  let controller!: ToolCallStreamController;
+  const stream = createToolCallStream({
+    start(c) {
+      controller = c;
+    },
+  });
+  return [stream, controller] as const;
 };

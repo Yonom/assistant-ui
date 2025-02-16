@@ -1,192 +1,202 @@
 import { AssistantStreamChunk } from "../AssistantStream";
-import { parsePartialJson } from "./partial-json/parse-partial-json";
-import { AssistantMessage, ToolCallContentPart } from "../utils/types";
+import { parsePartialJson } from "../utils/json/parse-partial-json";
+import {
+  AssistantMessage,
+  AssistantMessageStatus,
+  TextPart,
+  ToolCallPart,
+  SourcePart,
+} from "../utils/types";
 
-export const assistantMessageAccumulator = () => {
-  let message: AssistantMessage = {
-    role: "assistant",
-    content: [],
-    status: { type: "running" },
-    metadata: {
-      steps: [],
-      custom: {},
-    },
+/**
+ * Creates an initial AssistantMessage.
+ */
+const createInitialMessage = (): AssistantMessage => ({
+  role: "assistant",
+  status: { type: "running" },
+  parts: [],
+  metadata: {
+    unstable_data: [],
+    unstable_annotations: [],
+    steps: [],
+    custom: {},
+  },
+});
+
+/**
+ * Helper to update the last part in the message.
+ * If no parts exist, logs an error.
+ */
+const updateLastPart = (
+  message: AssistantMessage,
+  updater: (lastPart: any) => any,
+): AssistantMessage => {
+  if (message.parts.length === 0) {
+    console.error("No parts available to update.");
+    return message;
+  }
+  const lastIndex = message.parts.length - 1;
+  const updatedPart = updater(message.parts[lastIndex]);
+  return {
+    ...message,
+    parts: [...message.parts.slice(0, lastIndex), updatedPart],
   };
-  const transformer = new TransformStream<
-    AssistantStreamChunk,
-    AssistantMessage
-  >({
+};
+
+/**
+ * Handles a "part" chunk by appending a new part to the message.
+ */
+const handlePart = (
+  message: AssistantMessage,
+  chunk: AssistantStreamChunk & { type: "part" },
+): AssistantMessage => {
+  const partInit = chunk.part;
+  if (partInit.type === "text" || partInit.type === "reasoning") {
+    const newTextPart: TextPart = {
+      type: "text",
+      text: "",
+      status: { type: "running" },
+    };
+    return { ...message, parts: [...message.parts, newTextPart] };
+  } else if (partInit.type === "tool-call") {
+    const newToolCallPart: ToolCallPart = {
+      type: "tool-call",
+      status: { type: "running", isArgsComplete: false },
+      toolCallId: partInit.toolCallId,
+      toolName: partInit.toolName,
+      argsText: "",
+      args: {},
+    };
+    return { ...message, parts: [...message.parts, newToolCallPart] };
+  } else if (partInit.type === "source") {
+    const newSourcePart: SourcePart = {
+      type: "source",
+      sourceType: partInit.sourceType,
+      id: partInit.id,
+      url: partInit.url,
+      ...(partInit.title ? { title: partInit.title } : undefined),
+    };
+    return { ...message, parts: [...message.parts, newSourcePart] };
+  } else {
+    console.warn("Ignoring unsupported part type:", partInit.type);
+    return message;
+  }
+};
+
+/**
+ * Handles a "text-delta" chunk by appending the delta
+ * to the most recent part.
+ */
+const handleTextDelta = (
+  message: AssistantMessage,
+  chunk: AssistantStreamChunk & { type: "text-delta" },
+): AssistantMessage => {
+  return updateLastPart(message, (lastPart) => {
+    if (lastPart.type === "text") {
+      return { ...lastPart, text: lastPart.text + chunk.textDelta };
+    } else if (lastPart.type === "tool-call") {
+      const newArgsText = lastPart.argsText + chunk.textDelta;
+      let newArgs: Record<string, unknown>;
+      try {
+        newArgs = parsePartialJson(newArgsText);
+      } catch (err) {
+        newArgs = lastPart.args;
+      }
+      return { ...lastPart, argsText: newArgsText, args: newArgs };
+    } else {
+      console.error(
+        "text-delta received but last part is neither text nor tool-call",
+      );
+      return lastPart;
+    }
+  });
+};
+
+/**
+ * Handles a "result" chunk by updating the most recent tool-call part.
+ */
+const handleResult = (
+  message: AssistantMessage,
+  chunk: AssistantStreamChunk & { type: "result" },
+): AssistantMessage => {
+  return updateLastPart(message, (lastPart) => {
+    if (lastPart.type === "tool-call") {
+      return {
+        ...lastPart,
+        result: chunk.result,
+        isError: chunk.isError ?? false,
+        // Marking as complete; adjust the reason as needed.
+        status: { type: "complete", reason: "stop" },
+      };
+    } else {
+      console.error("Result chunk received but last part is not a tool-call");
+      return lastPart;
+    }
+  });
+};
+
+/**
+ * Handles a "finish" chunk by updating the overall message status.
+ */
+const handleFinish = (
+  message: AssistantMessage,
+  chunk: AssistantStreamChunk & { type: "finish" },
+): AssistantMessage => {
+  const finishReason = chunk.finishReason;
+  let newStatus: AssistantMessageStatus;
+  if (finishReason === "stop" || finishReason === "unknown") {
+    newStatus = { type: "complete", reason: finishReason };
+  } else {
+    newStatus = {
+      type: "incomplete",
+      reason: finishReason,
+    };
+  }
+  return { ...message, status: newStatus };
+};
+
+/**
+ * The accumulator transform stream.
+ */
+export const assistantMessageAccumulator = (): TransformStream<
+  AssistantStreamChunk,
+  AssistantMessage
+> => {
+  let message: AssistantMessage = createInitialMessage();
+
+  return new TransformStream<AssistantStreamChunk, AssistantMessage>({
     transform(chunk, controller) {
-      const { type } = chunk;
+      const type = chunk.type;
       switch (type) {
-        case "text-delta": {
-          message = appendOrUpdateText(message, chunk.textDelta);
-          controller.enqueue(message);
+        case "part":
+          message = handlePart(message, chunk);
           break;
-        }
+        case "text-delta":
+          message = handleTextDelta(message, chunk);
+          break;
+        case "result":
+          message = handleResult(message, chunk);
+          break;
+        case "finish":
+          message = handleFinish(message, chunk);
+          break;
 
-        case "tool-call-begin": {
-          const { toolCallId, toolName } = chunk;
-          message = appendToolCall(message, toolCallId, toolName);
-          controller.enqueue(message);
+        case "annotations":
+        case "data":
+        case "step-start":
+        case "step-finish":
+        case "error":
           break;
-        }
-        case "tool-call-delta": {
-          const { toolCallId, argsTextDelta } = chunk;
-          message = appendToolArgsTextDelta(message, toolCallId, argsTextDelta);
-          controller.enqueue(message);
-          break;
-        }
-        case "tool-result": {
-          const { toolCallId, result } = chunk;
-          message = setToolResult(message, toolCallId, result);
-          controller.enqueue(message);
-
-          break;
-        }
-
-        case "error": {
-          const { error } = chunk;
-          message = setError(message, error);
-          controller.enqueue(message);
-          break;
-        }
 
         default: {
-          const _exhaustiveCheck: never = type;
-          throw new Error(`Unsupported chunk type: ${_exhaustiveCheck}`);
+          const unhandledType: never = type;
+          throw new Error(`Unsupported chunk type: ${unhandledType}`);
         }
       }
+      controller.enqueue(message);
     },
     flush(controller) {
-      message = appendOrUpdateFinish(message);
       controller.enqueue(message);
     },
   });
-
-  return transformer;
-};
-
-const appendOrUpdateText = (message: AssistantMessage, textDelta: string) => {
-  let contentParts = message.content ?? [];
-  let contentPart = message.content?.at(-1);
-  if (contentPart?.type !== "text") {
-    contentPart = {
-      type: "text",
-      text: textDelta,
-      status: { type: "running" },
-    };
-  } else {
-    contentParts = contentParts.slice(0, -1);
-    contentPart = {
-      type: "text",
-      text: contentPart.text + textDelta,
-      status: { type: "running" },
-    };
-  }
-  return {
-    ...message,
-    content: contentParts.concat([contentPart]),
-  };
-};
-
-const appendToolCall = (
-  message: AssistantMessage,
-  toolCallId: string,
-  toolName: string,
-): AssistantMessage => {
-  return {
-    ...message,
-    content: [
-      ...message.content,
-      {
-        type: "tool-call",
-        toolCallId,
-        toolName,
-        argsText: "",
-        args: {},
-        status: { type: "running", isArgsComplete: false },
-      },
-    ],
-  };
-};
-
-const appendToolArgsTextDelta = (
-  message: AssistantMessage,
-  toolCallId: string,
-  argsTextDelta: string,
-): AssistantMessage => {
-  const contentPartIdx = message.content.findIndex(
-    (part) => part.type === "tool-call" && part.toolCallId === toolCallId,
-  );
-  if (contentPartIdx === -1)
-    throw new Error(
-      `Received tool call delta for unknown tool call "${toolCallId}".`,
-    );
-  const contentPart = message.content[contentPartIdx]! as ToolCallContentPart;
-  const newArgsText = contentPart.argsText + argsTextDelta;
-
-  return {
-    ...message,
-    content: [
-      ...message.content.slice(0, contentPartIdx),
-      {
-        ...contentPart,
-        argsText: newArgsText,
-        args: parsePartialJson(newArgsText),
-      },
-      ...message.content.slice(contentPartIdx + 1),
-    ],
-  };
-};
-
-const setToolResult = (
-  message: AssistantMessage,
-  toolCallId: string,
-  result: any,
-) => {
-  let found = false;
-  const newContentParts = message.content?.map((part) => {
-    if (part.type !== "tool-call" || part.toolCallId !== toolCallId)
-      return part;
-    found = true;
-
-    return {
-      ...part,
-      result,
-    };
-  });
-  if (!found)
-    throw new Error(
-      `Received tool result for unknown tool call "${toolCallId}". This is likely an internal bug in assistant-ui.`,
-    );
-
-  return {
-    ...message,
-    content: newContentParts!,
-  };
-};
-
-const appendOrUpdateFinish = (message: AssistantMessage): AssistantMessage => {
-  return {
-    ...message,
-    status: {
-      type: "complete",
-      reason: "unknown",
-    },
-  };
-};
-
-const setError = (
-  message: AssistantMessage,
-  error: string,
-): AssistantMessage => {
-  return {
-    ...message,
-    status: {
-      type: "incomplete",
-      reason: "error",
-      error,
-    },
-  };
 };

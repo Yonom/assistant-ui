@@ -1,27 +1,84 @@
-export type AssistantStreamChunk =
+import { ReadonlyJSONValue } from "./utils/json/json-value";
+
+export type PartInit =
+  | {
+      type: "text" | "reasoning";
+    }
+  | {
+      type: "tool-call";
+      toolCallId: string;
+      toolName: string;
+    }
+  | {
+      type: "source";
+      sourceType: "url";
+      id: string;
+      url: string;
+      title?: string;
+    };
+
+export type AssistantStreamChunk = { path: number[] } & (
+  | {
+      readonly type: "part";
+      readonly part: PartInit;
+    }
   | {
       type: "text-delta";
       textDelta: string;
     }
   | {
-      type: "tool-call-begin";
-      toolCallId: string;
-      toolName: string;
+      type: "annotations";
+      annotations: ReadonlyJSONValue[];
     }
   | {
-      type: "tool-call-delta";
-      toolCallId: string;
-      argsTextDelta: string;
+      type: "data";
+      data: ReadonlyJSONValue[];
     }
   | {
-      type: "tool-result";
-      toolCallId: string;
+      type: "step-start";
+      messageId: string;
+    }
+  | {
+      type: "step-finish";
+      finishReason:
+        | "stop"
+        | "length"
+        | "content-filter"
+        | "tool-calls"
+        | "error"
+        | "other"
+        | "unknown";
+      usage: {
+        promptTokens: number;
+        completionTokens: number;
+      };
+      isContinued: boolean;
+    }
+  | {
+      type: "finish";
+      finishReason:
+        | "stop"
+        | "length"
+        | "content-filter"
+        | "tool-calls"
+        | "error"
+        | "other"
+        | "unknown";
+      usage: {
+        promptTokens: number;
+        completionTokens: number;
+      };
+    }
+  | {
+      type: "result";
       result: any;
+      isError?: boolean;
     }
   | {
       type: "error";
       error: string;
-    };
+    }
+);
 
 export type AssistantStream = ReadableStream<AssistantStreamChunk>;
 

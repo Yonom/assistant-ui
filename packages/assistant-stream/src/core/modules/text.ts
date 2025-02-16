@@ -1,5 +1,5 @@
 import { AssistantStream, AssistantStreamChunk } from "../AssistantStream";
-import { UnderlyingReadable } from "../utils/UnderlyingReadable";
+import { UnderlyingReadable } from "../utils/stream/UnderlyingReadable";
 
 export type TextStreamController = {
   append(textDelta: string): void;
@@ -18,6 +18,7 @@ class TextStreamControllerImpl implements TextStreamController {
   append(textDelta: string) {
     this._controller.enqueue({
       type: "text-delta",
+      path: [],
       textDelta,
     });
     return this;
@@ -42,4 +43,14 @@ export const createTextStream = (
       return readable.cancel?.(c);
     },
   });
+};
+
+export const createTextStreamController = () => {
+  let controller!: TextStreamController;
+  const stream = createTextStream({
+    start(c) {
+      controller = c;
+    },
+  });
+  return [stream, controller] as const;
 };

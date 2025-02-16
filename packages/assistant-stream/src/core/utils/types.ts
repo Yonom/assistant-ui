@@ -1,3 +1,5 @@
+import { ReadonlyJSONValue } from "./json/json-value";
+
 type TextStatus =
   | {
       type: "running";
@@ -11,7 +13,7 @@ type TextStatus =
       reason: "cancelled" | "length" | "content-filter" | "other";
     };
 
-type TextContentPart = {
+export type TextPart = {
   type: "text";
   text: string;
   status: TextStatus;
@@ -35,7 +37,7 @@ type ToolCallStatus =
       reason: "cancelled" | "length" | "content-filter" | "other";
     };
 
-export type ToolCallContentPart = {
+export type ToolCallPart = {
   type: "tool-call";
   status: ToolCallStatus;
   toolCallId: string;
@@ -43,13 +45,40 @@ export type ToolCallContentPart = {
   argsText: string;
   args: Record<string, unknown>;
   result?: unknown;
+  isError?: boolean;
 };
 
-type AssistantMessageContentPart = TextContentPart | ToolCallContentPart;
+export type SourcePart = {
+  type: "source";
+  sourceType: "url";
+  id: string;
+  url: string;
+  title?: string;
+};
 
-type AssistantMessageStepMetadata = {};
+type AssistantMessagePart = TextPart | ToolCallPart | SourcePart;
 
-export type AssitantMessageStatus =
+type AssistantMessageStepLogprobs = Array<{
+  token: string;
+  logprob: number;
+  topLogprobs: Array<{
+    token: string;
+    logprob: number;
+  }>;
+}>;
+
+type AssistantMessageStepUsage = {
+  promptTokens: number;
+  completionTokens: number;
+};
+
+type AssistantMessageStepMetadata = {
+  usage: AssistantMessageStepUsage;
+  isContinued: boolean;
+  logprobs?: AssistantMessageStepLogprobs;
+};
+
+export type AssistantMessageStatus =
   | {
       type: "running";
     }
@@ -75,9 +104,11 @@ export type AssitantMessageStatus =
 
 export type AssistantMessage = {
   role: "assistant";
-  status: AssitantMessageStatus;
-  content: AssistantMessageContentPart[];
+  status: AssistantMessageStatus;
+  parts: AssistantMessagePart[];
   metadata: {
+    unstable_data: ReadonlyJSONValue[];
+    unstable_annotations: ReadonlyJSONValue[];
     steps: AssistantMessageStepMetadata[];
     custom: Record<string, unknown>;
   };

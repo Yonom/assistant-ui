@@ -23,8 +23,10 @@ export class AssistantMessageStream {
       return {
         role: "assistant",
         status: { type: "complete", reason: "unknown" },
-        content: [],
+        parts: [],
         metadata: {
+          unstable_data: [],
+          unstable_annotations: [],
           steps: [],
           custom: {},
         },
