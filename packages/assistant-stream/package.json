@@ -43,7 +43,8 @@
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "tsup": "8.3.6",
-    "tsx": "^4.19.2"
+    "tsx": "^4.19.2",
+    "vitest": "^3.0.3"
   },
   "publishConfig": {
     "access": "public"

@@ -11,7 +11,7 @@ type TextStatus =
       reason: "cancelled" | "length" | "content-filter" | "other";
     };
 
-type TextContentPart = {
+export type TextContentPart = {
   type: "text";
   text: string;
   status: TextStatus;
@@ -24,7 +24,7 @@ type ToolCallStatus =
     }
   | {
       type: "requires-action";
-      reason: "tool-call-result";
+      reason: "tool-calls";
     }
   | {
       type: "complete";
@@ -32,7 +32,8 @@ type ToolCallStatus =
     }
   | {
       type: "incomplete";
-      reason: "cancelled" | "length" | "content-filter" | "other";
+      reason: "cancelled" | "length" | "content-filter" | "other" | "error";
+      error?: unknown;
     };
 
 export type ToolCallContentPart = {
@@ -49,33 +50,33 @@ type AssistantMessageContentPart = TextContentPart | ToolCallContentPart;
 
 type AssistantMessageStepMetadata = {};
 
-export type AssitantMessageStatus =
+export type AssistantMessageStatus =
   | {
-      type: "running";
+      readonly type: "running";
     }
   | {
-      type: "requires-action";
-      reason: "tool-calls";
+      readonly type: "requires-action";
+      readonly reason: "tool-calls" | "interrupted";
     }
   | {
-      type: "complete";
-      reason: "stop" | "unknown";
+      readonly type: "complete";
+      readonly reason: "stop" | "unknown";
     }
   | {
-      type: "incomplete";
-      reason:
+      readonly type: "incomplete";
+      readonly reason:
         | "cancelled"
         | "tool-calls"
         | "length"
         | "content-filter"
         | "other"
         | "error";
-      error?: unknown;
+      readonly error?: unknown;
     };
 
 export type AssistantMessage = {
   role: "assistant";
-  status: AssitantMessageStatus;
+  status: AssistantMessageStatus;
   content: AssistantMessageContentPart[];
   metadata: {
     steps: AssistantMessageStepMetadata[];

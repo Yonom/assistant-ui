@@ -1,5 +1,5 @@
 import { AssistantStreamChunk } from "../AssistantStream";
-import { PipeableTransformStream } from "../utils/PipeableTransformStream";
+import { PipeableTransformStream } from "../utils/stream/PipeableTransformStream";
 
 export class PlainTextEncoder
   implements ReadableWritablePair<Uint8Array, AssistantStreamChunk>
@@ -23,16 +23,17 @@ export class PlainTextEncoder
         transform(chunk, controller) {
           const type = chunk.type;
           switch (type) {
-            case "text-delta":
+            case "text-delta": {
               controller.enqueue(chunk.textDelta);
               break;
+            }
+
+            case "finish": {
+              break;
+            }
 
             default:
-              const unsupportedType:
-                | "tool-call-begin"
-                | "tool-call-delta"
-                | "tool-result"
-                | "error" = type;
+              const unsupportedType: "tool-call-start" = type;
               throw new Error(`unsupported chunk type: ${unsupportedType}`);
           }
         },
@@ -66,6 +67,12 @@ export class PlainTextDecoder {
           controller.enqueue({
             type: "text-delta",
             textDelta: chunk,
+          });
+        },
+        flush(controller) {
+          controller.enqueue({
+            type: "finish",
+            status: { type: "complete", reason: "unknown" },
           });
         },
       });

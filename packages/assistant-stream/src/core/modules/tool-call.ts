@@ -1,52 +1,43 @@
 import { AssistantStream, AssistantStreamChunk } from "../AssistantStream";
-import { UnderlyingReadable } from "../utils/UnderlyingReadable";
-import { createTextStream, TextStreamController } from "./text";
+import { ReadonlyJSONValue } from "../json/json-value";
+import { UnderlyingReadable } from "../utils/stream/UnderlyingReadable";
+import { createTextStreamController, TextStreamController } from "./text";
 
 export type ToolCallStreamController = {
-  readonly toolCallId: string;
-  readonly toolName: string;
-
   argsText: TextStreamController;
 
+  
   setResult(result: unknown): void;
   close(): void;
 };
 
 class ToolCallStreamControllerImpl implements ToolCallStreamController {
-  public get toolCallId() {
-    return this._options.toolCallId;
-  }
-
-  public get toolName() {
-    return this._options.toolName;
-  }
-
   constructor(
     private _controller: ReadableStreamDefaultController<AssistantStreamChunk>,
-    private _options: { toolCallId: string; toolName: string },
   ) {
-    this._controller.enqueue({
-      type: "tool-call-begin",
-      toolCallId: this._options.toolCallId,
-      toolName: this._options.toolName,
-    });
+    const [argsTextStream, argsTextController] = createTextStreamController();
+    this._argsTextController = argsTextController;
 
+<<<<<<< ours
     const stream = createTextStream({
       start: (c) => {
         this._argsTextController = c;
       },
     });
     stream.pipeTo(
+||||||| ancestor
+    const stream = createTextStream({
+      start: (c) => {
+        this._argsTextController = c;
+      },
+    });
+    stream.readable.pipeTo(
+=======
+    argsTextStream.pipeTo(
+>>>>>>> theirs
       new WritableStream({
         write: (chunk) => {
-          if (chunk.type !== "text-delta")
-            throw new Error("Unexpected chunk type");
-
-          this._controller.enqueue({
-            type: "tool-call-delta",
-            toolCallId: this._options.toolCallId,
-            argsTextDelta: chunk.textDelta,
-          });
+          this._controller.enqueue(chunk);
         },
       }),
     );
@@ -56,12 +47,12 @@ class ToolCallStreamControllerImpl implements ToolCallStreamController {
     return this._argsTextController;
   }
 
-  private _argsTextController!: TextStreamController;
+  private _argsTextController: TextStreamController;
 
-  setResult(result: unknown) {
+  setResult(result: ReadonlyJSONValue) {
     this._controller.enqueue({
-      type: "tool-result",
-      toolCallId: this._options.toolCallId,
+      type: "result",
+      path: [],
       result,
     });
   }
@@ -72,14 +63,12 @@ class ToolCallStreamControllerImpl implements ToolCallStreamController {
 }
 
 type UnderlyingToolCallStreamReadable =
-  UnderlyingReadable<ToolCallStreamController> & {
-    toolCallId: string;
-    toolName: string;
-  };
+  UnderlyingReadable<ToolCallStreamController>;
 
 export const createToolCallStream = (
   readable: UnderlyingToolCallStreamReadable,
 ): AssistantStream => {
+<<<<<<< ours
   const options = {
     toolCallId: readable.toolCallId,
     toolName: readable.toolName,
@@ -95,4 +84,45 @@ export const createToolCallStream = (
       return readable.cancel?.(c);
     },
   });
+||||||| ancestor
+  const options = {
+    toolCallId: readable.toolCallId,
+    toolName: readable.toolName,
+  };
+  return new AssistantStream(
+    new ReadableStream({
+      start(c) {
+        return readable.start?.(new ToolCallStreamControllerImpl(c, options));
+      },
+      pull(c) {
+        return readable.pull?.(new ToolCallStreamControllerImpl(c, options));
+      },
+      cancel(c) {
+        return readable.cancel?.(c);
+      },
+    }),
+  );
+=======
+  return new ReadableStream({
+    start(c) {
+      return readable.start?.(new ToolCallStreamControllerImpl(c));
+    },
+    pull(c) {
+      return readable.pull?.(new ToolCallStreamControllerImpl(c));
+    },
+    cancel(c) {
+      return readable.cancel?.(c);
+    },
+  });
+};
+
+export const createToolCallStreamController = () => {
+  let controller!: ToolCallStreamController;
+  const stream = createToolCallStream({
+    start(c) {
+      controller = c;
+    },
+  });
+  return [stream, controller] as const;
+>>>>>>> theirs
 };
