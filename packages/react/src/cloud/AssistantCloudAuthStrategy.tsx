@@ -170,7 +170,31 @@ export class AssistantCloudAnonymousAuthStrategy
     if (storedRefreshToken) {
       const refreshExpiry = new Date(storedRefreshToken.expires_at).getTime();
       if (refreshExpiry - currentTime > 30 * 1000) {
-        return { Authorization: `Bearer ${storedRefreshToken.token}` };
+        const response = await fetch(`${this.baseUrl}/v1/auth/tokens/refresh`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            refresh_token: storedRefreshToken.token,
+          }),
+        });
+
+        if (!response.ok) {
+          return false;
+        }
+
+        const data = await response.json();
+        const { access_token, refresh_token } = data;
+
+        if (refresh_token) {
+          localStorage.setItem(AUI_REFRESH_TOKEN_NAME, refresh_token);
+        }
+
+        this.cachedToken = access_token;
+        this.tokenExpiry = new Date(data.expires_at).getTime();
+
+        return { Authorization: `Bearer ${this.cachedToken}` };
       } else {
         localStorage.removeItem(AUI_REFRESH_TOKEN_NAME);
       }
