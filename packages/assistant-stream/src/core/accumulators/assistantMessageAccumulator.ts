@@ -1,4 +1,5 @@
-import { AssistantStreamChunk } from "../AssistantStream";
+import { generateId } from "../utils/generateId";
+import { ReadonlyJSONValue } from "../utils/json/json-value";
 import { parsePartialJson } from "../utils/json/parse-partial-json";
 import {
   AssistantMessage,
@@ -156,6 +157,112 @@ const handleFinish = (
 };
 
 /**
+ * Handles "annotations" chunks by appending them to the metadata.
+ */
+const handleAnnotations = (
+  message: AssistantMessage,
+  chunk: AssistantStreamChunk & { type: "annotations" },
+): AssistantMessage => {
+  return {
+    ...message,
+    metadata: {
+      ...message.metadata,
+      unstable_annotations: [
+        ...message.metadata.unstable_annotations,
+        ...chunk.annotations,
+      ],
+    },
+  };
+};
+
+/**
+ * Handles "data" chunks by appending them to the metadata.
+ */
+const handleData = (
+  message: AssistantMessage,
+  chunk: AssistantStreamChunk & { type: "data" },
+): AssistantMessage => {
+  return {
+    ...message,
+    metadata: {
+      ...message.metadata,
+      unstable_data: [...message.metadata.unstable_data, ...chunk.data],
+    },
+  };
+};
+
+/**
+ * Handles a "step-start" chunk by recording the start of a step.
+ */
+const handleStepStart = (
+  message: AssistantMessage,
+  chunk: AssistantStreamChunk & { type: "step-start" },
+): AssistantMessage => {
+  return {
+    ...message,
+    metadata: {
+      ...message.metadata,
+      steps: [
+        ...message.metadata.steps,
+        { state: "started", messageId: chunk.messageId },
+      ],
+    },
+  };
+};
+
+/**
+ * Handles a "step-finish" chunk by updating the previous "step-start" if it exists.
+ */
+const handleStepFinish = (
+  message: AssistantMessage,
+  chunk: AssistantStreamChunk & { type: "step-finish" },
+): AssistantMessage => {
+  const steps = message.metadata.steps.slice();
+  const lastIndex = steps.length - 1;
+
+  // Check if the previous step is a step-start (has state "started")
+  if (steps.length > 0 && (steps[lastIndex] as any).state === "started") {
+    steps[lastIndex] = {
+      ...steps[lastIndex]!,
+      state: "finished",
+      finishReason: chunk.finishReason,
+      usage: chunk.usage,
+      isContinued: chunk.isContinued,
+    };
+  } else {
+    // If no previous step-start exists, append a finished step
+    steps.push({
+      state: "finished",
+      messageId: generateId(),
+      finishReason: chunk.finishReason,
+      usage: chunk.usage,
+      isContinued: chunk.isContinued,
+    });
+  }
+
+  return {
+    ...message,
+    metadata: {
+      ...message.metadata,
+      steps,
+    },
+  };
+};
+
+/**
+ * Handles an "error" chunk by updating the message status and logging the error.
+ */
+const handleErrorChunk = (
+  message: AssistantMessage,
+  chunk: AssistantStreamChunk & { type: "error" },
+): AssistantMessage => {
+  return {
+    ...message,
+    status: { type: "incomplete", reason: "error", error: chunk.error },
+  };
+};
+
+/**
  * The accumulator transform stream.
  */
 export const assistantMessageAccumulator = (): TransformStream<
@@ -180,14 +287,21 @@ export const assistantMessageAccumulator = (): TransformStream<
         case "finish":
           message = handleFinish(message, chunk);
           break;
-
         case "annotations":
-        case "data":
-        case "step-start":
-        case "step-finish":
-        case "error":
+          message = handleAnnotations(message, chunk);
           break;
-
+        case "data":
+          message = handleData(message, chunk);
+          break;
+        case "step-start":
+          message = handleStepStart(message, chunk);
+          break;
+        case "step-finish":
+          message = handleStepFinish(message, chunk);
+          break;
+        case "error":
+          message = handleErrorChunk(message, chunk);
+          break;
         default: {
           const unhandledType: never = type;
           throw new Error(`Unsupported chunk type: ${unhandledType}`);
@@ -200,3 +314,83 @@ export const assistantMessageAccumulator = (): TransformStream<
     },
   });
 };
+
+export type PartInit =
+  | {
+      type: "text" | "reasoning";
+    }
+  | {
+      type: "tool-call";
+      toolCallId: string;
+      toolName: string;
+    }
+  | {
+      type: "source";
+      sourceType: "url";
+      id: string;
+      url: string;
+      title?: string;
+    };
+
+export type AssistantStreamChunk = { path: number[] } & (
+  | {
+      readonly type: "part";
+      readonly part: PartInit;
+    }
+  | {
+      type: "text-delta";
+      textDelta: string;
+    }
+  | {
+      type: "annotations";
+      annotations: ReadonlyJSONValue[];
+    }
+  | {
+      type: "data";
+      data: ReadonlyJSONValue[];
+    }
+  | {
+      type: "step-start";
+      messageId: string;
+    }
+  | {
+      type: "step-finish";
+      finishReason:
+        | "stop"
+        | "length"
+        | "content-filter"
+        | "tool-calls"
+        | "error"
+        | "other"
+        | "unknown";
+      usage: {
+        promptTokens: number;
+        completionTokens: number;
+      };
+      isContinued: boolean;
+    }
+  | {
+      type: "finish";
+      finishReason:
+        | "stop"
+        | "length"
+        | "content-filter"
+        | "tool-calls"
+        | "error"
+        | "other"
+        | "unknown";
+      usage: {
+        promptTokens: number;
+        completionTokens: number;
+      };
+    }
+  | {
+      type: "result";
+      result: any;
+      isError?: boolean;
+    }
+  | {
+      type: "error";
+      error: string;
+    }
+);

@@ -58,25 +58,30 @@ export type SourcePart = {
 
 type AssistantMessagePart = TextPart | ToolCallPart | SourcePart;
 
-type AssistantMessageStepLogprobs = Array<{
-  token: string;
-  logprob: number;
-  topLogprobs: Array<{
-    token: string;
-    logprob: number;
-  }>;
-}>;
-
 type AssistantMessageStepUsage = {
   promptTokens: number;
   completionTokens: number;
 };
 
-type AssistantMessageStepMetadata = {
-  usage: AssistantMessageStepUsage;
-  isContinued: boolean;
-  logprobs?: AssistantMessageStepLogprobs;
-};
+type AssistantMessageStepMetadata =
+  | {
+      state: "started";
+      messageId: string;
+    }
+  | {
+      state: "finished";
+      messageId: string;
+      finishReason:
+        | "stop"
+        | "length"
+        | "content-filter"
+        | "tool-calls"
+        | "error"
+        | "other"
+        | "unknown";
+      usage?: AssistantMessageStepUsage;
+      isContinued: boolean;
+    };
 
 export type AssistantMessageStatus =
   | {

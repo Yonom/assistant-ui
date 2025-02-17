@@ -58,9 +58,8 @@ export const createMergeStream = () => {
       controller = c;
     },
     async pull() {
-      list.map((item) => {
+      list.forEach((item) => {
         handlePull(item);
-        return item.promise!;
       });
 
       currentPull = promiseWithResolvers();

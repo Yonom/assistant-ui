@@ -8,7 +8,7 @@ export const fromStreamText = (
 ): AssistantStream => {
   const toolControllers = new Map<string, ToolCallStreamController>();
   const transformer = new AssistantTransformStream<
-    TextStreamPart<Record<string, Tool>>
+    TextStreamPart<Record<any, Tool>>
   >({
     transform(chunk, controller) {
       const { type } = chunk;
@@ -36,9 +36,9 @@ export const fromStreamText = (
         }
         case "tool-call-delta": {
           const { toolCallId, argsTextDelta } = chunk;
-          const controller = toolControllers.get(toolCallId);
-          if (!controller) throw new Error("Tool call not found");
-          controller.argsText.append(argsTextDelta);
+          const toolController = toolControllers.get(toolCallId);
+          if (!toolController) throw new Error("Tool call not found");
+          toolController.argsText.append(argsTextDelta);
           break;
         }
         case "tool-result" as string: {
@@ -46,9 +46,11 @@ export const fromStreamText = (
             toolCallId: string;
             result: unknown;
           };
-          const controller = toolControllers.get(toolCallId);
-          if (!controller) throw new Error("Tool call not found");
-          controller.setResult(result);
+          const toolController = toolControllers.get(toolCallId);
+          if (!toolController) throw new Error("Tool call not found");
+          toolController.setResult(result);
+          toolController.close();
+          toolControllers.delete(toolCallId);
           break;
         }
         case "tool-call": {
@@ -103,6 +105,12 @@ export const fromStreamText = (
           throw new Error(`Unhandled chunk type: ${unhandledType}`);
         }
       }
+    },
+    flush() {
+      for (const controller of toolControllers.values()) {
+        controller.close();
+      }
+      toolControllers.clear();
     },
   });
 
