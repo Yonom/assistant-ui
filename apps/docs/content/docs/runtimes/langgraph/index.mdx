@@ -290,3 +290,7 @@ To handle interrupts in your application:
 3. The runtime will automatically restore the interrupt state when switching threads
 
 This feature is particularly useful for applications that require user approval flows, multi-step forms, or any other interactive elements that might span multiple thread switches.
+
+## Updates
+
+The RemoteThreadListHookInstanceManager, RemoteThreadListThreadListRuntimeCore, and useRemoteThreadListRuntime have been updated to handle generic types. This means that these classes and functions can now handle a wider range of types, providing more flexibility in their usage. This update does not require any changes in the existing documentation as it is an internal enhancement.
