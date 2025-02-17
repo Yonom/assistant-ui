@@ -25,3 +25,34 @@ For custom backends, we have two entrypoints for integration:
 
 - [LocalRuntime](/docs/runtimes/custom/local)
 - [ExternalStoreRuntime](/docs/runtimes/custom/external-store)
+
+## Updates
+
+The useRemoteThreadListRuntime function has been updated to support generic types. This means that the function can now accept and return any type that extends the AssistantRuntime type. This allows for more flexibility and type safety when using the function.
+
+Here is the updated function signature:
+
+```typescript
+export const useRemoteThreadListRuntime = <T extends AssistantRuntime>(
+  options: RemoteThreadListOptions<T>,
+): T => {
+  const [runtime] = useState(() => new RemoteThreadListRuntimeCore(options));
+  useEffect(() => {
+    runtime.threads.__internal_setOptions(options);
+    runtime.threads.__internal_load();
+  }, [runtime, options]);
+  return useMemo(() => AssistantRuntimeImpl.create(runtime) as T, [runtime]);
+};
+```
+
+This change affects the following files:
+
+- AssistantRuntimeProvider.tsx
+- AssistantContext.ts
+- index.ts
+- RemoteThreadListHookInstanceManager.tsx
+- RemoteThreadListThreadListRuntimeCore.tsx
+- types.tsx
+- useRemoteThreadListRuntime.tsx
+
+Please refer to the code changes for more details.
