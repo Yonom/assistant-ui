@@ -85,6 +85,8 @@ export class AssistantCloudJWTAuthStrategy
   }
 }
 
+const AUI_REFRESH_TOKEN_NAME = "aui:refresh_token";
+
 export class AssistantCloudAPIKeyAuthStrategy
   implements AssistantCloudAuthStrategy
 {
@@ -113,7 +115,7 @@ export class AssistantCloudAPIKeyAuthStrategy
   }
 }
 
-export class AssistantCloudAnonAuthStrategy
+export class AssistantCloudAnonymousAuthStrategy
   implements AssistantCloudAuthStrategy
 {
   public readonly strategy = "anon";
@@ -152,9 +154,11 @@ export class AssistantCloudAnonAuthStrategy
 
   public async getAuthHeaders(): Promise<Record<string, string> | false> {
     const currentTime = Date.now();
-    const storedRefreshToken = localStorage.getItem("refresh_token");
+    const storedRefreshTokenJson = localStorage.getItem(AUI_REFRESH_TOKEN_NAME);
+    const storedRefreshToken = (
+      storedRefreshTokenJson ? JSON.parse(storedRefreshTokenJson) : undefined
+    ) as { token: string; expires_at: string } | undefined;
 
-    // Check if cached access token is valid for at least 30 seconds
     if (
       this.cachedToken &&
       this.tokenExpiry &&
@@ -164,13 +168,11 @@ export class AssistantCloudAnonAuthStrategy
     }
 
     if (storedRefreshToken) {
-      try {
-        const refreshExpiry = this.getJwtExpiry(storedRefreshToken);
-        if (refreshExpiry - currentTime > 30 * 1000) {
-          return { Authorization: `Bearer ${storedRefreshToken}` };
-        }
-      } catch {
-        localStorage.removeItem("refresh_token"); // Clear invalid token
+      const refreshExpiry = new Date(storedRefreshToken.expires_at).getTime();
+      if (refreshExpiry - currentTime > 30 * 1000) {
+        return { Authorization: `Bearer ${storedRefreshToken.token}` };
+      } else {
+        localStorage.removeItem(AUI_REFRESH_TOKEN_NAME);
       }
     }
 
@@ -192,7 +194,7 @@ export class AssistantCloudAnonAuthStrategy
 
     this.cachedToken = access_token;
     this.tokenExpiry = this.getJwtExpiry(access_token);
-    localStorage.setItem("refresh_token", refresh_token);
+    localStorage.setItem(AUI_REFRESH_TOKEN_NAME, JSON.stringify(refresh_token));
 
     return { Authorization: `Bearer ${access_token}` };
   }
@@ -209,7 +211,7 @@ export class AssistantCloudAnonAuthStrategy
 
     const refreshHeader = headers.get("Aui-Refresh-Token");
     if (refreshHeader) {
-      localStorage.setItem("refresh_token", refreshHeader);
+      localStorage.setItem(AUI_REFRESH_TOKEN_NAME, refreshHeader);
     }
   }
 }
