@@ -7,11 +7,26 @@ export const fromStreamText = (
   stream: ReadableStream<TextStreamPart<Record<string, Tool>>>,
 ): AssistantStream => {
   const toolControllers = new Map<string, ToolCallStreamController>();
+  let currentToolCallArgsText:
+    | { toolCallId: string; controller: ToolCallStreamController }
+    | undefined;
+
+  const endCurrentToolCallArgsText = () => {
+    if (!currentToolCallArgsText) return;
+    currentToolCallArgsText.controller.argsText.close();
+    currentToolCallArgsText = undefined;
+  };
+
   const transformer = new AssistantTransformStream<
     TextStreamPart<Record<string, Tool>>
   >({
     transform(chunk, controller) {
       const { type } = chunk;
+
+      if (type !== "tool-call-delta" && type !== "error") {
+        endCurrentToolCallArgsText();
+      }
+
       switch (type) {
         case "text-delta": {
           const { textDelta } = chunk;
@@ -32,6 +47,13 @@ export const fromStreamText = (
               toolName,
             }),
           );
+          currentToolCallArgsText = {
+            toolCallId,
+            controller: controller.addToolCallPart({
+              toolCallId,
+              toolName,
+            }),
+          };
           break;
         }
         case "tool-call-delta": {
@@ -144,7 +166,11 @@ export const fromStreamObject = (
           break;
 
         case "error": {
-          controller.error(chunk.error);
+          controller.enqueue({
+            type: "error",
+            path: [],
+            error: String(chunk.error),
+          });
           break;
         }
 

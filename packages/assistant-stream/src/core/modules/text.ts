@@ -9,6 +9,7 @@ export type TextStreamController = {
 
 class TextStreamControllerImpl implements TextStreamController {
   private _controller: ReadableStreamDefaultController<AssistantStreamChunk>;
+  private _isClosed = false;
 
   constructor(
     controller: ReadableStreamDefaultController<AssistantStreamChunk>,
@@ -26,6 +27,8 @@ class TextStreamControllerImpl implements TextStreamController {
   }
 
   close() {
+    if (this._isClosed) return;
+    this._isClosed = true;
     this._controller.enqueue({
       type: "part-finish",
       path: [],

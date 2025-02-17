@@ -17,7 +17,7 @@ export class ToolExecutionStream extends PipeableTransformStream<
   AssistantStreamChunk
 > {
   constructor(toolCallback: ToolCallback) {
-    const toolCallPromises: Promise<unknown>[] = [];
+    const toolCallPromises = new Map<string, Promise<unknown>>();
     const toolCallArgsText: Record<string, string> = {};
     super((readable) => {
       const transform = new TransformStream<
@@ -40,7 +40,7 @@ export class ToolExecutionStream extends PipeableTransformStream<
               }
               break;
             }
-            case "part-finish": {
+            case "tool-call-args-text-finish": {
               if (chunk.meta.type !== "tool-call") break;
 
               const { toolCallId, toolName } = chunk.meta;
@@ -68,6 +68,8 @@ export class ToolExecutionStream extends PipeableTransformStream<
 
               const toolCallPromise = executeTool()
                 .then((c) => {
+                  if (c === undefined) return;
+
                   controller.enqueue({
                     type: "result",
                     path: chunk.path,
@@ -82,13 +84,24 @@ export class ToolExecutionStream extends PipeableTransformStream<
                     result: String(e),
                     isError: true,
                   });
-                })
-                .then(() => {
-                  controller.enqueue(chunk);
                 });
 
-              toolCallPromises.push(toolCallPromise);
+              toolCallPromises.set(toolCallId, toolCallPromise);
               break;
+            }
+
+            case "part-finish": {
+              if (chunk.meta.type !== "tool-call") break;
+
+              const { toolCallId } = chunk.meta;
+              const toolCallPromise = toolCallPromises.get(toolCallId);
+              if (toolCallPromise) {
+                toolCallPromise.then(() => {
+                  controller.enqueue(chunk);
+                });
+              } else {
+                controller.enqueue(chunk);
+              }
             }
           }
         },

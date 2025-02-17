@@ -20,8 +20,10 @@ export type AssistantStreamController = {
   addTextPart(): TextStreamController;
   addToolCallPart(toolName: string): ToolCallStreamController;
   addToolCallPart(options: {
-    toolCallId: string;
+    toolCallId?: string;
     toolName: string;
+    args?: Record<string, unknown>;
+    result?: unknown;
   }): ToolCallStreamController;
 
   enqueue(chunk: AssistantStreamChunk): void;
@@ -45,6 +47,11 @@ class AssistantStreamControllerImpl implements AssistantStreamController {
 
   __internal_getReadable() {
     return this._merger.readable;
+  }
+
+  private _closeSubscriber: undefined | (() => void);
+  __internal_subscribeToClose(callback: () => void) {
+    this._closeSubscriber = callback;
   }
 
   private _addPart(part: PartInit, stream: AssistantStream) {
@@ -125,7 +132,7 @@ class AssistantStreamControllerImpl implements AssistantStreamController {
       controller.argsText.append(JSON.stringify(opt.args));
       controller.argsText.close();
     }
-    if (opt !== undefined) {
+    if (opt.result !== undefined) {
       controller.setResult(opt.result);
     }
 
@@ -134,11 +141,17 @@ class AssistantStreamControllerImpl implements AssistantStreamController {
 
   enqueue(chunk: AssistantStreamChunk) {
     this._merger.enqueue(chunk);
+
+    if (chunk.type === "part-start" && chunk.path.length === 0) {
+      this._contentCounter.up();
+    }
   }
 
   close() {
     this._merger.seal();
     this._append?.controller?.close();
+
+    this._closeSubscriber?.();
   }
 }
 
@@ -156,6 +169,11 @@ export function createAssistantStream(
         }
       } catch (e) {
         if (!controller.__internal_isClosed) {
+          controller.enqueue({
+            type: "error",
+            path: [],
+            error: String(e),
+          });
           controller.close();
         }
         throw e;
@@ -169,6 +187,32 @@ export function createAssistantStream(
   }
 
   return controller.__internal_getReadable();
+}
+
+const promiseWithResolvers = function <T>() {
+  let resolve: ((value: T | PromiseLike<T>) => void) | undefined;
+  let reject: ((reason?: any) => void) | undefined;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  if (!resolve || !reject) throw new Error("Failed to create promise");
+  return { promise, resolve, reject };
+};
+
+export function createAssistantStreamController() {
+  const { resolve, promise } = promiseWithResolvers<void>();
+  let controller!: AssistantStreamController;
+  const stream = createAssistantStream((c) => {
+    controller = c;
+
+    (controller as AssistantStreamControllerImpl).__internal_subscribeToClose(
+      resolve,
+    );
+
+    return promise;
+  });
+  return [stream, controller] as const;
 }
 
 export function createAssistantStreamResponse(

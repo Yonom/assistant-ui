@@ -11,6 +11,8 @@ export type ToolCallStreamController = {
 };
 
 class ToolCallStreamControllerImpl implements ToolCallStreamController {
+  private _isClosed = false;
+
   constructor(
     private _controller: ReadableStreamDefaultController<AssistantStreamChunk>,
   ) {
@@ -58,11 +60,15 @@ class ToolCallStreamControllerImpl implements ToolCallStreamController {
   }
 
   close() {
+    if (this._isClosed) return;
+
+    this._isClosed = true;
+    this._argsTextController.close();
+
     this._controller.enqueue({
       type: "part-finish",
       path: [],
     });
-
     this._controller.close();
   }
 }

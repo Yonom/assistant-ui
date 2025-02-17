@@ -7,7 +7,7 @@ export class DataStreamChunkEncoder extends TransformStream<
   constructor() {
     super({
       transform: (chunk, controller) => {
-        controller.enqueue(`${chunk.type}:${JSON.stringify(chunk.value)}`);
+        controller.enqueue(`${chunk.type}:${JSON.stringify(chunk.value)}\n`);
       },
     });
   }

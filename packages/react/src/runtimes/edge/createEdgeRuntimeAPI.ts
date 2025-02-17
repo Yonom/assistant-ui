@@ -122,6 +122,17 @@ export const getEdgeRuntimeStream = async ({
   });
   stream = streamResult.stream.pipeThrough(new LanguageModelV1StreamDecoder());
 
+  const [t1, t2] = stream.tee();
+  stream = t1;
+
+  t2.pipeTo(
+    new WritableStream({
+      write(chunk) {
+        console.log(chunk);
+      },
+    }),
+  );
+
   // add tool results if we have server tools
   const canExecuteTools = hasServerTools && toolChoice?.type !== "none";
   if (canExecuteTools) {

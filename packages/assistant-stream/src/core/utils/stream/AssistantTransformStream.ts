@@ -1,15 +1,14 @@
 import { AssistantStreamChunk } from "../../AssistantStreamChunk";
 import {
   AssistantStreamController,
-  createAssistantStream,
+  createAssistantStreamController,
 } from "../../modules/assistant-stream";
 
 export interface AssistantTransformStreamController
   extends AssistantStreamController {
-  readonly desiredSize: number | null;
-
-  error(reason?: any): void;
-  terminate(): void;
+  // readonly desiredSize: number | null;
+  // error(reason?: any): void;
+  // terminate(): void;
 }
 
 interface AssistantTransformerFlushCallback {
@@ -33,17 +32,6 @@ type AssistantTransformer<I> = {
   transform?: AssistantTransformerTransformCallback<I>;
 };
 
-const promiseWithResolvers = function <T>() {
-  let resolve: ((value: T | PromiseLike<T>) => void) | undefined;
-  let reject: ((reason?: any) => void) | undefined;
-  const promise = new Promise<T>((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  if (!resolve || !reject) throw new Error("Failed to create promise");
-  return { promise, resolve, reject };
-};
-
 export class AssistantTransformStream<I> extends TransformStream<
   I,
   AssistantStreamChunk
@@ -53,30 +41,11 @@ export class AssistantTransformStream<I> extends TransformStream<
     writableStrategy?: QueuingStrategy<I>,
     readableStrategy?: QueuingStrategy<AssistantStreamChunk>,
   ) {
-    let runController: AssistantStreamController;
-    let innerController: AssistantTransformStreamController;
-    const { resolve, reject, promise } = promiseWithResolvers<void>();
-    const stream = createAssistantStream((c) => {
-      runController = c;
-      return promise;
-    });
+    const [stream, runController] = createAssistantStreamController();
 
     super(
       {
         start(controller) {
-          innerController = {
-            ...runController,
-            get desiredSize() {
-              return controller.desiredSize;
-            },
-            error(reason?: any) {
-              reject(reason);
-            },
-            terminate() {
-              resolve();
-            },
-          };
-
           stream.pipeTo(
             new WritableStream({
               write(chunk) {
@@ -91,13 +60,13 @@ export class AssistantTransformStream<I> extends TransformStream<
             }),
           );
 
-          transformer.start?.(innerController);
+          transformer.start?.(runController);
         },
         transform(chunk) {
-          transformer.transform?.(chunk, innerController);
+          transformer.transform?.(chunk, runController);
         },
         flush() {
-          transformer.flush?.(innerController);
+          transformer.flush?.(runController);
         },
       },
       writableStrategy,
