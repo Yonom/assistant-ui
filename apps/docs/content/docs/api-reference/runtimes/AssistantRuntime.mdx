@@ -5,7 +5,7 @@ title: AssistantRuntime
 import { ParametersTable } from "@/components/docs";
 import { AssistantRuntime, AssistantToolUIsState } from "@/generated/typeDocs";
 
-The `AssistantRuntime` is the root runtime of the application.
+The `AssistantRuntime` is the root runtime of the application. It now supports generic types.
 
 ### `useAssistantRuntime`
 
@@ -13,6 +13,14 @@ The `AssistantRuntime` is the root runtime of the application.
 import { useAssistantRuntime } from "@assistant-ui/react";
 
 const runtime = useAssistantRuntime();
+```
+
+This hook now supports generic types. You can specify the type of the runtime when calling the hook.
+
+```tsx
+import { useAssistantRuntime } from "@assistant-ui/react";
+
+const runtime = useAssistantRuntime<MyRuntimeType>();
 ```
 
 <ParametersTable {...AssistantRuntime} />
