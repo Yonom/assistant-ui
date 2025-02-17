@@ -5,7 +5,7 @@ title: <AssistantRuntimeProvider />
 import { ParametersTable } from "@/components/docs";
 import { AssistantRuntimeProvider } from "@/generated/typeDocs";
 
-The `AssistantRuntimeProvider` provides data and APIs used by assistant-ui components.
+The `AssistantRuntimeProvider` now supports generic types, providing data and APIs used by assistant-ui components.
 
 Almost all components in assistant-ui require an `AssistantRuntimeProvider` around them to function properly.
 
@@ -28,3 +28,40 @@ const MyApp = () => {
 #### Properties
 
 <ParametersTable {...AssistantRuntimeProvider} />
+
+The `AssistantRuntimeProvider` now accepts a generic type `T` that extends `AssistantRuntime`. This allows you to specify the type of runtime you are providing to the rest of your app. 
+
+```tsx
+export const AssistantRuntimeProviderImpl = <T extends AssistantRuntime>({
+  children,
+  runtime,
+}: AssistantRuntimeProvider.Props<T>) => {
+  // ...
+};
+```
+
+The `useAssistantRuntime` function also now accepts a generic type `T` that extends `AssistantRuntime`. This allows you to specify the type of runtime you are expecting to use in your app.
+
+```tsx
+export function useAssistantRuntime<T extends AssistantRuntime>(options?: {
+  optional?: boolean | undefined;
+}): T | null;
+```
+
+The `RemoteThreadListHookInstanceManager` class and `useRemoteThreadListRuntime` function have also been updated to support generic types that extend `AssistantRuntime`.
+
+```tsx
+export class RemoteThreadListHookInstanceManager<
+  T extends AssistantRuntime,
+> extends BaseSubscribable {
+  // ...
+};
+
+export const useRemoteThreadListRuntime = <T extends AssistantRuntime>(
+  options: RemoteThreadListOptions<T>,
+): T => {
+  // ...
+};
+```
+
+These changes allow for more flexibility and type safety when working with different types of runtimes in your app.
