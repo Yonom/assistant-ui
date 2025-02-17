@@ -1,4 +1,4 @@
-import { AssistantStreamChunk } from "../../AssistantStream";
+import { AssistantStreamChunk } from "../../AssistantStreamChunk";
 import { ToolCallStreamController } from "../../modules/tool-call";
 import { AssistantTransformStream } from "../../utils/stream/AssistantTransformStream";
 import { PipeableTransformStream } from "../../utils/stream/PipeableTransformStream";
@@ -12,25 +12,14 @@ import {
   AssistantMetaStreamChunk,
   AssistantMetaTransformStream,
 } from "../../utils/stream/AssistantMetaTransformStream";
+import { TextStreamController } from "../../modules/text";
 
-export class DataStreamEncoder {
-  private _transformStream: PipeableTransformStream<
-    AssistantStreamChunk,
-    Uint8Array
-  >;
-
-  public get writable() {
-    return this._transformStream.writable;
-  }
-  public get readable() {
-    return this._transformStream.readable;
-  }
-
+export class DataStreamEncoder extends PipeableTransformStream<
+  AssistantStreamChunk,
+  Uint8Array
+> {
   constructor() {
-    this._transformStream = new PipeableTransformStream<
-      AssistantStreamChunk,
-      Uint8Array
-    >((readable) => {
+    super((readable) => {
       const transform = new TransformStream<
         AssistantMetaStreamChunk,
         DataStreamChunk
@@ -38,7 +27,7 @@ export class DataStreamEncoder {
         transform(chunk, controller) {
           const type = chunk.type;
           switch (type) {
-            case "part": {
+            case "part-start": {
               const part = chunk.part;
               if (part.type === "tool-call") {
                 const { type, ...value } = part;
@@ -123,7 +112,7 @@ export class DataStreamEncoder {
               });
               break;
             }
-            case "finish": {
+            case "message-finish": {
               const { type, ...value } = chunk;
               controller.enqueue({
                 type: DataStreamStreamChunkType.FinishMessage,
@@ -152,6 +141,13 @@ export class DataStreamEncoder {
               });
               break;
             }
+
+            // TODO ignore for now
+            // in the future, we should create a handler that waits for text parts to finish before continuing
+            case "tool-call-args-text-finish":
+            case "part-finish":
+              break;
+
             default: {
               const exhaustiveCheck: never = type;
               throw new Error(`Unsupported chunk type: ${exhaustiveCheck}`);
@@ -169,26 +165,34 @@ export class DataStreamEncoder {
   }
 }
 
-export class DataStreamDecoder {
-  private _transformStream;
+const TOOL_CALL_ARGS_CLOSING_CHUNKS = [
+  DataStreamStreamChunkType.StartToolCall,
+  DataStreamStreamChunkType.ToolCall,
+  DataStreamStreamChunkType.TextDelta,
+  DataStreamStreamChunkType.ReasoningDelta,
+  DataStreamStreamChunkType.Source,
+  DataStreamStreamChunkType.Error,
+  DataStreamStreamChunkType.FinishStep,
+  DataStreamStreamChunkType.FinishMessage,
+];
 
-  public get writable() {
-    return this._transformStream.writable;
-  }
-
-  public get readable() {
-    return this._transformStream.readable;
-  }
-
+export class DataStreamDecoder extends PipeableTransformStream<
+  Uint8Array,
+  AssistantStreamChunk
+> {
   constructor() {
-    this._transformStream = new PipeableTransformStream<
-      Uint8Array,
-      AssistantStreamChunk
-    >((readable) => {
+    super((readable) => {
       const toolCallControllers = new Map<string, ToolCallStreamController>();
+      let activeToolCallArgsText: TextStreamController | undefined;
       const transform = new AssistantTransformStream<DataStreamChunk>({
         transform(chunk, controller) {
           const { type, value } = chunk;
+
+          if (TOOL_CALL_ARGS_CLOSING_CHUNKS.includes(type)) {
+            activeToolCallArgsText?.close();
+            activeToolCallArgsText = undefined;
+          }
+
           switch (type) {
             case DataStreamStreamChunkType.ReasoningDelta:
               controller.appendReasoning(value);
@@ -208,6 +212,8 @@ export class DataStreamDecoder {
                 toolName,
               });
               toolCallControllers.set(toolCallId, toolCallController);
+
+              activeToolCallArgsText = toolCallController.argsText;
               break;
             }
 
@@ -252,12 +258,13 @@ export class DataStreamDecoder {
               });
               toolCallControllers.set(toolCallId, toolCallController);
               toolCallController.argsText.append(JSON.stringify(args));
+              toolCallController.argsText.close();
               break;
             }
 
             case DataStreamStreamChunkType.FinishMessage:
               controller.enqueue({
-                type: "finish",
+                type: "message-finish",
                 path: [],
                 ...value,
               });
@@ -296,12 +303,16 @@ export class DataStreamDecoder {
 
             case DataStreamStreamChunkType.Source:
               controller.enqueue({
-                type: "part",
+                type: "part-start",
                 path: [],
                 part: {
                   type: "source",
                   ...value,
                 },
+              });
+              controller.enqueue({
+                type: "part-finish",
+                path: [],
               });
               break;
 
@@ -317,6 +328,12 @@ export class DataStreamDecoder {
               const exhaustiveCheck: never = type;
               throw new Error(`unsupported chunk type: ${exhaustiveCheck}`);
           }
+        },
+        flush() {
+          activeToolCallArgsText?.close();
+          activeToolCallArgsText = undefined;
+          toolCallControllers.forEach((controller) => controller.close());
+          toolCallControllers.clear();
         },
       });
 

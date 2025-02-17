@@ -1,4 +1,4 @@
-import { AssistantStreamChunk } from "../../AssistantStream";
+import { AssistantStreamChunk } from "../../AssistantStreamChunk";
 
 type MergeStreamItem = {
   reader: ReadableStreamDefaultReader<AssistantStreamChunk>;

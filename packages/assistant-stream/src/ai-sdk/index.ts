@@ -91,7 +91,7 @@ export const fromStreamText = (
 
         case "finish": {
           controller.enqueue({
-            type: "finish",
+            type: "message-finish",
             path: [],
             finishReason: chunk.finishReason,
             usage: chunk.usage,

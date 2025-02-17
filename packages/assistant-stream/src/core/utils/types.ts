@@ -1,4 +1,4 @@
-import { ReadonlyJSONValue } from "./json/json-value";
+import { ReadonlyJSONObject, ReadonlyJSONValue } from "./json/json-value";
 
 type TextStatus =
   | {
@@ -43,8 +43,8 @@ export type ToolCallPart = {
   toolCallId: string;
   toolName: string;
   argsText: string;
-  args: Record<string, unknown>;
-  result?: unknown;
+  args: ReadonlyJSONObject;
+  result?: ReadonlyJSONValue;
   isError?: boolean;
 };
 
@@ -104,7 +104,7 @@ export type AssistantMessageStatus =
         | "content-filter"
         | "other"
         | "error";
-      error?: unknown;
+      error?: ReadonlyJSONValue;
     };
 
 export type AssistantMessage = {

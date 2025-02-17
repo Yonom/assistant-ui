@@ -1,4 +1,5 @@
-import { AssistantStream, AssistantStreamChunk } from "../AssistantStream";
+import { AssistantStream } from "../AssistantStream";
+import { AssistantStreamChunk } from "../AssistantStreamChunk";
 import { UnderlyingReadable } from "../utils/stream/UnderlyingReadable";
 
 export type TextStreamController = {
@@ -25,6 +26,10 @@ class TextStreamControllerImpl implements TextStreamController {
   }
 
   close() {
+    this._controller.enqueue({
+      type: "part-finish",
+      path: [],
+    });
     this._controller.close();
   }
 }

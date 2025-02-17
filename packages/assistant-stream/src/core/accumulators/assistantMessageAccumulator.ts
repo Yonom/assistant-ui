@@ -1,5 +1,5 @@
+import { AssistantStreamChunk } from "../AssistantStreamChunk";
 import { generateId } from "../utils/generateId";
-import { ReadonlyJSONValue } from "../utils/json/json-value";
 import { parsePartialJson } from "../utils/json/parse-partial-json";
 import {
   AssistantMessage,
@@ -49,7 +49,7 @@ const updateLastPart = (
  */
 const handlePart = (
   message: AssistantMessage,
-  chunk: AssistantStreamChunk & { type: "part" },
+  chunk: AssistantStreamChunk & { readonly type: "part-start" },
 ): AssistantMessage => {
   const partInit = chunk.part;
   if (partInit.type === "text" || partInit.type === "reasoning") {
@@ -141,7 +141,7 @@ const handleResult = (
  */
 const handleFinish = (
   message: AssistantMessage,
-  chunk: AssistantStreamChunk & { type: "finish" },
+  chunk: AssistantStreamChunk & { type: "message-finish" },
 ): AssistantMessage => {
   const finishReason = chunk.finishReason;
   let newStatus: AssistantMessageStatus;
@@ -265,132 +265,59 @@ const handleErrorChunk = (
 /**
  * The accumulator transform stream.
  */
-export const assistantMessageAccumulator = (): TransformStream<
+export class AssistantMessageAccumulator extends TransformStream<
   AssistantStreamChunk,
   AssistantMessage
-> => {
-  let message: AssistantMessage = createInitialMessage();
+> {
+  constructor() {
+    let message: AssistantMessage = createInitialMessage();
+    super({
+      transform(chunk, controller) {
+        const type = chunk.type;
+        switch (type) {
+          case "part-start":
+            message = handlePart(message, chunk);
+            break;
 
-  return new TransformStream<AssistantStreamChunk, AssistantMessage>({
-    transform(chunk, controller) {
-      const type = chunk.type;
-      switch (type) {
-        case "part":
-          message = handlePart(message, chunk);
-          break;
-        case "text-delta":
-          message = handleTextDelta(message, chunk);
-          break;
-        case "result":
-          message = handleResult(message, chunk);
-          break;
-        case "finish":
-          message = handleFinish(message, chunk);
-          break;
-        case "annotations":
-          message = handleAnnotations(message, chunk);
-          break;
-        case "data":
-          message = handleData(message, chunk);
-          break;
-        case "step-start":
-          message = handleStepStart(message, chunk);
-          break;
-        case "step-finish":
-          message = handleStepFinish(message, chunk);
-          break;
-        case "error":
-          message = handleErrorChunk(message, chunk);
-          break;
-        default: {
-          const unhandledType: never = type;
-          throw new Error(`Unsupported chunk type: ${unhandledType}`);
+          case "tool-call-args-text-finish":
+            break;
+          case "part-finish":
+            break;
+
+          case "text-delta":
+            message = handleTextDelta(message, chunk);
+            break;
+          case "result":
+            message = handleResult(message, chunk);
+            break;
+          case "message-finish":
+            message = handleFinish(message, chunk);
+            break;
+          case "annotations":
+            message = handleAnnotations(message, chunk);
+            break;
+          case "data":
+            message = handleData(message, chunk);
+            break;
+          case "step-start":
+            message = handleStepStart(message, chunk);
+            break;
+          case "step-finish":
+            message = handleStepFinish(message, chunk);
+            break;
+          case "error":
+            message = handleErrorChunk(message, chunk);
+            break;
+          default: {
+            const unhandledType: never = type;
+            throw new Error(`Unsupported chunk type: ${unhandledType}`);
+          }
         }
-      }
-      controller.enqueue(message);
-    },
-    flush(controller) {
-      controller.enqueue(message);
-    },
-  });
-};
-
-export type PartInit =
-  | {
-      type: "text" | "reasoning";
-    }
-  | {
-      type: "tool-call";
-      toolCallId: string;
-      toolName: string;
-    }
-  | {
-      type: "source";
-      sourceType: "url";
-      id: string;
-      url: string;
-      title?: string;
-    };
-
-export type AssistantStreamChunk = { path: number[] } & (
-  | {
-      readonly type: "part";
-      readonly part: PartInit;
-    }
-  | {
-      type: "text-delta";
-      textDelta: string;
-    }
-  | {
-      type: "annotations";
-      annotations: ReadonlyJSONValue[];
-    }
-  | {
-      type: "data";
-      data: ReadonlyJSONValue[];
-    }
-  | {
-      type: "step-start";
-      messageId: string;
-    }
-  | {
-      type: "step-finish";
-      finishReason:
-        | "stop"
-        | "length"
-        | "content-filter"
-        | "tool-calls"
-        | "error"
-        | "other"
-        | "unknown";
-      usage: {
-        promptTokens: number;
-        completionTokens: number;
-      };
-      isContinued: boolean;
-    }
-  | {
-      type: "finish";
-      finishReason:
-        | "stop"
-        | "length"
-        | "content-filter"
-        | "tool-calls"
-        | "error"
-        | "other"
-        | "unknown";
-      usage: {
-        promptTokens: number;
-        completionTokens: number;
-      };
-    }
-  | {
-      type: "result";
-      result: any;
-      isError?: boolean;
-    }
-  | {
-      type: "error";
-      error: string;
-    }
-);
+        controller.enqueue(message);
+      },
+      flush() {
+        // TODO figure out what to do if no chunks are emitted at all
+      },
+    });
+  }
+}

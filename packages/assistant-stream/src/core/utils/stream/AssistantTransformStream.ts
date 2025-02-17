@@ -1,10 +1,11 @@
-import { AssistantStreamChunk } from "../../AssistantStream";
+import { AssistantStreamChunk } from "../../AssistantStreamChunk";
 import {
   AssistantStreamController,
   createAssistantStream,
 } from "../../modules/assistant-stream";
 
-interface AssistantTransformStreamController extends AssistantStreamController {
+export interface AssistantTransformStreamController
+  extends AssistantStreamController {
   readonly desiredSize: number | null;
 
   error(reason?: any): void;

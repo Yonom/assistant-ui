@@ -1,4 +1,5 @@
-import { AssistantStream, AssistantStreamChunk } from "../AssistantStream";
+import { AssistantStream } from "../AssistantStream";
+import { AssistantStreamChunk } from "../AssistantStreamChunk";
 import { UnderlyingReadable } from "../utils/stream/UnderlyingReadable";
 import { createTextStream, TextStreamController } from "./text";
 
@@ -21,10 +22,21 @@ class ToolCallStreamControllerImpl implements ToolCallStreamController {
     stream.pipeTo(
       new WritableStream({
         write: (chunk) => {
-          if (chunk.type !== "text-delta")
-            throw new Error("Unexpected chunk type");
+          switch (chunk.type) {
+            case "text-delta":
+              this._controller.enqueue(chunk);
+              break;
 
-          this._controller.enqueue(chunk);
+            case "part-finish":
+              this._controller.enqueue({
+                type: "tool-call-args-text-finish",
+                path: [],
+              });
+              break;
+
+            default:
+              throw new Error(`Unexpected chunk type: ${chunk.type}`);
+          }
         },
       }),
     );
@@ -46,6 +58,11 @@ class ToolCallStreamControllerImpl implements ToolCallStreamController {
   }
 
   close() {
+    this._controller.enqueue({
+      type: "part-finish",
+      path: [],
+    });
+
     this._controller.close();
   }
 }

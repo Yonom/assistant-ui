@@ -1,8 +1,5 @@
-import {
-  AssistantStream,
-  AssistantStreamChunk,
-  PartInit,
-} from "../AssistantStream";
+import { AssistantStream } from "../AssistantStream";
+import { AssistantStreamChunk, PartInit } from "../AssistantStreamChunk";
 import { createMergeStream } from "../utils/stream/merge";
 import { createTextStreamController, TextStreamController } from "./text";
 import {
@@ -52,7 +49,7 @@ class AssistantStreamControllerImpl implements AssistantStreamController {
 
   private _addPart(part: PartInit, stream: AssistantStream) {
     this.enqueue({
-      type: "part",
+      type: "part-start",
       part,
       path: [],
     });

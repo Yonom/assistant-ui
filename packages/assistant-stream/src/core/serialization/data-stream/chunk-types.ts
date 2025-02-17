@@ -7,6 +7,20 @@ export type DataStreamChunk = {
   };
 }[DataStreamStreamChunkType];
 
+type LanguageModelV1FinishReason =
+  | "stop"
+  | "length"
+  | "content-filter"
+  | "tool-calls"
+  | "error"
+  | "other"
+  | "unknown";
+
+type LanguageModelV1Usage = {
+  promptTokens: number;
+  completionTokens: number;
+};
+
 export enum DataStreamStreamChunkType {
   TextDelta = "0",
   Data = "2",
@@ -45,42 +59,13 @@ type DataStreamStreamChunkValue = {
   };
   [DataStreamStreamChunkType.Error]: string;
   [DataStreamStreamChunkType.FinishStep]: {
-    finishReason:
-      | "stop"
-      | "length"
-      | "content-filter"
-      | "tool-calls"
-      | "error"
-      | "other"
-      | "unknown";
-    usage: {
-      promptTokens: number;
-      completionTokens: number;
-    };
+    finishReason: LanguageModelV1FinishReason;
+    usage: LanguageModelV1Usage;
     isContinued: boolean;
   };
   [DataStreamStreamChunkType.FinishMessage]: {
-    finishReason:
-      | "stop"
-      | "length"
-      | "content-filter"
-      | "tool-calls"
-      | "error"
-      | "other"
-      | "unknown";
-    providerMetadata?: Record<string, Record<string, ReadonlyJSONValue>>;
-    usage: {
-      promptTokens: number;
-      completionTokens: number;
-    };
-    logprobs?: Array<{
-      token: string;
-      logprob: number;
-      topLogprobs: Array<{
-        token: string;
-        logprob: number;
-      }>;
-    }>;
+    finishReason: LanguageModelV1FinishReason;
+    usage: LanguageModelV1Usage;
   };
   [DataStreamStreamChunkType.StartStep]: {
     messageId: string;
@@ -91,6 +76,5 @@ type DataStreamStreamChunkValue = {
     id: string;
     url: string;
     title?: string;
-    providerMetadata?: Record<string, Record<string, ReadonlyJSONValue>>;
   };
 };

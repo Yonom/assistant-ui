@@ -1,6 +1,6 @@
 import { AssistantStream } from "../AssistantStream";
 import { AssistantMessage } from "../utils/types";
-import { assistantMessageAccumulator } from "./assistantMessageAccumulator";
+import { AssistantMessageAccumulator } from "./AssistantMessageAccumulator";
 
 export class AssistantMessageStream {
   constructor(public readonly readable: ReadableStream<AssistantMessage>) {
@@ -9,7 +9,7 @@ export class AssistantMessageStream {
 
   static fromAssistantStream(stream: AssistantStream) {
     return new AssistantMessageStream(
-      stream.pipeThrough(assistantMessageAccumulator()),
+      stream.pipeThrough(new AssistantMessageAccumulator()),
     );
   }
 
