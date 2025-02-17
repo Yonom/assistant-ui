@@ -86,12 +86,12 @@ const MyModelAdapter: ChatModelAdapter = {
   },
 };
 
-export function MyRuntimeProvider({
+export function MyRuntimeProvider<T extends LocalRuntime>({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const runtime = useLocalRuntime(MyModelAdapter);
+  const runtime = useLocalRuntime<T>(MyModelAdapter);
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
