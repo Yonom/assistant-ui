@@ -5,7 +5,7 @@ title: <AssistantRuntimeProvider />
 import { ParametersTable } from "@/components/docs";
 import { AssistantRuntimeProvider } from "@/generated/typeDocs";
 
-The `AssistantRuntimeProvider` provides data and APIs used by assistant-ui components.
+The `AssistantRuntimeProvider` provides data and APIs used by assistant-ui components. It now supports generic types, allowing for more flexibility and specificity in the types of data it can handle.
 
 Almost all components in assistant-ui require an `AssistantRuntimeProvider` around them to function properly.
 
@@ -28,3 +28,24 @@ const MyApp = () => {
 #### Properties
 
 <ParametersTable {...AssistantRuntimeProvider} />
+
+The `AssistantRuntimeProvider` now accepts a generic type `T` that extends `AssistantRuntime`. This allows you to specify the type of runtime you are providing.
+
+```tsx
+export const AssistantRuntimeProviderImpl = <T extends AssistantRuntime>({
+  children,
+  runtime,
+}: AssistantRuntimeProvider.Props<T>) => {
+  // ...
+};
+```
+
+The `useAssistantRuntime` function has also been updated to handle generic types. It now returns a type `T` that extends `AssistantRuntime` or `null`.
+
+```tsx
+export function useAssistantRuntime<T extends AssistantRuntime>(options?: {
+  optional?: boolean | undefined;
+}): T | null;
+```
+
+These changes provide more flexibility and specificity in the types of data that can be handled by the `AssistantRuntimeProvider` and `useAssistantRuntime` function.
