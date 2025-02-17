@@ -5,7 +5,7 @@ title: AssistantRuntime
 import { ParametersTable } from "@/components/docs";
 import { AssistantRuntime, AssistantToolUIsState } from "@/generated/typeDocs";
 
-The `AssistantRuntime` is the root runtime of the application.
+The `AssistantRuntime` is the root runtime of the application. It is now used as a generic parameter in several places.
 
 ### `useAssistantRuntime`
 
@@ -16,6 +16,14 @@ const runtime = useAssistantRuntime();
 ```
 
 <ParametersTable {...AssistantRuntime} />
+
+The `useAssistantRuntime` function now accepts a generic parameter `T` that extends `AssistantRuntime`. This allows you to specify the type of runtime you are using.
+
+```tsx
+import { useAssistantRuntime } from "@assistant-ui/react";
+
+const runtime = useAssistantRuntime<MyCustomRuntime>();
+```
 
 ### Tool UI Registry
 
@@ -31,3 +39,40 @@ const webSearchToolUI = useToolUIs((m) => m.getToolUI("web_search"));
 ```
 
 <ParametersTable {...AssistantToolUIsState} />
+
+The `AssistantRuntimeProvider` now also accepts a generic parameter `T` that extends `AssistantRuntime`. This allows you to provide a specific type of runtime to the rest of your app.
+
+```tsx
+import { AssistantRuntimeProvider } from "@assistant-ui/react";
+
+<AssistantRuntimeProvider<MyCustomRuntime> runtime={myCustomRuntime}>
+  {/* Your app */}
+</AssistantRuntimeProvider>
+```
+
+The `useRemoteThreadListRuntime` function now accepts a generic parameter `T` that extends `AssistantRuntime`. This allows you to specify the type of runtime you are using.
+
+```tsx
+import { useRemoteThreadListRuntime } from "@assistant-ui/react";
+
+const runtime = useRemoteThreadListRuntime<MyCustomRuntime>(options);
+```
+
+The `RemoteThreadListOptions` type now accepts a generic parameter `T` that extends `AssistantRuntime`. This allows you to specify the type of runtime you are using.
+
+```tsx
+import { RemoteThreadListOptions } from "@assistant-ui/react";
+
+const options: RemoteThreadListOptions<MyCustomRuntime> = {
+  runtimeHook: myCustomRuntimeHook,
+  adapter: myAdapter,
+};
+```
+
+The `RemoteThreadListHookInstanceManager` class now accepts a generic parameter `T` that extends `AssistantRuntime`. This allows you to manage instances of a specific type of runtime.
+
+```tsx
+import { RemoteThreadListHookInstanceManager } from "@assistant-ui/react";
+
+const manager = new RemoteThreadListHookInstanceManager<MyCustomRuntime>(myCustomRuntimeHook);
+```
