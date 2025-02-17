@@ -25,3 +25,69 @@ For custom backends, we have two entrypoints for integration:
 
 - [LocalRuntime](/docs/runtimes/custom/local)
 - [ExternalStoreRuntime](/docs/runtimes/custom/external-store)
+
+## AssistantRuntimeProvider
+
+The AssistantRuntimeProvider now accepts a generic parameter `T` that extends `AssistantRuntime`. This allows you to specify the type of runtime you are providing to the rest of your app.
+
+```tsx
+export const AssistantRuntimeProviderImpl = <T extends AssistantRuntime>({
+  children,
+  runtime,
+}: AssistantRuntimeProvider.Props<T>) => {
+  // implementation
+};
+```
+
+You can use the `useAssistantRuntime` hook to get the provided runtime. This hook now also accepts a generic parameter `T` that extends `AssistantRuntime`.
+
+```tsx
+export function useAssistantRuntime<T extends AssistantRuntime>(options?: {
+  optional?: boolean | undefined;
+}): T | null;
+```
+
+## LocalRuntime
+
+The `LocalRuntime` is now also exported from the `useLocalRuntime` module.
+
+```tsx
+export { useLocalRuntime, type LocalRuntime } from "./useLocalRuntime";
+```
+
+## RemoteThreadListHookInstanceManager
+
+The `RemoteThreadListHookInstanceManager` class now accepts a generic parameter `T` that extends `AssistantRuntime`. This allows you to specify the type of runtime the hook returns.
+
+```tsx
+export class RemoteThreadListHookInstanceManager<
+  T extends AssistantRuntime,
+> extends BaseSubscribable {
+  // implementation
+};
+```
+
+## RemoteThreadListThreadListRuntimeCore
+
+The `RemoteThreadListThreadListRuntimeCore` class now accepts a generic parameter `T` that extends `AssistantRuntime`. This allows you to specify the type of runtime the hook returns.
+
+```tsx
+export class RemoteThreadListThreadListRuntimeCore<T extends AssistantRuntime>
+  extends BaseSubscribable
+  implements ThreadListRuntimeCore
+{
+  // implementation
+};
+```
+
+## useRemoteThreadListRuntime
+
+The `useRemoteThreadListRuntime` hook now accepts a generic parameter `T` that extends `AssistantRuntime`. This allows you to specify the type of runtime the hook returns.
+
+```tsx
+export const useRemoteThreadListRuntime = <T extends AssistantRuntime>(
+  options: RemoteThreadListOptions<T>,
+): T => {
+  // implementation
+};
+```
