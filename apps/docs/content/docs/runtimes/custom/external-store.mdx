@@ -110,3 +110,14 @@ const WeatherToolUI = makeAssistantToolUI({
   },
 });
 ```
+
+Note: The `RemoteThreadListOptions` type has been updated to be generic. This means that when you use the `useRemoteThreadListRuntime` function, you can now specify the type of `AssistantRuntime` you are using. For example:
+
+```tsx
+const runtime = useRemoteThreadListRuntime<MyAssistantRuntime>({
+  runtimeHook: myRuntimeHook,
+  adapter: myAdapter,
+});
+```
+
+In the above example, `MyAssistantRuntime` is the type of `AssistantRuntime` you are using. This allows for more flexibility and type safety when using the `useRemoteThreadListRuntime` function.
