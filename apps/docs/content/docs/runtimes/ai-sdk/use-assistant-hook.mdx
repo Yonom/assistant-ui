@@ -125,12 +125,12 @@ import { useAssistant } from "ai/react";
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useVercelUseAssistantRuntime } from "@assistant-ui/react-ai-sdk";
 
-export function MyRuntimeProvider({
+export function MyRuntimeProvider<T extends AssistantRuntime>({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const assistant = useAssistant({
+  const assistant = useAssistant<T>({
     api: "/api/assistant",
   });
 
@@ -156,13 +156,13 @@ import { MyRuntimeProvider } from '@/app/MyRuntimeProvider';
 
 ...
 
-export default function RootLayout({
+export default function RootLayout<T extends AssistantRuntime>({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <MyRuntimeProvider>
+    <MyRuntimeProvider<T>>
       <html lang="en">
         <body className={inter.className}>
           {children}
