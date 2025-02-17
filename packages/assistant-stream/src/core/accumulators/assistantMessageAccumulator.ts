@@ -221,7 +221,7 @@ const handleStepFinish = (
   const lastIndex = steps.length - 1;
 
   // Check if the previous step is a step-start (has state "started")
-  if (steps.length > 0 && (steps[lastIndex] as any).state === "started") {
+  if (steps.length > 0 && steps[lastIndex]!.state === "started") {
     steps[lastIndex] = {
       ...steps[lastIndex]!,
       state: "finished",

@@ -8,7 +8,7 @@ export const fromStreamText = (
 ): AssistantStream => {
   const toolControllers = new Map<string, ToolCallStreamController>();
   const transformer = new AssistantTransformStream<
-    TextStreamPart<Record<any, Tool>>
+    TextStreamPart<Record<string, Tool>>
   >({
     transform(chunk, controller) {
       const { type } = chunk;
