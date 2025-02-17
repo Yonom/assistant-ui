@@ -75,7 +75,7 @@ import { useChat } from "ai/react";
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useVercelUseChatRuntime } from "@assistant-ui/react-ai-sdk";
 
-export function MyRuntimeProvider({
+export function MyRuntimeProvider<T extends AssistantRuntime>({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -85,7 +85,7 @@ export function MyRuntimeProvider({
     unstable_AISDKInterop: true,
   });
 
-  const runtime = useVercelUseChatRuntime(chat);
+  const runtime = useVercelUseChatRuntime<T>(chat);
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
@@ -107,13 +107,13 @@ export function MyRuntimeProvider({
 import type { ReactNode } from "react";
 import { MyRuntimeProvider } from "@/app/MyRuntimeProvider";
 
-export default function RootLayout({
+export default function RootLayout<T extends AssistantRuntime>({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
   return (
-    <MyRuntimeProvider>
+    <MyRuntimeProvider<T>>
       <html lang="en">
         <body>{children}</body>
       </html>
