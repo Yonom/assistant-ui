@@ -5,14 +5,14 @@ title: AssistantRuntime
 import { ParametersTable } from "@/components/docs";
 import { AssistantRuntime, AssistantToolUIsState } from "@/generated/typeDocs";
 
-The `AssistantRuntime` is the root runtime of the application.
+The `AssistantRuntime` is the root runtime of the application. It has been updated to be generic, which means it can be used with a specific type that extends `AssistantRuntime`.
 
 ### `useAssistantRuntime`
 
 ```tsx
 import { useAssistantRuntime } from "@assistant-ui/react";
 
-const runtime = useAssistantRuntime();
+const runtime = useAssistantRuntime<YourSpecificRuntimeType>();
 ```
 
 <ParametersTable {...AssistantRuntime} />
@@ -31,3 +31,5 @@ const webSearchToolUI = useToolUIs((m) => m.getToolUI("web_search"));
 ```
 
 <ParametersTable {...AssistantToolUIsState} />
+
+Please replace `YourSpecificRuntimeType` with the specific type that extends `AssistantRuntime` in your application. If you are using the default `AssistantRuntime`, you can use `AssistantRuntime` as the type.
