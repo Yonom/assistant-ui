@@ -110,3 +110,28 @@ const WeatherToolUI = makeAssistantToolUI({
   },
 });
 ```
+
+## Updates
+
+The RemoteThreadListHookInstanceManager class has been updated to support generic types. This means that the `runtimeHook` in `RemoteThreadListOptions` now returns a generic type `T` that extends `AssistantRuntime`. This change allows for more flexibility and type safety when using the `useRemoteThreadListRuntime` function.
+
+```tsx
+export type RemoteThreadListOptions<
+  T extends AssistantRuntime = AssistantRuntime,
+> = {
+  runtimeHook: () => T;
+  adapter: RemoteThreadListAdapter;
+};
+
+export const useRemoteThreadListRuntime = <T extends AssistantRuntime>(
+  options: RemoteThreadListOptions<T>,
+): T => {
+  const [runtime] = useState(() => new RemoteThreadListRuntimeCore(options));
+  useEffect(() => {
+    runtime.threads.__internal_setOptions(options);
+    runtime.threads.__internal_load();
+  }, [runtime, options]);
+  return useMemo(() => AssistantRuntimeImpl.create(runtime) as T, [runtime]);
+};
+```
+This update allows you to specify the type of `AssistantRuntime` that your `runtimeHook` returns, providing better type safety and code clarity.
