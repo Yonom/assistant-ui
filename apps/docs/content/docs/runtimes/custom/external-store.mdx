@@ -20,9 +20,11 @@ Use the `ExternalStoreRuntime` if you want to manage the message state yourself 
 This runtime requires a `ExternalStoreAdapter<TMessage>` handles communication between `assistant-ui`and your state.
 Unless you are storing messages as `ThreadMessage`, you need to define a `convertMessage` function to convert your messages to `ThreadMessage`.
 
+The `ThreadMessageLike` type now includes a new role: "data". This role can be used to represent messages that contain data or information that is not directly from the user, assistant, or system.
+
 ```tsx twoslash title="@/app/MyRuntimeProvider.tsx"
 type MyMessage = {
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "data";
   content: string;
 };
 const backendApi = async (input: string): Promise<MyMessage> => {
