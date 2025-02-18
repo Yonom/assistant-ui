@@ -32,7 +32,7 @@ const AssistantMessage = () => (
 
 ### Root
 
-Containts all parts of the message.
+Contains all parts of the message.
 
 This primitive renders a `<div>` element unless `asChild` is set.
 
@@ -154,6 +154,11 @@ Renders children if a condition is met.
       description:
         "Render children if the message is the last or hovered over.",
     },
+    {
+      name: "data",
+      type: "boolean | undefined",
+      description: "Render children if the message role is data.",
+    },
   ]}
 />
 
@@ -163,5 +168,8 @@ Renders children if a condition is met.
 </Message.If>
 <Message.If assistant>
   {/* rendered if message is from the assistant */}
+</Message.If>
+<Message.If data>
+  {/* rendered if message role is data */}
 </Message.If>
 ```
