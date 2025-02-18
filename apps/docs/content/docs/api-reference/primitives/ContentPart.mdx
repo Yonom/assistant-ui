@@ -1,6 +1,6 @@
 ---
 title: ContentPartPrimitive
-description: A part of a message's content. Content parts may be text, image, tool call or UI elements.
+description: A part of a message's content. Content parts may be text, image, tool call, UI elements, or data.
 ---
 
 import { ParametersTable } from "@/components/docs";
@@ -12,7 +12,7 @@ import {
 } from "@/generated/typeDocs";
 
 Each message can have any number of content parts.  
-Content parts are usually one of text, reasoning, audio or tool-call.
+Content parts are usually one of text, reasoning, audio, tool-call, or data.
 
 ## Content Part Types
 
@@ -31,6 +31,10 @@ Audio content that can be played back.
 ### Tool Call
 
 Interactive elements that represent tool operations.
+
+### Data
+
+This is a new type of content part that represents data.
 
 ## Anatomy
 
@@ -116,6 +120,7 @@ import { MessagePrimitive } from "@assistant/react";
     Text: MyText,
     Reasoning: MyReasoning,
     Audio: MyAudio,
+    Data: MyData,
     tools: {
       by_name: {
         get_weather: MyWeatherToolUI,
