@@ -45,7 +45,7 @@ const convertMessage = (message: MyMessage): ThreadMessageLike => {
   };
 };
 
-export function MyRuntimeProvider({
+export function MyRuntimeProvider<T extends AssistantRuntime>({
   children,
 }: Readonly<{
   children: ReactNode;
@@ -72,7 +72,7 @@ export function MyRuntimeProvider({
     setIsRunning(false);
   };
 
-  const runtime = useExternalStoreRuntime({
+  const runtime = useExternalStoreRuntime<T>({
     isRunning,
     messages,
     convertMessage,
