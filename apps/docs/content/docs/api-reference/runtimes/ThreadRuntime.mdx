@@ -36,7 +36,7 @@ const isRunning = useThread((m) => m.isRunning);
 
 ### `useThreadMessages`
 
-Work with the messages within a thread:
+Work with the messages within a thread. Note that the `ThreadMessageLike` type now includes a new role "data", in addition to "assistant", "user", and "system". This could impact the runtime handling of threads:
 
 ```tsx
 import { useThreadMessages } from "@assistant-ui/react";
