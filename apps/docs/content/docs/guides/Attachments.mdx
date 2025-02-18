@@ -29,3 +29,36 @@ const runtime = useChatRuntime({
   },
 });
 ```
+
+## Changes in Import Statements
+
+The order of import statements in `ThreadMessageLike.tsx` has been changed. This change does not affect the functionality of attachments. The import statements are now organized in a way that groups similar types together.
+
+```tsx
+import {
+  CompleteAttachment,
+  FileContentPart,
+  ImageContentPart,
+  MessageStatus,
+  TextContentPart,
+  ThreadAssistantContentPart,
+  ThreadAssistantMessage,
+  ThreadMessage,
+  ThreadSystemMessage,
+  ThreadUserContentPart,
+  ThreadUserMessage,
+  UIContentPart,
+  Unstable_AudioContentPart,
+} from "../../types";
+import { ReasoningContentPart, ThreadStep } from "../../types/AssistantTypes";
+```
+
+## Message Role Update
+
+The `MessageRole` type has been updated to include a new role: "data". This change does not affect the functionality of attachments but provides more flexibility in defining the role of a message.
+
+```tsx
+export type MessageRole = "user" | "assistant" | "system" | "data";
+```
+
+Please note that these changes do not require any modifications to the way attachments are handled in your application.
