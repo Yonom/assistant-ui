@@ -25,3 +25,19 @@ For custom backends, we have two entrypoints for integration:
 
 - [LocalRuntime](/docs/runtimes/custom/local)
 - [ExternalStoreRuntime](/docs/runtimes/custom/external-store)
+
+## Updates
+
+The useRemoteThreadListRuntime function now returns a generic type. This means that the function can now return any type that extends the AssistantRuntime type. This change allows for more flexibility and adaptability in the use of the function.
+
+The AssistantRuntimeProviderImpl function now also accepts a generic type that extends the AssistantRuntime type. This change reflects the update to the useRemoteThreadListRuntime function and ensures consistency across the codebase.
+
+The RemoteThreadListHookInstanceManager class now accepts a generic type that extends the AssistantRuntime type. This update allows the class to manage instances of any type that extends the AssistantRuntime type.
+
+The RemoteThreadListThreadListRuntimeCore class now accepts a generic type that extends the AssistantRuntime type. This update allows the class to manage instances of any type that extends the AssistantRuntime type.
+
+The RemoteThreadListOptions type now accepts a generic type that extends the AssistantRuntime type. This update allows the type to manage options for any type that extends the AssistantRuntime type.
+
+The RemoteThreadListRuntimeCore class now accepts a generic type that extends the AssistantRuntime type. This update allows the class to manage instances of any type that extends the AssistantRuntime type.
+
+The useRemoteThreadListRuntime function now returns a generic type that extends the AssistantRuntime type. This update allows the function to return instances of any type that extends the AssistantRuntime type.
