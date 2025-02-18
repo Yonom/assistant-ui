@@ -22,7 +22,7 @@ Unless you are storing messages as `ThreadMessage`, you need to define a `conver
 
 ```tsx twoslash title="@/app/MyRuntimeProvider.tsx"
 type MyMessage = {
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "system" | "data";
   content: string;
 };
 const backendApi = async (input: string): Promise<MyMessage> => {
