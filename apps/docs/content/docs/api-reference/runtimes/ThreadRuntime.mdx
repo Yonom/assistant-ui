@@ -59,3 +59,25 @@ const isAtBottom = useThreadViewport((m) => m.isAtBottom);
 ```
 
 <ParametersTable {...ThreadViewportState} />
+
+### `ThreadMessageLike`
+
+The `ThreadMessageLike` type has been updated to include a new role: "data". This role can be used in addition to the existing "assistant", "user", and "system" roles. The order of imports in the `ThreadMessageLike.tsx` file has also been rearranged, but this does not affect the functionality.
+
+```tsx
+export type ThreadMessageLike = {
+  readonly role: "assistant" | "user" | "system" | "data";
+  readonly content:
+    | string
+    | readonly (
+```
+
+### `MessageRole`
+
+The `MessageRole` type in `AssistantTypes.ts` has also been updated to include the "data" role.
+
+```tsx
+export type MessageRole = "user" | "assistant" | "system" | "data";
+```
+
+Please note that these changes may require updates to any code that uses these types.
