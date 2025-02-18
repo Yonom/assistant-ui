@@ -47,3 +47,22 @@ const text = useEditComposer((m) => m.text);
 ```
 
 <ParametersTable {...EditComposerState} />
+
+### `ThreadMessageLike` and `MessageRole` Changes
+
+The `ThreadMessageLike` type now includes an additional role: `"data"`. This role can be used alongside the existing `"assistant"`, `"user"`, and `"system"` roles. 
+
+```tsx
+export type ThreadMessageLike = {
+  readonly role: "assistant" | "user" | "system" | "data";
+  ...
+};
+```
+
+The `MessageRole` type has also been updated to include the `"data"` role:
+
+```tsx
+export type MessageRole = "user" | "assistant" | "system" | "data";
+```
+
+These changes allow for more flexibility when defining the role of a message.
