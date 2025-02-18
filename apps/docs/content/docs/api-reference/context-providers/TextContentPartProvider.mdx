@@ -24,3 +24,39 @@ const MyApp = () => {
 #### Properties
 
 <ParametersTable {...AssistantRuntimeProvider} />
+
+The `ThreadMessageLike` type now includes a new role: "data". This role can be used to represent data-specific messages in a thread.
+
+```tsx
+export type ThreadMessageLike = {
+  readonly role: "assistant" | "user" | "system" | "data";
+  readonly content:
+    | string
+    | readonly (
+```
+
+The `MessageRole` type has also been updated to include the "data" role.
+
+```tsx
+export type MessageRole = "user" | "assistant" | "system" | "data";
+```
+
+The `CoreToolCallContentPart` and `ToolCallContentPart` types now have a more specific type for the `TArgs` parameter, which extends `ReadonlyJSONObject`.
+
+```tsx
+export type CoreToolCallContentPart<
+  TArgs extends ReadonlyJSONObject = ReadonlyJSONObject,
+  TResult = unknown,
+> = {
+  readonly type: "tool-call";
+```
+
+```tsx
+export type ToolCallContentPart<
+  TArgs extends ReadonlyJSONObject = ReadonlyJSONObject,
+  TResult = unknown,
+> = CoreToolCallContentPart<TArgs, TResult> & {
+  readonly argsText: string;
+```
+
+Please note that these changes may require updates to your existing code if you are using these types.
