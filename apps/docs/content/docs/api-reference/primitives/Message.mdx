@@ -32,7 +32,7 @@ const AssistantMessage = () => (
 
 ### Root
 
-Containts all parts of the message.
+Contains all parts of the message.
 
 This primitive renders a `<div>` element unless `asChild` is set.
 
@@ -165,3 +165,22 @@ Renders children if a condition is met.
   {/* rendered if message is from the assistant */}
 </Message.If>
 ```
+
+### ThreadMessageLike
+
+ThreadMessageLike has been updated to include a new role "data". This role can be used to represent messages that contain data.
+
+```tsx
+export type ThreadMessageLike = {
+  readonly role: "assistant" | "user" | "system" | "data";
+  readonly content:
+    | string
+    | readonly (
+```
+
+The role of a message can be one of the following:
+
+- "assistant": The message is from the assistant.
+- "user": The message is from the user.
+- "system": The message is a system message.
+- "data": The message contains data.
