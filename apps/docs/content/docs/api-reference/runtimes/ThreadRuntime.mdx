@@ -59,3 +59,38 @@ const isAtBottom = useThreadViewport((m) => m.isAtBottom);
 ```
 
 <ParametersTable {...ThreadViewportState} />
+
+### `ThreadMessageLike`
+
+The `ThreadMessageLike` type has been updated to include a new role: "data". This role can be used in the context of the `ThreadRuntime`. The `ThreadMessageLike` type now looks like this:
+
+```tsx
+export type ThreadMessageLike = {
+  readonly role: "assistant" | "user" | "system" | "data";
+  readonly content:
+    | string
+    | readonly (
+        | TextContentPart
+        | ImageContentPart
+        | UIContentPart
+        | ThreadAssistantContentPart
+        | ThreadUserContentPart
+        | ThreadSystemContentPart
+        | Unstable_AudioContentPart
+        | ReasoningContentPart
+        | ThreadStep
+      )[];
+  readonly status: MessageStatus;
+  readonly id: string;
+  readonly timestamp: number;
+  readonly attachments?: CompleteAttachment[];
+};
+```
+
+Please note that the `MessageRole` type has also been updated to include the "data" role:
+
+```tsx
+export type MessageRole = "user" | "assistant" | "system" | "data";
+```
+
+These changes allow for more flexibility when working with messages in a thread.
