@@ -2,7 +2,7 @@ import type { TextStreamPart, CoreTool, ObjectStreamPart } from "ai";
 import { AssistantStream, AssistantStreamChunk } from "../core/AssistantStream";
 import { generateId } from "../core/utils/generateId";
 
-export const fromAISDKStreamText = (
+export const fromStreamText = (
   stream: ReadableStream<TextStreamPart<Record<string, CoreTool>>>,
 ): AssistantStream => {
   const transformer = new TransformStream<
@@ -64,6 +64,9 @@ export const fromAISDKStreamText = (
           });
           break;
         }
+
+        case "reasoning":
+        case "step-start":
         case "step-finish":
         case "error":
         case "finish": {
@@ -78,10 +81,10 @@ export const fromAISDKStreamText = (
     },
   });
 
-  return new AssistantStream(stream.pipeThrough(transformer));
+  return stream.pipeThrough(transformer);
 };
 
-export const fromAISDKStreamObject = (
+export const fromStreamObject = (
   stream: ReadableStream<ObjectStreamPart<unknown>>,
   toolName: string,
 ): AssistantStream => {
@@ -131,5 +134,5 @@ export const fromAISDKStreamObject = (
     },
   });
 
-  return new AssistantStream(stream.pipeThrough(transformer));
+  return stream.pipeThrough(transformer);
 };

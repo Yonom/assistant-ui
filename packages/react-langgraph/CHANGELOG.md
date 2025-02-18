@@ -1,5 +1,174 @@
 # @assistant-ui/react-langgraph
 
+## 0.2.5
+
+### Patch Changes
+
+- a787c39: feat: LangGraph interrupt persistence support
+
+## 0.2.4
+
+### Patch Changes
+
+- 72e66db: chore: update dependencies
+- Updated dependencies [72e66db]
+  - @assistant-ui/react@0.7.71
+
+## 0.2.3
+
+### Patch Changes
+
+- 4f5d77f: feat: ToolCallContentPart.args should be JSONObject
+- Updated dependencies [8ec1f07]
+- Updated dependencies [4f5d77f]
+- Updated dependencies [8ec1f07]
+  - @assistant-ui/react@0.7.59
+
+## 0.2.2
+
+### Patch Changes
+
+- fix: improved interrupt+Command support
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies [2713487]
+  - @assistant-ui/react@0.7.46
+
+## 0.2.1
+
+### Patch Changes
+
+- 177bcce: feat: interrupt state stream support
+- Updated dependencies [9934aef]
+- Updated dependencies [3a8b55a]
+  - @assistant-ui/react@0.7.45
+
+## 0.1.18
+
+### Patch Changes
+
+- 22272e6: chore: update dependencies
+- Updated dependencies [0979334]
+- Updated dependencies [22272e6]
+  - @assistant-ui/react@0.7.39
+
+## 0.1.17
+
+### Patch Changes
+
+- 9dfa127: refactor: rewrite message stream parser
+- Updated dependencies [5794b1b]
+  - @assistant-ui/react@0.7.38
+
+## 0.1.16
+
+### Patch Changes
+
+- 345f3d5: chore: update dependencies
+- Updated dependencies [345f3d5]
+- Updated dependencies [345f3d5]
+- Updated dependencies [2846559]
+  - @assistant-ui/react@0.7.35
+
+## 0.1.15
+
+### Patch Changes
+
+- feat: Feedback and Speech adapter support
+
+## 0.1.14
+
+### Patch Changes
+
+- 4c2bf58: chore: update dependencies
+- Updated dependencies [9a3dc93]
+- Updated dependencies [4c2bf58]
+  - @assistant-ui/react@0.7.34
+
+## 0.1.13
+
+### Patch Changes
+
+- fix: missing type for abortSignal
+
+## 0.1.12
+
+### Patch Changes
+
+- 982a6a2: chore: update dependencies
+- Updated dependencies [982a6a2]
+  - @assistant-ui/react@0.7.30
+
+## 0.1.11
+
+### Patch Changes
+
+- 392188c: fix: wrong import path causing crash
+- Updated dependencies [a8ac203]
+  - @assistant-ui/react@0.7.28
+
+## 0.1.10
+
+### Patch Changes
+
+- 18c21b2: feat: cancellation support
+- Updated dependencies [528cfd3]
+- Updated dependencies [3c70ea1]
+  - @assistant-ui/react@0.7.27
+
+## 0.1.9
+
+### Patch Changes
+
+- 738ef3c: feat: manually trigger langgraph sends via useLangGraphRuntimeSend
+- 738ef3c: feat: support for Command
+- 738ef3c: feat: interrupt+Command support via useLangGraphRuntimeSendCommand
+- Updated dependencies [6a17ec2]
+  - @assistant-ui/react@0.7.26
+
+## 0.1.8
+
+### Patch Changes
+
+- ec3b8cc: chore: update dependencies
+- Updated dependencies [ec3b8cc]
+  - @assistant-ui/react@0.7.19
+
+## 0.1.7
+
+### Patch Changes
+
+- 4c54273: chore: update dependencies
+- Updated dependencies [4c54273]
+- Updated dependencies [4c54273]
+  - @assistant-ui/react@0.7.12
+
+## 0.1.6
+
+### Patch Changes
+
+- 2112ce8: chore: update dependencies
+- Updated dependencies [589d37b]
+- Updated dependencies [2112ce8]
+  - @assistant-ui/react@0.7.8
+
+## 0.1.5
+
+### Patch Changes
+
+- 933b8c0: chore: update deps
+- Updated dependencies [933b8c0]
+- Updated dependencies [09a2a38]
+  - @assistant-ui/react@0.7.6
+
+## 0.1.4
+
+### Patch Changes
+
+- c59d8b5: chore: update dependencies
+- Updated dependencies [c59d8b5]
+  - @assistant-ui/react@0.7.5
+
 ## 0.1.3
 
 ### Patch Changes

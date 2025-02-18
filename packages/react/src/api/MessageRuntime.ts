@@ -2,6 +2,7 @@ import {
   SpeechState,
   SubmittedFeedback,
 } from "../runtimes/core/ThreadRuntimeCore";
+import { symbolInnerMessage } from "../runtimes/external-store/getExternalStoreMessage";
 import {
   ThreadMessage,
   ThreadAssistantContentPart,
@@ -10,6 +11,7 @@ import {
 } from "../types";
 import {
   ContentPartStatus,
+  RunConfig,
   ToolCallContentPartStatus,
 } from "../types/AssistantTypes";
 import { getThreadMessageText } from "../utils/getThreadMessageText";
@@ -58,37 +60,22 @@ export const toContentPartStatus = (
   return isLastPart ? (message.status as ContentPartStatus) : COMPLETE_STATUS;
 };
 
-export const EMPTY_CONTENT_SYMBOL = Symbol("empty-content");
-const EMPTY_CONTENT = Object.freeze({
-  type: "text",
-  text: "",
-  [EMPTY_CONTENT_SYMBOL]: true,
-});
-
 const getContentPartState = (
   message: MessageState,
   partIndex: number,
 ): ContentPartState | SKIP_UPDATE => {
   let part = message.content[partIndex];
   if (!part) {
-    // for empty messages, show an empty text content part
-    if (message.content.length === 0 && partIndex === 0) {
-      part = EMPTY_CONTENT;
-    } else {
-      return SKIP_UPDATE;
-    }
-  } else if (
-    message.content.length === 1 &&
-    part.type === "text" &&
-    part.text.length === 0
-  ) {
-    // ensure reference equality for equivalent empty text parts
-    part = EMPTY_CONTENT;
+    return SKIP_UPDATE;
   }
 
   // if the content part is the same, don't update
   const status = toContentPartStatus(message, partIndex, part);
-  return Object.freeze({ ...part, status });
+  return Object.freeze({
+    ...part,
+    ...{ [symbolInnerMessage]: (part as any)[symbolInnerMessage] },
+    status,
+  });
 };
 
 export type MessageState = ThreadMessage & {
@@ -110,13 +97,17 @@ export type MessageStateBinding = SubscribableWithState<
   MessageRuntimePath
 >;
 
+type ReloadConfig = {
+  runConfig?: RunConfig;
+};
+
 export type MessageRuntime = {
   readonly path: MessageRuntimePath;
 
   readonly composer: EditComposerRuntime;
 
   getState(): MessageState;
-  reload(): void;
+  reload(config?: ReloadConfig): void;
   /**
    * @deprecated This API is still under active development and might change without notice.
    */
@@ -159,28 +150,56 @@ export class MessageRuntimeImpl implements MessageRuntime {
           ref: this.path.ref + `${this.path.ref}.composer`,
           composerSource: "edit",
         },
-        getState: () =>
-          this._threadBinding
-            .getState()
-            .getEditComposer(this._core.getState().id),
+        getState: this._getEditComposerRuntimeCore,
         subscribe: (callback) => this._threadBinding.subscribe(callback),
       }),
       () => this._threadBinding.getState().beginEdit(this._core.getState().id),
     );
   }
 
+  protected __internal_bindMethods() {
+    this.reload = this.reload.bind(this);
+    this.getState = this.getState.bind(this);
+    this.subscribe = this.subscribe.bind(this);
+    this.getContentPartByIndex = this.getContentPartByIndex.bind(this);
+    this.getContentPartByToolCallId =
+      this.getContentPartByToolCallId.bind(this);
+    this.getAttachmentByIndex = this.getAttachmentByIndex.bind(this);
+    this.unstable_getCopyText = this.unstable_getCopyText.bind(this);
+    this.speak = this.speak.bind(this);
+    this.stopSpeaking = this.stopSpeaking.bind(this);
+    this.submitFeedback = this.submitFeedback.bind(this);
+    this.switchToBranch = this.switchToBranch.bind(this);
+  }
+
   public readonly composer;
+
+  private _getEditComposerRuntimeCore = () => {
+    return this._threadBinding
+      .getState()
+      .getEditComposer(this._core.getState().id);
+  };
 
   public getState() {
     return this._core.getState();
   }
 
-  public reload() {
+  public reload(reloadConfig: ReloadConfig = {}) {
+    const editComposerRuntimeCore = this._getEditComposerRuntimeCore();
+    const composerRuntimeCore =
+      editComposerRuntimeCore ?? this._threadBinding.getState().composer;
+    const composer = editComposerRuntimeCore ?? composerRuntimeCore;
+
+    const { runConfig = composer.runConfig } = reloadConfig;
     const state = this._core.getState();
     if (state.role !== "assistant")
       throw new Error("Can only reload assistant messages");
 
-    this._threadBinding.getState().startRun(state.parentId);
+    this._threadBinding.getState().startRun({
+      parentId: state.parentId,
+      sourceId: state.id,
+      runConfig,
+    });
   }
 
   public speak() {

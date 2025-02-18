@@ -2,8 +2,9 @@ import { JSONSchema7 } from "json-schema";
 import {
   LanguageModelConfigSchema,
   LanguageModelV1CallSettingsSchema,
-} from "../../types/ModelConfigTypes";
+} from "../../model-context/ModelContextTypes";
 import { z } from "zod";
+import { ReadonlyJSONObject } from "../../utils/json/json-value";
 
 const LanguageModelV1FunctionToolSchema = z.object({
   type: z.literal("function"),
@@ -24,6 +25,12 @@ const ImageContentPartSchema = z.object({
   image: z.string(),
 });
 
+const FileContentPartSchema = z.object({
+  type: z.literal("file"),
+  data: z.string(),
+  mimeType: z.string(),
+});
+
 const Unstable_AudioContentPart = z.object({
   type: z.literal("audio"),
   audio: z.object({
@@ -36,11 +43,12 @@ const CoreToolCallContentPartSchema = z.object({
   type: z.literal("tool-call"),
   toolCallId: z.string(),
   toolName: z.string(),
-  args: z.record(z.unknown()),
+  args: z
+    .record(z.unknown())
+    .refine((c): c is ReadonlyJSONObject => c !== undefined),
   result: z.unknown().optional(),
   isError: z.boolean().optional(),
 });
-// args is required but unknown;
 
 const CoreUserMessageSchema = z.object({
   role: z.literal("user"),
@@ -49,10 +57,12 @@ const CoreUserMessageSchema = z.object({
       z.discriminatedUnion("type", [
         TextContentPartSchema,
         ImageContentPartSchema,
+        FileContentPartSchema,
         Unstable_AudioContentPart,
       ]),
     )
-    .min(1),
+    .min(1)
+    .readonly(),
 });
 
 const CoreAssistantMessageSchema = z.object({
@@ -64,12 +74,13 @@ const CoreAssistantMessageSchema = z.object({
         CoreToolCallContentPartSchema,
       ]),
     )
-    .min(1),
+    .min(1)
+    .readonly(),
 });
 
 const CoreSystemMessageSchema = z.object({
   role: z.literal("system"),
-  content: z.tuple([TextContentPartSchema]),
+  content: z.tuple([TextContentPartSchema]).readonly(),
 });
 
 const CoreMessageSchema = z.discriminatedUnion("role", [
@@ -81,8 +92,13 @@ const CoreMessageSchema = z.discriminatedUnion("role", [
 export const EdgeRuntimeRequestOptionsSchema = z
   .object({
     system: z.string().optional(),
-    messages: z.array(CoreMessageSchema).min(1),
-    tools: z.array(LanguageModelV1FunctionToolSchema).optional(),
+    messages: z.array(CoreMessageSchema).min(1).readonly(),
+    runConfig: z
+      .object({
+        custom: z.record(z.unknown()).optional(),
+      })
+      .optional(),
+    tools: z.array(LanguageModelV1FunctionToolSchema).readonly().optional(),
     unstable_assistantMessageId: z.string().optional(),
   })
   .merge(LanguageModelV1CallSettingsSchema)

@@ -1,6 +1,7 @@
 import { Attachment, PendingAttachment } from "../types/AttachmentTypes";
 import {
   ComposerRuntimeCore,
+  ComposerRuntimeEventType,
   ThreadComposerRuntimeCore,
 } from "../runtimes/core/ComposerRuntimeCore";
 import { Unsubscribe } from "../types";
@@ -15,7 +16,8 @@ import {
 import { ShallowMemoizeSubject } from "./subscribable/ShallowMemoizeSubject";
 import { SKIP_UPDATE } from "./subscribable/SKIP_UPDATE";
 import { ComposerRuntimePath } from "./RuntimePathTypes";
-import { MessageRole } from "../types/AssistantTypes";
+import { MessageRole, RunConfig } from "../types/AssistantTypes";
+import { EventSubscriptionSubject } from "./subscribable/EventSubscriptionSubject";
 
 export type ThreadComposerRuntimeCoreBinding = SubscribableWithState<
   ThreadComposerRuntimeCore | undefined,
@@ -33,13 +35,14 @@ export type ComposerRuntimeCoreBinding = SubscribableWithState<
 >;
 
 type BaseComposerState = {
-  readonly text: string;
-  readonly role: MessageRole;
-  readonly attachments: readonly Attachment[];
-
   readonly canCancel: boolean;
   readonly isEditing: boolean;
   readonly isEmpty: boolean;
+
+  readonly text: string;
+  readonly role: MessageRole;
+  readonly attachments: readonly Attachment[];
+  readonly runConfig: RunConfig;
 };
 
 export type ThreadComposerState = BaseComposerState & {
@@ -55,6 +58,7 @@ export type EditComposerState = BaseComposerState & {
 export type ComposerState = ThreadComposerState | EditComposerState;
 
 const EMPTY_ARRAY = Object.freeze([]);
+const EMPTY_OBJECT = Object.freeze({});
 const getThreadComposerState = (
   runtime: ThreadComposerRuntimeCore | undefined,
 ): ThreadComposerState => {
@@ -64,9 +68,11 @@ const getThreadComposerState = (
     isEditing: runtime?.isEditing ?? false,
     canCancel: runtime?.canCancel ?? false,
     isEmpty: runtime?.isEmpty ?? true,
-    text: runtime?.text ?? "",
+
     attachments: runtime?.attachments ?? EMPTY_ARRAY,
+    text: runtime?.text ?? "",
     role: runtime?.role ?? "user",
+    runConfig: runtime?.runConfig ?? EMPTY_OBJECT,
 
     value: runtime?.text ?? "",
   });
@@ -81,9 +87,11 @@ const getEditComposerState = (
     isEditing: runtime?.isEditing ?? false,
     canCancel: runtime?.canCancel ?? false,
     isEmpty: runtime?.isEmpty ?? true,
+
     text: runtime?.text ?? "",
-    attachments: runtime?.attachments ?? EMPTY_ARRAY,
     role: runtime?.role ?? "user",
+    attachments: runtime?.attachments ?? EMPTY_ARRAY,
+    runConfig: runtime?.runConfig ?? EMPTY_OBJECT,
 
     value: runtime?.text ?? "",
   });
@@ -94,13 +102,16 @@ export type ComposerRuntime = {
   readonly type: "edit" | "thread";
   getState(): ComposerState;
 
-  setText(text: string): void;
-  setValue(text: string): void;
-
   getAttachmentAccept(): string;
   addAttachment(file: File): Promise<void>;
 
-  reset(): void;
+  setText(text: string): void;
+  setRole(role: MessageRole): void;
+  setRunConfig(runConfig: RunConfig): void;
+
+  reset(): Promise<void>;
+  clearAttachments(): Promise<void>;
+
   send(): void;
   cancel(): void;
   subscribe(callback: () => void): Unsubscribe;
@@ -116,6 +127,22 @@ export abstract class ComposerRuntimeImpl implements ComposerRuntime {
 
   constructor(protected _core: ComposerRuntimeCoreBinding) {}
 
+  protected __internal_bindMethods() {
+    this.setText = this.setText.bind(this);
+    this.setRunConfig = this.setRunConfig.bind(this);
+    this.getState = this.getState.bind(this);
+    this.subscribe = this.subscribe.bind(this);
+    this.addAttachment = this.addAttachment.bind(this);
+    this.reset = this.reset.bind(this);
+    this.clearAttachments = this.clearAttachments.bind(this);
+    this.send = this.send.bind(this);
+    this.cancel = this.cancel.bind(this);
+    this.setRole = this.setRole.bind(this);
+    this.getAttachmentAccept = this.getAttachmentAccept.bind(this);
+    this.getAttachmentByIndex = this.getAttachmentByIndex.bind(this);
+    this.unstable_on = this.unstable_on.bind(this);
+  }
+
   public abstract getState(): ComposerState;
 
   public setText(text: string) {
@@ -124,8 +151,10 @@ export abstract class ComposerRuntimeImpl implements ComposerRuntime {
     core.setText(text);
   }
 
-  public setValue(text: string) {
-    this.setText(text);
+  public setRunConfig(runConfig: RunConfig) {
+    const core = this._core.getState();
+    if (!core) throw new Error("Composer is not available");
+    core.setRunConfig(runConfig);
   }
 
   public addAttachment(file: File) {
@@ -137,7 +166,13 @@ export abstract class ComposerRuntimeImpl implements ComposerRuntime {
   public reset() {
     const core = this._core.getState();
     if (!core) throw new Error("Composer is not available");
-    core.reset();
+    return core.reset();
+  }
+
+  public clearAttachments() {
+    const core = this._core.getState();
+    if (!core) throw new Error("Composer is not available");
+    return core.clearAttachments();
   }
 
   public send() {
@@ -160,6 +195,26 @@ export abstract class ComposerRuntimeImpl implements ComposerRuntime {
 
   public subscribe(callback: () => void) {
     return this._core.subscribe(callback);
+  }
+
+  private _eventSubscriptionSubjects = new Map<
+    string,
+    EventSubscriptionSubject<ComposerRuntimeEventType>
+  >();
+
+  public unstable_on(
+    event: ComposerRuntimeEventType,
+    callback: () => void,
+  ): Unsubscribe {
+    let subject = this._eventSubscriptionSubjects.get(event);
+    if (!subject) {
+      subject = new EventSubscriptionSubject({
+        event: event,
+        binding: this._core,
+      });
+      this._eventSubscriptionSubjects.set(event, subject);
+    }
+    return subject.subscribe(callback);
   }
 
   public getAttachmentAccept(): string {
@@ -289,6 +344,11 @@ export class EditComposerRuntimeImpl
     });
 
     this._getState = stateBinding.getState.bind(stateBinding);
+  }
+
+  public override __internal_bindMethods() {
+    super.__internal_bindMethods();
+    this.beginEdit = this.beginEdit.bind(this);
   }
 
   public override getState(): EditComposerState {

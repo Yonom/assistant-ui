@@ -2,19 +2,18 @@
 
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { Primitive } from "@radix-ui/react-primitive";
-import { type ElementRef, forwardRef, ComponentPropsWithoutRef } from "react";
-import {
-  UseThreadViewportAutoScrollProps,
-  useThreadViewportAutoScroll,
-} from "../../primitive-hooks/thread/useThreadViewportAutoScroll";
+import { type ComponentRef, forwardRef, ComponentPropsWithoutRef } from "react";
+import { useThreadViewportAutoScroll } from "./useThreadViewportAutoScroll";
+import { ThreadViewportProvider } from "../../context/providers/ThreadViewportProvider";
 
 export namespace ThreadPrimitiveViewport {
-  export type Element = ElementRef<typeof Primitive.div>;
-  export type Props = ComponentPropsWithoutRef<typeof Primitive.div> &
-    UseThreadViewportAutoScrollProps;
+  export type Element = ComponentRef<typeof Primitive.div>;
+  export type Props = ComponentPropsWithoutRef<typeof Primitive.div> & {
+    autoScroll?: boolean | undefined;
+  };
 }
 
-export const ThreadPrimitiveViewport = forwardRef<
+const ThreadPrimitiveViewportScrollable = forwardRef<
   ThreadPrimitiveViewport.Element,
   ThreadPrimitiveViewport.Props
 >(({ autoScroll, children, ...rest }, forwardedRef) => {
@@ -28,6 +27,17 @@ export const ThreadPrimitiveViewport = forwardRef<
     <Primitive.div {...rest} ref={ref}>
       {children}
     </Primitive.div>
+  );
+});
+
+export const ThreadPrimitiveViewport = forwardRef<
+  ThreadPrimitiveViewport.Element,
+  ThreadPrimitiveViewport.Props
+>((props, ref) => {
+  return (
+    <ThreadViewportProvider>
+      <ThreadPrimitiveViewportScrollable {...props} ref={ref} />
+    </ThreadViewportProvider>
   );
 });
 

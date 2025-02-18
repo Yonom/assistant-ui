@@ -4,15 +4,10 @@ import {
   ThreadRuntimeCore,
   SpeechState,
   ThreadRuntimeEventType,
-  ThreadMetadata,
+  StartRunConfig,
 } from "../runtimes/core/ThreadRuntimeCore";
 import { ExportedMessageRepository } from "../runtimes/utils/MessageRepository";
-import {
-  AppendMessage,
-  ModelConfig,
-  ThreadMessage,
-  Unsubscribe,
-} from "../types";
+import { AppendMessage, ThreadMessage, Unsubscribe } from "../types";
 import {
   MessageRuntime,
   MessageRuntimeImpl,
@@ -20,22 +15,43 @@ import {
 } from "./MessageRuntime";
 import { NestedSubscriptionSubject } from "./subscribable/NestedSubscriptionSubject";
 import { ShallowMemoizeSubject } from "./subscribable/ShallowMemoizeSubject";
-import {
-  Subscribable,
-  SubscribableWithState,
-} from "./subscribable/Subscribable";
+import { SubscribableWithState } from "./subscribable/Subscribable";
 import {
   ThreadComposerRuntime,
   ThreadComposerRuntimeImpl,
 } from "./ComposerRuntime";
 import { LazyMemoizeSubject } from "./subscribable/LazyMemoizeSubject";
 import { SKIP_UPDATE } from "./subscribable/SKIP_UPDATE";
-import { MessageRuntimePath, ThreadRuntimePath } from "./RuntimePathTypes";
+import {
+  MessageRuntimePath,
+  ThreadListItemRuntimePath,
+  ThreadRuntimePath,
+} from "./RuntimePathTypes";
+import { ThreadListItemState } from "./ThreadListItemRuntime";
+import { RunConfig } from "../types/AssistantTypes";
+import { EventSubscriptionSubject } from "./subscribable/EventSubscriptionSubject";
+import { symbolInnerMessage } from "../runtimes/external-store/getExternalStoreMessage";
+import { ModelContext } from "../model-context";
+
+export type CreateStartRunConfig = {
+  parentId: string | null;
+  sourceId?: string | null | undefined;
+  runConfig?: RunConfig | undefined;
+};
+
+const toStartRunConfig = (message: CreateStartRunConfig): StartRunConfig => {
+  return {
+    parentId: message.parentId ?? null,
+    sourceId: message.sourceId ?? null,
+    runConfig: message.runConfig ?? {},
+  };
+};
 
 export type CreateAppendMessage =
   | string
   | {
       parentId?: string | null | undefined;
+      sourceId?: string | null | undefined;
       role?: AppendMessage["role"] | undefined;
       content: AppendMessage["content"];
       attachments?: AppendMessage["attachments"] | undefined;
@@ -49,6 +65,8 @@ const toAppendMessage = (
   if (typeof message === "string") {
     return {
       parentId: messages.at(-1)?.id ?? null,
+      sourceId: null,
+      runConfig: {},
       role: "user",
       content: [{ type: "text", text: message }],
       attachments: [],
@@ -62,6 +80,7 @@ const toAppendMessage = (
   return {
     ...message,
     parentId: message.parentId ?? messages.at(-1)?.id ?? null,
+    sourceId: message.sourceId ?? null,
     role: message.role ?? "user",
     attachments: message.attachments ?? [],
   } as AppendMessage;
@@ -74,17 +93,24 @@ export type ThreadRuntimeCoreBinding = SubscribableWithState<
   outerSubscribe(callback: () => void): Unsubscribe;
 };
 
+export type ThreadListItemRuntimeBinding = SubscribableWithState<
+  ThreadListItemState,
+  ThreadListItemRuntimePath
+>;
+
 export type ThreadState = {
   /**
    * The thread ID.
-   * @deprecated This field is deprecated and will be removed in 0.8.0. Use `metadata.threadId` instead.
+   * @deprecated This field is deprecated and will be removed in 0.8.0. Use `useThreadListItem().id` instead.
    */
   readonly threadId: string;
 
   /**
    * The thread metadata.
+   *
+   * @deprecated Use `useThreadListItem()` instead. This field is deprecated and will be removed in 0.8.0.
    */
-  readonly metadata: ThreadMetadata;
+  readonly metadata: ThreadListItemState;
 
   /**
    * Whether the thread is disabled. Disabled threads cannot receive new messages.
@@ -122,11 +148,14 @@ export type ThreadState = {
   readonly speech: SpeechState | undefined;
 };
 
-export const getThreadState = (runtime: ThreadRuntimeCore): ThreadState => {
+export const getThreadState = (
+  runtime: ThreadRuntimeCore,
+  threadListItemState: ThreadListItemState,
+): ThreadState => {
   const lastMessage = runtime.messages.at(-1);
   return Object.freeze({
-    threadId: runtime.metadata.threadId,
-    metadata: runtime.metadata,
+    threadId: threadListItemState.id,
+    metadata: threadListItemState,
     capabilities: runtime.capabilities,
     isDisabled: runtime.isDisabled,
     isRunning:
@@ -175,13 +204,23 @@ export type ThreadRuntime = {
   append(message: CreateAppendMessage): void;
 
   /**
-   *
-   * @param parentId
+   * @deprecated pass an object with `parentId` instead. This will be removed in 0.8.0.
    */
   startRun(parentId: string | null): void;
+  /**
+   * Start a new run with the given configuration.
+   * @param config The configuration for starting the run
+   */
+  startRun(config: CreateStartRunConfig): void;
   subscribe(callback: () => void): Unsubscribe;
   cancelRun(): void;
-  getModelConfig(): ModelConfig;
+  getModelContext(): ModelContext;
+
+  /**
+   * @deprecated This method was renamed to `getModelContext`.
+   */
+  getModelConfig(): ModelContext;
+
   export(): ExportedMessageRepository;
   import(repository: ExportedMessageRepository): void;
   getMesssageByIndex(idx: number): MessageRuntime;
@@ -200,19 +239,33 @@ export class ThreadRuntimeImpl implements ThreadRuntime {
     return this._threadBinding.path;
   }
 
-  public unstable_getCore() {
-    return this._threadBinding.getState();
+  public get __internal_threadBinding() {
+    return this._threadBinding;
   }
 
-  private _threadBinding: ThreadRuntimeCoreBinding & {
+  private readonly _threadBinding: ThreadRuntimeCoreBinding & {
     getStateState(): ThreadState;
   };
 
-  constructor(threadBinding: ThreadRuntimeCoreBinding) {
+  constructor(
+    threadBinding: ThreadRuntimeCoreBinding,
+    threadListItemBinding: ThreadListItemRuntimeBinding,
+  ) {
     const stateBinding = new LazyMemoizeSubject({
       path: threadBinding.path,
-      getState: () => getThreadState(threadBinding.getState()),
-      subscribe: (callback) => threadBinding.subscribe(callback),
+      getState: () =>
+        getThreadState(
+          threadBinding.getState(),
+          threadListItemBinding.getState(),
+        ),
+      subscribe: (callback) => {
+        const sub1 = threadBinding.subscribe(callback);
+        const sub2 = threadListItemBinding.subscribe(callback);
+        return () => {
+          sub1();
+          sub2();
+        };
+      },
     });
 
     this._threadBinding = {
@@ -236,6 +289,22 @@ export class ThreadRuntimeImpl implements ThreadRuntime {
     );
   }
 
+  protected __internal_bindMethods() {
+    this.append = this.append.bind(this);
+    this.startRun = this.startRun.bind(this);
+    this.cancelRun = this.cancelRun.bind(this);
+    this.stopSpeaking = this.stopSpeaking.bind(this);
+    this.export = this.export.bind(this);
+    this.import = this.import.bind(this);
+    this.getMesssageByIndex = this.getMesssageByIndex.bind(this);
+    this.getMesssageById = this.getMesssageById.bind(this);
+    this.subscribe = this.subscribe.bind(this);
+    this.unstable_on = this.unstable_on.bind(this);
+    this.getModelContext = this.getModelContext.bind(this);
+    this.getModelConfig = this.getModelConfig.bind(this);
+    this.getState = this.getState.bind(this);
+  }
+
   public readonly composer;
 
   public getState() {
@@ -254,12 +323,20 @@ export class ThreadRuntimeImpl implements ThreadRuntime {
     return this._threadBinding.subscribe(callback);
   }
 
-  public getModelConfig() {
-    return this._threadBinding.getState().getModelConfig();
+  public getModelContext() {
+    return this._threadBinding.getState().getModelContext();
   }
 
-  public startRun(parentId: string | null) {
-    return this._threadBinding.getState().startRun(parentId);
+  public getModelConfig() {
+    return this.getModelContext();
+  }
+
+  public startRun(configOrParentId: string | null | CreateStartRunConfig) {
+    const config =
+      configOrParentId === null || typeof configOrParentId === "string"
+        ? { parentId: configOrParentId }
+        : configOrParentId;
+    return this._threadBinding.getState().startRun(toStartRunConfig(config));
   }
 
   public cancelRun() {
@@ -268,10 +345,6 @@ export class ThreadRuntimeImpl implements ThreadRuntime {
 
   public stopSpeaking() {
     return this._threadBinding.getState().stopSpeaking();
-  }
-
-  public getSubmittedFeedback(messageId: string) {
-    return this._threadBinding.getState().getSubmittedFeedback(messageId);
   }
 
   public export() {
@@ -340,6 +413,7 @@ export class ThreadRuntimeImpl implements ThreadRuntime {
 
           return {
             ...message,
+            ...{ [symbolInnerMessage]: (message as any)[symbolInnerMessage] },
 
             isLast: messages.at(-1)?.id === message.id,
             parentId,
@@ -359,26 +433,22 @@ export class ThreadRuntimeImpl implements ThreadRuntime {
     );
   }
 
-  private _eventListenerNestedSubscriptions = new Map<
+  private _eventSubscriptionSubjects = new Map<
     string,
-    NestedSubscriptionSubject<Subscribable, ThreadRuntimePath>
+    EventSubscriptionSubject<ThreadRuntimeEventType>
   >();
 
   public unstable_on(
     event: ThreadRuntimeEventType,
     callback: () => void,
   ): Unsubscribe {
-    let subject = this._eventListenerNestedSubscriptions.get(event);
+    let subject = this._eventSubscriptionSubjects.get(event);
     if (!subject) {
-      subject = new NestedSubscriptionSubject({
-        path: this.path,
-        getState: () => ({
-          subscribe: (callback) =>
-            this._threadBinding.getState().unstable_on(event, callback),
-        }),
-        subscribe: (callback) => this._threadBinding.outerSubscribe(callback),
+      subject = new EventSubscriptionSubject({
+        event: event,
+        binding: this._threadBinding,
       });
-      this._eventListenerNestedSubscriptions.set(event, subject);
+      this._eventSubscriptionSubjects.set(event, subject);
     }
     return subject.subscribe(callback);
   }

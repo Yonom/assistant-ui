@@ -3,15 +3,22 @@ import {
   CompleteAttachment,
   PendingAttachment,
 } from "../../types/AttachmentTypes";
-import { AppendMessage, Unsubscribe } from "../../types";
-import { AttachmentAdapter } from "../attachment";
-import { ComposerRuntimeCore } from "../core/ComposerRuntimeCore";
-import { MessageRole } from "../../types/AssistantTypes";
+import { AppendMessage } from "../../types";
+import { AttachmentAdapter } from "../adapters/attachment";
+import {
+  ComposerRuntimeCore,
+  ComposerRuntimeEventType,
+} from "../core/ComposerRuntimeCore";
+import { MessageRole, RunConfig } from "../../types/AssistantTypes";
+import { BaseSubscribable } from "../remote-thread-list/BaseSubscribable";
 
 const isAttachmentComplete = (a: Attachment): a is CompleteAttachment =>
   a.status.type === "complete";
 
-export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
+export abstract class BaseComposerRuntimeCore
+  extends BaseSubscribable
+  implements ComposerRuntimeCore
+{
   public readonly isEditing = true;
 
   protected abstract getAttachmentAdapter(): AttachmentAdapter | undefined;
@@ -27,7 +34,7 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
 
   protected setAttachments(value: readonly Attachment[]) {
     this._attachments = value;
-    this.notifySubscribers();
+    this._notifySubscribers();
   }
 
   public abstract get canCancel(): boolean;
@@ -48,21 +55,69 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
     return this._role;
   }
 
-  setRole(role: MessageRole) {
-    this._role = role;
-    this.notifySubscribers();
+  private _runConfig: RunConfig = {};
+
+  get runConfig() {
+    return this._runConfig;
   }
 
-  setText(value: string) {
+  public setText(value: string) {
+    if (this._text === value) return;
+
     this._text = value;
-    this.notifySubscribers();
+    this._notifySubscribers();
   }
 
-  reset() {
-    this._text = "";
-    this._role = "user";
+  public setRole(role: MessageRole) {
+    if (this._role === role) return;
+
+    this._role = role;
+    this._notifySubscribers();
+  }
+
+  public setRunConfig(runConfig: RunConfig) {
+    if (this._runConfig === runConfig) return;
+
+    this._runConfig = runConfig;
+    this._notifySubscribers();
+  }
+
+  private _emptyTextAndAttachments() {
     this._attachments = [];
-    this.notifySubscribers();
+    this._text = "";
+    this._notifySubscribers();
+  }
+
+  private async _onClearAttachments() {
+    const adapter = this.getAttachmentAdapter();
+    if (adapter) {
+      await Promise.all(this._attachments.map((a) => adapter.remove(a)));
+    }
+  }
+
+  public async reset() {
+    if (
+      this._attachments.length === 0 &&
+      this._text === "" &&
+      this._role === "user" &&
+      Object.keys(this._runConfig).length === 0
+    ) {
+      return;
+    }
+
+    this._role = "user";
+    this._runConfig = {};
+
+    const task = this._onClearAttachments();
+    this._emptyTextAndAttachments();
+    await task;
+  }
+
+  public async clearAttachments() {
+    const task = this._onClearAttachments();
+    this.setAttachments([]);
+
+    await task;
   }
 
   public async send() {
@@ -78,26 +133,58 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
           )
         : [];
 
-    const message: Omit<AppendMessage, "parentId"> = {
+    const message: Omit<AppendMessage, "parentId" | "sourceId"> = {
       role: this.role,
       content: this.text ? [{ type: "text", text: this.text }] : [],
       attachments,
+      runConfig: this.runConfig,
     };
-    this.reset();
+    this._emptyTextAndAttachments();
 
     this.handleSend(message);
+    this._notifyEventSubscribers("send");
   }
-  public abstract handleSend(message: Omit<AppendMessage, "parentId">): void;
-  public abstract cancel(): void;
+
+  public cancel() {
+    this.handleCancel();
+  }
+
+  protected abstract handleSend(
+    message: Omit<AppendMessage, "parentId" | "sourceId">,
+  ): void;
+  protected abstract handleCancel(): void;
 
   async addAttachment(file: File) {
     const adapter = this.getAttachmentAdapter();
     if (!adapter) throw new Error("Attachments are not supported");
 
-    const attachment = await adapter.add({ file });
+    const upsertAttachment = (a: PendingAttachment) => {
+      const idx = this._attachments.findIndex((attachment) => attachment.id === a.id);
+      if (idx !== -1)
+        this._attachments = [
+          ...this._attachments.slice(0, idx),
+          a,
+          ...this._attachments.slice(idx + 1),
+        ];
+      else {
+        this._attachments = [...this._attachments, a];
+        this._notifyEventSubscribers("attachment_add");
+      }
 
-    this._attachments = [...this._attachments, attachment as PendingAttachment];
-    this.notifySubscribers();
+      this._notifySubscribers();
+    };
+
+    const promiseOrGenerator = adapter.add({ file });
+    if (Symbol.asyncIterator in promiseOrGenerator) {
+      for await (const r of promiseOrGenerator) {
+        upsertAttachment(r);
+      }
+    } else {
+      upsertAttachment(await promiseOrGenerator);
+    }
+
+    this._notifyEventSubscribers("attachment_add");
+    this._notifySubscribers();
   }
 
   async removeAttachment(attachmentId: string) {
@@ -110,17 +197,38 @@ export abstract class BaseComposerRuntimeCore implements ComposerRuntimeCore {
 
     await adapter.remove(attachment);
 
-    this._attachments = this._attachments.toSpliced(index, 1);
-    this.notifySubscribers();
+    // this._attachments.toSpliced(index, 1); - not yet widely supported
+    this._attachments = [
+      ...this._attachments.slice(0, index),
+      ...this._attachments.slice(index + 1),
+    ];
+    this._notifySubscribers();
   }
 
-  private _subscriptions = new Set<() => void>();
-  protected notifySubscribers() {
-    for (const callback of this._subscriptions) callback();
+  private _eventSubscribers = new Map<
+    ComposerRuntimeEventType,
+    Set<() => void>
+  >();
+
+  protected _notifyEventSubscribers(event: ComposerRuntimeEventType) {
+    const subscribers = this._eventSubscribers.get(event);
+    if (!subscribers) return;
+
+    for (const callback of subscribers) callback();
   }
 
-  public subscribe(callback: () => void): Unsubscribe {
-    this._subscriptions.add(callback);
-    return () => this._subscriptions.delete(callback);
+  public unstable_on(event: ComposerRuntimeEventType, callback: () => void) {
+    const subscribers = this._eventSubscribers.get(event);
+    if (!subscribers) {
+      this._eventSubscribers.set(event, new Set([callback]));
+    } else {
+      subscribers.add(callback);
+    }
+
+    return () => {
+      const subscribers = this._eventSubscribers.get(event);
+      if (!subscribers) return;
+      subscribers.delete(callback);
+    };
   }
 }

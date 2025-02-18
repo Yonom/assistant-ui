@@ -17,7 +17,7 @@ import { Steps, Step } from "fumadocs-ui/components/steps";
   ### Create a new project based on the LangGraph assistant-ui template
 
 ```sh
-npx assistant-ui@latest create -t langgraph my-app
+npx create-assistant-ui@latest -t langgraph my-app
 ```
 
   </Step>
@@ -44,7 +44,7 @@ NEXT_PUBLIC_LANGGRAPH_ASSISTANT_ID=your_graph_id
 ### Install dependencies
 
 ```sh npm2yarn
-npm install @assistant-ui/react @assistant-ui/react-langgraph @langchain/langgraph-sdk
+npm install @assistant-ui/react @assistant-ui/react-ui @assistant-ui/react-langgraph @langchain/langgraph-sdk
 ```
 
   </Step>
@@ -190,9 +190,8 @@ export const sendMessage = async (params: {
 "use client";
 
 import { useRef } from "react";
-import { Thread } from "@assistant-ui/react";
+import { Thread, makeMarkdownText } from "@assistant-ui/react-ui";
 import { useLangGraphRuntime } from "@assistant-ui/react-langgraph";
-import { makeMarkdownText } from "@assistant-ui/react-markdown";
 
 import { createThread, getThreadState, sendMessage } from "@/lib/chatApi";
 
@@ -220,7 +219,10 @@ export function MyAssistant() {
     onSwitchToThread: async (threadId) => {
       const state = await getThreadState(threadId);
       threadIdRef.current = threadId;
-      return { messages: state.values.messages };
+      return { 
+        messages: state.values.messages,
+        interrupts: state.tasks[0]?.interrupts,
+      };
     },
   });
 
@@ -272,7 +274,19 @@ NEXT_PUBLIC_LANGGRAPH_ASSISTANT_ID=your_graph_id
 
 ### Setup UI components
 
-Follow the [UI Components](/docs/ui/styled/Thread) guide to setup the UI components.
+Follow the [UI Components](/docs/ui/shadcn-ui/Thread) guide to setup the UI components.
 
   </Step>
 </Steps>
+
+## Interrupt Persistence
+
+LangGraph supports interrupting the execution flow to request user input or handle specific interactions. These interrupts can be persisted and restored when switching between threads. This means that if a user switches away from a thread during an interaction (like waiting for user approval), the interaction state will be preserved when they return to that thread.
+
+To handle interrupts in your application:
+
+1. Make sure your thread state type includes the `interrupts` field
+2. Return the interrupts from `onSwitchToThread` along with the messages
+3. The runtime will automatically restore the interrupt state when switching threads
+
+This feature is particularly useful for applications that require user approval flows, multi-step forms, or any other interactive elements that might span multiple thread switches.

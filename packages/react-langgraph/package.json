@@ -1,6 +1,6 @@
 {
   "name": "@assistant-ui/react-langgraph",
-  "version": "0.1.3",
+  "version": "0.2.5",
   "license": "MIT",
   "exports": {
     ".": {
@@ -27,10 +27,11 @@
     "build": "tsup src/index.ts --format cjs,esm --dts --sourcemap --clean"
   },
   "dependencies": {
-    "zod": "^3.23.8"
+    "uuid": "^11.0.5",
+    "zod": "^3.24.1"
   },
   "peerDependencies": {
-    "@assistant-ui/react": "^0.7.4",
+    "@assistant-ui/react": "^0.7.82",
     "@types/react": "*",
     "react": "^18 || ^19 || ^19.0.0-rc"
   },
@@ -42,19 +43,19 @@
   "devDependencies": {
     "@assistant-ui/react": "workspace:*",
     "@assistant-ui/tsconfig": "workspace:*",
-    "eslint-config-next": "15.0.3",
-    "tsup": "8.3.5"
+    "eslint-config-next": "15.1.6",
+    "tsup": "8.3.6"
   },
   "publishConfig": {
     "access": "public",
     "provenance": true
   },
-  "homepage": "https://assistant-ui.com/",
+  "homepage": "https://www.assistant-ui.com/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Yonom/assistant-ui.git"
+    "url": "git+https://github.com/assistant-ui/assistant-ui.git"
   },
   "bugs": {
-    "url": "https://github.com/Yonom/assistant-ui/issues"
+    "url": "https://github.com/assistant-ui/assistant-ui/issues"
   }
 }

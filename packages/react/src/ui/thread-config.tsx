@@ -11,9 +11,13 @@ import {
 
 import { AssistantRuntime } from "../api/AssistantRuntime";
 import { AvatarProps } from "./base/avatar";
-import { TextContentPartComponent, ToolCallContentPartProps } from "../types";
+import {
+  EmptyContentPartComponent,
+  TextContentPartComponent,
+  ToolCallContentPartProps,
+} from "../types";
 import { AssistantRuntimeProvider } from "../context";
-import { AssistantToolUI } from "../model-config";
+import { AssistantToolUI } from "../model-context";
 import { useAssistantRuntime } from "../context/react/AssistantContext";
 
 export type SuggestionConfig = {
@@ -39,7 +43,9 @@ export type AssistantMessageConfig = {
   components?:
     | {
         Text?: TextContentPartComponent | undefined;
+        Empty?: EmptyContentPartComponent | undefined;
         ToolFallback?: ComponentType<ToolCallContentPartProps> | undefined;
+        Footer?: ComponentType | undefined;
       }
     | undefined;
 };
@@ -61,6 +67,19 @@ export type StringsConfig = {
     };
     closed: {
       button: {
+        tooltip?: string | undefined;
+      };
+    };
+  };
+  threadList?: {
+    new?: {
+      label?: string | undefined;
+    };
+    item?: {
+      title?: {
+        fallback?: string | undefined;
+      };
+      archive?: {
         tooltip?: string | undefined;
       };
     };
@@ -174,6 +193,7 @@ export type ThreadConfig = {
         EditComposer?: ComponentType | undefined;
         Composer?: ComponentType | undefined;
         ThreadWelcome?: ComponentType | undefined;
+        MessagesFooter?: ComponentType | undefined;
       }
     | undefined;
 };
@@ -192,14 +212,23 @@ export const ThreadConfigProvider: FC<ThreadConfigProviderProps> = ({
 }) => {
   const hasAssistant = !!useAssistantRuntime({ optional: true });
 
-  const configProvider =
-    config && Object.keys(config ?? {}).length > 0 ? (
-      <ThreadConfigContext.Provider value={config}>
-        {children}
-      </ThreadConfigContext.Provider>
-    ) : (
-      <>{children}</>
+  const hasConfig = config && Object.keys(config).length > 0;
+  const outerConfig = useThreadConfig();
+
+  if (hasConfig && Object.keys(outerConfig).length > 0) {
+    throw new Error(
+      "You are providing ThreadConfig to several nested components. Please provide all configuration to the same component.",
     );
+  }
+
+  const configProvider = hasConfig ? (
+    <ThreadConfigContext.Provider value={config}>
+      {children}
+    </ThreadConfigContext.Provider>
+  ) : (
+    <>{children}</>
+  );
+
   if (!config?.runtime) return configProvider;
 
   if (hasAssistant) {

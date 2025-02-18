@@ -1,8 +1,8 @@
+import { generateId } from "../../internal";
 import {
   MessageStatus,
   TextContentPart,
   ImageContentPart,
-  ToolCallContentPart,
   UIContentPart,
   ThreadMessage,
   ThreadAssistantContentPart,
@@ -11,33 +11,51 @@ import {
   ThreadUserMessage,
   ThreadSystemMessage,
   CompleteAttachment,
-} from "../../types";
-import {
-  CoreToolCallContentPart,
-  ThreadStep,
+  FileContentPart,
   Unstable_AudioContentPart,
-} from "../../types/AssistantTypes";
+} from "../../types";
+import { ReasoningContentPart, ThreadStep } from "../../types/AssistantTypes";
+import {
+  ReadonlyJSONObject,
+  ReadonlyJSONValue,
+} from "../../utils/json/json-value";
+import { parsePartialJson } from "../../utils/json/parse-partial-json";
 
 export type ThreadMessageLike = {
-  role: "assistant" | "user" | "system";
-  content:
+  readonly role: "assistant" | "user" | "system";
+  readonly content:
     | string
-    | (
+    | readonly (
         | TextContentPart
+        | ReasoningContentPart
         | ImageContentPart
+        | FileContentPart
         | Unstable_AudioContentPart
-        | ToolCallContentPart<any, any>
-        | CoreToolCallContentPart<any, any>
+        | {
+            readonly type: "tool-call";
+            readonly toolCallId?: string;
+            readonly toolName: string;
+            readonly args?: ReadonlyJSONObject;
+            readonly argsText?: string;
+            readonly result?: any | undefined;
+            readonly isError?: boolean | undefined;
+          }
         | UIContentPart
       )[];
-  id?: string | undefined;
-  createdAt?: Date | undefined;
-  status?: MessageStatus | undefined;
-  attachments?: CompleteAttachment[] | undefined;
-  metadata?: {
-    steps?: ThreadStep[] | undefined;
-    custom?: Record<string, unknown> | undefined;
-  };
+  readonly id?: string | undefined;
+  readonly createdAt?: Date | undefined;
+  readonly status?: MessageStatus | undefined;
+  readonly attachments?: readonly CompleteAttachment[] | undefined;
+  readonly metadata?:
+    | {
+        readonly unstable_annotations?:
+          | readonly ReadonlyJSONValue[]
+          | undefined;
+        readonly unstable_data?: readonly ReadonlyJSONValue[] | undefined;
+        readonly steps?: readonly ThreadStep[] | undefined;
+        readonly custom?: Record<string, unknown> | undefined;
+      }
+    | undefined;
 };
 
 export const fromThreadMessageLike = (
@@ -75,6 +93,7 @@ export const fromThreadMessageLike = (
             const type = part.type;
             switch (type) {
               case "text":
+              case "reasoning":
                 if (part.text.trim().length === 0) return null;
                 return part;
 
@@ -82,22 +101,35 @@ export const fromThreadMessageLike = (
                 return part;
 
               case "tool-call": {
-                if ("argsText" in part) return part;
+                if (part.args) {
+                  return {
+                    ...part,
+                    toolCallId: part.toolCallId ?? "tool-" + generateId(),
+                    args: part.args,
+                    argsText: JSON.stringify(part.args),
+                  };
+                }
                 return {
                   ...part,
-                  argsText: JSON.stringify(part.args),
+                  toolCallId: part.toolCallId ?? "tool-" + generateId(),
+                  args: part.args ?? parsePartialJson(part.argsText ?? "{}"),
+                  argsText: part.argsText ?? "",
                 };
               }
 
               default: {
-                const unhandledType: "image" | "audio" = type;
-                throw new Error(`Unknown content part type: ${unhandledType}`);
+                const unhandledType: "image" | "audio" | "file" = type;
+                throw new Error(
+                  `Unsupported assistant content part type: ${unhandledType}`,
+                );
               }
             }
           })
           .filter((c) => !!c),
         status: status ?? fallbackStatus,
         metadata: {
+          unstable_annotations: metadata?.unstable_annotations ?? [],
+          unstable_data: metadata?.unstable_data ?? [],
           custom: metadata?.custom ?? {},
           steps: metadata?.steps ?? [],
         },
@@ -114,11 +146,14 @@ export const fromThreadMessageLike = (
             case "ui":
             case "image":
             case "audio":
+            case "file":
               return part;
 
             default: {
-              const unhandledType: "tool-call" = type;
-              throw new Error(`Unknown content part type: ${unhandledType}`);
+              const unhandledType: "tool-call" | "reasoning" = type;
+              throw new Error(
+                `Unsupported user content part type: ${unhandledType}`,
+              );
             }
           }
         }),

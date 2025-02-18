@@ -8,7 +8,10 @@ export type {
 export type {
   AppendMessage,
   TextContentPart,
+  ReasoningContentPart,
   ImageContentPart,
+  FileContentPart,
+  Unstable_AudioContentPart,
   ToolCallContentPart,
   UIContentPart,
   MessageStatus,
@@ -28,9 +31,6 @@ export type {
   CoreUserMessage,
   CoreAssistantMessage,
   CoreMessage,
-
-  // TODO
-  Unstable_AudioContentPart,
 } from "./AssistantTypes";
 
 export type {
@@ -38,20 +38,18 @@ export type {
   EmptyContentPartComponent,
   TextContentPartProps,
   TextContentPartComponent,
+  ReasoningContentPartProps,
+  ReasoningContentPartComponent,
   ImageContentPartProps,
   ImageContentPartComponent,
+  FileContentPartProps,
+  FileContentPartComponent,
+  Unstable_AudioContentPartProps,
+  Unstable_AudioContentPartComponent,
   UIContentPartProps,
   UIContentPartComponent,
   ToolCallContentPartProps,
   ToolCallContentPartComponent,
-  Unstable_AudioContentPartProps,
-  Unstable_AudioContentPartComponent,
 } from "./ContentPartComponentTypes";
-
-export type {
-  ModelConfig,
-  ModelConfigProvider,
-  Tool,
-} from "./ModelConfigTypes";
 
 export type { Unsubscribe } from "./Unsubscribe";

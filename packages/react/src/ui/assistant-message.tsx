@@ -65,6 +65,7 @@ const AssistantMessageContent = forwardRef<
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [...(tools ?? []), components.ToolFallback],
   );
+  const Footer = components.Footer;
 
   return (
     <AssistantMessageContentWrapper {...rest} ref={ref}>
@@ -72,9 +73,11 @@ const AssistantMessageContent = forwardRef<
         components={{
           ...componentsProp,
           Text: componentsProp?.Text ?? components.Text ?? ContentPart.Text,
+          Empty: componentsProp?.Empty ?? components.Empty,
           tools: toolsComponents,
         }}
       />
+      {Footer && <Footer />}
     </AssistantMessageContentWrapper>
   );
 });

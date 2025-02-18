@@ -59,6 +59,10 @@ export class DataStreamEncoder {
               );
               break;
 
+            case "error":
+              controller.enqueue(`3:${JSON.stringify(chunk.error)}\n`);
+              break;
+
             default:
               const exhaustiveCheck: never = type;
               throw new Error(`unsupported chunk type: ${exhaustiveCheck}`);
@@ -149,6 +153,33 @@ export class DataStreamDecoder {
                 result,
               });
               break;
+            }
+
+            case "9": {
+              const { toolCallId, args } = value as {
+                toolCallId: string;
+                toolName: string;
+                args: object;
+              };
+              controller.enqueue({
+                type: "tool-call-begin",
+                toolCallId,
+                toolName: toolCallId,
+              });
+              controller.enqueue({
+                type: "tool-call-delta",
+                toolCallId,
+                argsTextDelta: JSON.stringify(args),
+              });
+              break;
+            }
+
+            case "2":
+            case "3":
+            case "8":
+            case "d":
+            case "e": {
+              break; // ignore
             }
 
             default:

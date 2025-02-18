@@ -1,5 +1,5 @@
 import { AppendMessage, PendingAttachment } from "../../types";
-import { AttachmentAdapter } from "../attachment";
+import { AttachmentAdapter } from "../adapters/attachment";
 import { ThreadComposerRuntimeCore } from "../core/ComposerRuntimeCore";
 import { ThreadRuntimeCore } from "../core/ThreadRuntimeCore";
 import { BaseComposerRuntimeCore } from "./BaseComposerRuntimeCore";
@@ -34,19 +34,22 @@ export class DefaultThreadComposerRuntimeCore
     return this.runtime.subscribe(() => {
       if (this.canCancel !== this.runtime.capabilities.cancel) {
         this._canCancel = this.runtime.capabilities.cancel;
-        this.notifySubscribers();
+        this._notifySubscribers();
       }
     });
   }
 
-  public async handleSend(message: Omit<AppendMessage, "parentId">) {
+  public async handleSend(
+    message: Omit<AppendMessage, "parentId" | "sourceId">,
+  ) {
     this.runtime.append({
       ...(message as AppendMessage),
       parentId: this.runtime.messages.at(-1)?.id ?? null,
+      sourceId: null,
     });
   }
 
-  public async cancel() {
+  public async handleCancel() {
     this.runtime.cancelRun();
   }
 }

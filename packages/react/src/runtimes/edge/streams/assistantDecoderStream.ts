@@ -11,24 +11,30 @@ export function assistantDecoderStream() {
     | { id: string; name: string; argsText: string }
     | undefined;
 
+  const endCurrentToolCall = (
+    controller: TransformStreamDefaultController<ToolResultStreamPart>,
+  ) => {
+    if (!currentToolCall) return;
+    controller.enqueue({
+      type: "tool-call",
+      toolCallType: "function",
+      toolCallId: currentToolCall.id,
+      toolName: currentToolCall.name,
+      args: currentToolCall.argsText,
+    });
+    currentToolCall = undefined;
+  };
+
   return new TransformStream<
     StreamPart<AssistantStreamChunk>,
     ToolResultStreamPart
   >({
     transform({ type, value }, controller) {
       if (
-        currentToolCall &&
         type !== AssistantStreamChunkType.ToolCallDelta &&
         type !== AssistantStreamChunkType.Error
       ) {
-        controller.enqueue({
-          type: "tool-call",
-          toolCallType: "function",
-          toolCallId: currentToolCall.id,
-          toolName: currentToolCall.name,
-          args: currentToolCall.argsText,
-        });
-        currentToolCall = undefined;
+        endCurrentToolCall(controller);
       }
 
       switch (type) {
@@ -80,7 +86,7 @@ export function assistantDecoderStream() {
           });
           break;
         }
-        case AssistantStreamChunkType.Finish: {
+        case AssistantStreamChunkType.FinishMessage: {
           controller.enqueue({
             type: "finish",
             ...value,
@@ -117,7 +123,7 @@ export function assistantDecoderStream() {
           break;
         }
 
-        case AssistantStreamChunkType.StepFinish: {
+        case AssistantStreamChunkType.FinishStep: {
           controller.enqueue({
             type: "step-finish",
             ...value,
@@ -125,8 +131,23 @@ export function assistantDecoderStream() {
           break;
         }
 
-        // TODO
+        case AssistantStreamChunkType.Annotation:
+          controller.enqueue({
+            type: "annotations",
+            annotations: value,
+          });
+          break;
+
         case AssistantStreamChunkType.Data:
+          controller.enqueue({
+            type: "data",
+            data: value,
+          });
+          break;
+
+        // TODO
+        case AssistantStreamChunkType.ReasoningDelta:
+        case AssistantStreamChunkType.StartStep:
           break;
 
         default: {
@@ -134,6 +155,9 @@ export function assistantDecoderStream() {
           throw new Error(`Unhandled chunk type: ${unhandledType}`);
         }
       }
+    },
+    flush(controller) {
+      endCurrentToolCall(controller);
     },
   });
 }

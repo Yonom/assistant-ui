@@ -1,5 +1,125 @@
 # assistant-ui
 
+## 0.0.39
+
+### Patch Changes
+
+- 1d56298: fix: make CLI's add command work w new templates
+
+## 0.0.38
+
+### Patch Changes
+
+- 65a2c7c: feat: assistant-ui init CLI
+
+## 0.0.37
+
+### Patch Changes
+
+- 72e66db: chore: update dependencies
+
+## 0.0.36
+
+### Patch Changes
+
+- 8190d09: fix: fileURLToPath to get codemods
+
+## 0.0.35
+
+### Patch Changes
+
+- 1a42993: fix: always use npx for jscodeshift
+
+## 0.0.34
+
+### Patch Changes
+
+- c760cb3: fix: node 20 support
+
+## 0.0.33
+
+### Patch Changes
+
+- 0a23a70: fix: node 20 support
+
+## 0.0.32
+
+### Patch Changes
+
+- 6703842: feat: codemod to migrate to @assistant-ui/react-ui
+
+## 0.0.31
+
+### Patch Changes
+
+- cefd975: fix: use mjs entrypoint
+
+## 0.0.30
+
+### Patch Changes
+
+- f3368ad: feat: codemod for v0.8 migration
+
+## 0.0.29
+
+### Patch Changes
+
+- 22272e6: chore: update dependencies
+
+## 0.0.28
+
+### Patch Changes
+
+- 345f3d5: chore: update dependencies
+
+## 0.0.27
+
+### Patch Changes
+
+- 4c2bf58: chore: update dependencies
+
+## 0.0.26
+
+### Patch Changes
+
+- 982a6a2: chore: update dependencies
+
+## 0.0.25
+
+### Patch Changes
+
+- ec3b8cc: chore: update dependencies
+
+## 0.0.24
+
+### Patch Changes
+
+- 4c54273: chore: update dependencies
+
+## 0.0.23
+
+### Patch Changes
+
+- 2112ce8: chore: update dependencies
+
+## 0.0.22
+
+### Patch Changes
+
+- 938e734: fix: correctly pass component URLs to shadcn CLI
+
+## 0.0.21
+
+### Patch Changes
+
+- 933b8c0: chore: update deps
+
+## 0.0.20
+
+### Patch Changes
+
+- c59d8b5: chore: update dependencies
+
 ## 0.0.18
 
 ### Patch Changes

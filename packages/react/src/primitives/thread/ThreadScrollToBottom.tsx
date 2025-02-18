@@ -5,7 +5,21 @@ import {
   ActionButtonProps,
   createActionButton,
 } from "../../utils/createActionButton";
-import { useThreadScrollToBottom } from "../../primitive-hooks/thread/useThreadScrollToBottom";
+import { useCallback } from "react";
+import { useThreadViewport, useThreadViewportStore } from "../../context/react/ThreadViewportContext";
+
+const useThreadScrollToBottom = () => {
+  const isAtBottom = useThreadViewport((s) => s.isAtBottom);
+
+  const threadViewportStore = useThreadViewportStore();
+
+  const handleScrollToBottom = useCallback(() => {
+    threadViewportStore.getState().scrollToBottom();
+  }, [threadViewportStore]);
+
+  if (isAtBottom) return null;
+  return handleScrollToBottom;
+};
 
 export namespace ThreadPrimitiveScrollToBottom {
   export type Element = ActionButtonElement;

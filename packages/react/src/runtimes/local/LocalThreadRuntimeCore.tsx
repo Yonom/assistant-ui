@@ -1,9 +1,5 @@
 import { generateId } from "../../internal";
-import type {
-  ModelConfigProvider,
-  AppendMessage,
-  ThreadAssistantMessage,
-} from "../../types";
+import type { AppendMessage, ThreadAssistantMessage } from "../../types";
 import { fromCoreMessage } from "../edge";
 import type { ChatModelRunResult } from "./ChatModelAdapter";
 import { shouldContinue } from "./shouldContinue";
@@ -12,9 +8,11 @@ import {
   AddToolResultOptions,
   ThreadSuggestion,
   ThreadRuntimeCore,
+  StartRunConfig,
 } from "../core/ThreadRuntimeCore";
 import { BaseThreadRuntimeCore } from "../core/BaseThreadRuntimeCore";
-import { LocalThreadMetadataRuntimeCore } from "./LocalThreadMetadataRuntimeCore";
+import { RunConfig } from "../../types/AssistantTypes";
+import { ModelContextProvider } from "../../model-context";
 
 export class LocalThreadRuntimeCore
   extends BaseThreadRuntimeCore
@@ -41,21 +39,22 @@ export class LocalThreadRuntimeCore
   }
 
   constructor(
-    configProvider: ModelConfigProvider,
-    threadId: string,
+    contextProvider: ModelContextProvider,
     options: LocalRuntimeOptionsBase,
   ) {
-    super(configProvider, new LocalThreadMetadataRuntimeCore(threadId));
-    this.setOptions(options);
+    super(contextProvider);
+    this.__internal_setOptions(options);
   }
 
   private _options!: LocalRuntimeOptionsBase;
+
+  private _lastRunConfig: RunConfig = {};
 
   public get extras() {
     return undefined;
   }
 
-  public setOptions(options: LocalRuntimeOptionsBase) {
+  public __internal_setOptions(options: LocalRuntimeOptionsBase) {
     if (this._options === options) return;
 
     this._options = options;
@@ -83,31 +82,51 @@ export class LocalThreadRuntimeCore
     if (hasUpdates) this._notifySubscribers();
   }
 
-  private _transitionAwayFromNewState() {
-    if (this.metadata.state === "new") {
-      this.metadata.create();
-    }
+  private _loadPromise: Promise<void> | undefined;
+  public __internal_load() {
+    if (this._loadPromise) return this._loadPromise;
+
+    const promise = this.adapters.history?.load() ?? Promise.resolve(null);
+
+    this._loadPromise = promise.then((repo) => {
+      if (!repo) return;
+      this.repository.import(repo);
+      this._notifySubscribers();
+    });
+
+    return this._loadPromise;
   }
 
   public async append(message: AppendMessage): Promise<void> {
-    this._transitionAwayFromNewState();
+    this.ensureInitialized();
 
     const newMessage = fromCoreMessage(message, {
       attachments: message.attachments,
     });
     this.repository.addOrUpdateMessage(message.parentId, newMessage);
+    this._options.adapters.history?.append({
+      parentId: message.parentId,
+      message: newMessage,
+    });
 
     const startRun = message.startRun ?? message.role === "user";
     if (startRun) {
-      await this.startRun(newMessage.id);
+      await this.startRun({
+        parentId: newMessage.id,
+        sourceId: message.sourceId,
+        runConfig: message.runConfig ?? {},
+      });
     } else {
       this.repository.resetHead(newMessage.id);
       this._notifySubscribers();
     }
   }
 
-  public async startRun(parentId: string | null): Promise<void> {
-    this._transitionAwayFromNewState();
+  public async startRun({
+    parentId,
+    runConfig,
+  }: StartRunConfig): Promise<void> {
+    this.ensureInitialized();
 
     this.repository.resetHead(parentId);
 
@@ -118,20 +137,30 @@ export class LocalThreadRuntimeCore
       role: "assistant",
       status: { type: "running" },
       content: [],
-      metadata: { steps: [], custom: {} },
+      metadata: {
+        unstable_annotations: [],
+        unstable_data: [],
+        steps: [],
+        custom: {},
+      },
       createdAt: new Date(),
     };
 
     this._notifyEventSubscribers("run-start");
 
-    do {
-      message = await this.performRoundtrip(parentId, message);
-    } while (shouldContinue(message));
+    try {
+      do {
+        message = await this.performRoundtrip(parentId, message, runConfig);
+      } while (shouldContinue(message, this._options.unstable_humanToolNames));
+    } finally {
+      this._notifyEventSubscribers("run-end");
+    }
   }
 
   private async performRoundtrip(
     parentId: string | null,
     message: ThreadAssistantMessage,
+    runConfig: RunConfig | undefined,
   ) {
     const messages = this.repository.getMessages();
 
@@ -140,6 +169,8 @@ export class LocalThreadRuntimeCore
     this.abortController = new AbortController();
 
     const initialContent = message.content;
+    const initialAnnotations = message.metadata?.unstable_annotations;
+    const initialData = message.metadata?.unstable_data;
     const initialSteps = message.metadata?.steps;
     const initalCustom = message.metadata?.custom;
     const updateMessage = (m: Partial<ChatModelRunResult>) => {
@@ -147,6 +178,13 @@ export class LocalThreadRuntimeCore
       const steps = newSteps
         ? [...(initialSteps ?? []), ...newSteps]
         : undefined;
+
+      const newAnnotations = m.metadata?.unstable_annotations;
+      const newData = m.metadata?.unstable_data;
+      const annotations = newAnnotations
+        ? [...(initialAnnotations ?? []), ...newAnnotations]
+        : undefined;
+      const data = newData ? [...(initialData ?? []), ...newData] : undefined;
 
       message = {
         ...message,
@@ -158,6 +196,10 @@ export class LocalThreadRuntimeCore
           ? {
               metadata: {
                 ...message.metadata,
+                ...(annotations
+                  ? { unstable_annotations: annotations }
+                  : undefined),
+                ...(data ? { unstable_data: data } : undefined),
                 ...(steps ? { steps } : undefined),
                 ...(m.metadata?.custom
                   ? {
@@ -193,11 +235,18 @@ export class LocalThreadRuntimeCore
     }
 
     try {
+      this._lastRunConfig = runConfig ?? {};
+      const context = this.getModelContext();
       const promiseOrGenerator = this.adapters.chatModel.run({
         messages,
+        runConfig: this._lastRunConfig,
         abortSignal: this.abortController.signal,
-        config: this.getModelConfig(),
+        context,
+        config: context,
         unstable_assistantMessageId: message.id,
+        unstable_getMessage() {
+          return message;
+        },
       });
 
       // handle async iterator for streaming results
@@ -226,10 +275,27 @@ export class LocalThreadRuntimeCore
         });
       } else {
         updateMessage({
-          status: { type: "incomplete", reason: "error", error: e },
+          status: {
+            type: "incomplete",
+            reason: "error",
+            error:
+              e instanceof Error
+                ? e.message
+                : `[${typeof e}] ${new String(e).toString()}`,
+          },
         });
 
         throw e;
+      }
+    } finally {
+      if (
+        message.status.type === "complete" ||
+        message.status.type === "incomplete"
+      ) {
+        await this._options.adapters.history?.append({
+          parentId,
+          message: message,
+        });
       }
     }
     return message;
@@ -274,8 +340,11 @@ export class LocalThreadRuntimeCore
     };
     this.repository.addOrUpdateMessage(parentId, message);
 
-    if (added && shouldContinue(message)) {
-      this.performRoundtrip(parentId, message);
+    if (
+      added &&
+      shouldContinue(message, this._options.unstable_humanToolNames)
+    ) {
+      this.performRoundtrip(parentId, message, this._lastRunConfig);
     }
   }
 }

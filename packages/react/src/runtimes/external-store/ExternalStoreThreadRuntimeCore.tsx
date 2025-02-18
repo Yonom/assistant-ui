@@ -1,9 +1,10 @@
 import {
   AddToolResultOptions,
+  StartRunConfig,
   ThreadSuggestion,
 } from "../core/ThreadRuntimeCore";
 
-import { AppendMessage, ModelConfigProvider, ThreadMessage } from "../../types";
+import { AppendMessage, ThreadMessage } from "../../types";
 import { ExternalStoreAdapter } from "./ExternalStoreAdapter";
 import {
   getExternalStoreMessage,
@@ -18,13 +19,13 @@ import {
   ThreadRuntimeCore,
 } from "../core/ThreadRuntimeCore";
 import { BaseThreadRuntimeCore } from "../core/BaseThreadRuntimeCore";
-import { LocalThreadMetadataRuntimeCore } from "../local/LocalThreadMetadataRuntimeCore";
+import { ModelContextProvider } from "../../model-context";
 
 const EMPTY_ARRAY = Object.freeze([]);
 
 export const hasUpcomingMessage = (
   isRunning: boolean,
-  messages: ThreadMessage[],
+  messages: readonly ThreadMessage[],
 ) => {
   return isRunning && messages[messages.length - 1]?.role !== "assistant";
 };
@@ -50,7 +51,7 @@ export class ExternalStoreThreadRuntimeCore
     return this._capabilities;
   }
 
-  private _messages!: ThreadMessage[];
+  private _messages!: readonly ThreadMessage[];
   public isDisabled!: boolean;
 
   public override get messages() {
@@ -76,17 +77,14 @@ export class ExternalStoreThreadRuntimeCore
   }
 
   constructor(
-    configProvider: ModelConfigProvider,
-    threadId: string,
+    contextProvider: ModelContextProvider,
     store: ExternalStoreAdapter<any>,
   ) {
-    const metadata = new LocalThreadMetadataRuntimeCore(threadId);
-    metadata.create();
-    super(configProvider, metadata);
-    this.setStore(store);
+    super(contextProvider);
+    this.__internal_setAdapter(store);
   }
 
-  public setStore(store: ExternalStoreAdapter<any>) {
+  public __internal_setAdapter(store: ExternalStoreAdapter<any>) {
     if (this._store === store) return;
 
     const isRunning = store.isRunning ?? false;
@@ -137,14 +135,25 @@ export class ExternalStoreThreadRuntimeCore
           )
             return cache;
 
+          const messageLike = store.convertMessage(m, idx);
           const newMessage = fromThreadMessageLike(
-            store.convertMessage(m, idx),
+            messageLike,
             idx.toString(),
             autoStatus,
           );
           (newMessage as any)[symbolInnerMessage] = m;
           return newMessage;
         });
+
+    if (messages.length > 0) this.ensureInitialized();
+
+    if (oldStore?.isRunning ?? false !== store.isRunning ?? false) {
+      if (store.isRunning) {
+        this._notifyEventSubscribers("run-start");
+      } else {
+        this._notifyEventSubscribers("run-end");
+      }
+    }
 
     for (let i = 0; i < messages.length; i++) {
       const message = messages[i]!;
@@ -193,11 +202,11 @@ export class ExternalStoreThreadRuntimeCore
     }
   }
 
-  public async startRun(parentId: string | null): Promise<void> {
+  public async startRun(config: StartRunConfig): Promise<void> {
     if (!this._store.onReload)
       throw new Error("Runtime does not support reloading messages.");
 
-    await this._store.onReload(parentId);
+    await this._store.onReload(config.parentId, config);
   }
 
   public cancelRun(): void {
@@ -239,14 +248,15 @@ export class ExternalStoreThreadRuntimeCore
     this._store.onAddToolResult(options);
   }
 
-  private updateMessages = (messages: ThreadMessage[]) => {
+  private updateMessages = (messages: readonly ThreadMessage[]) => {
     const hasConverter = this._store.convertMessage !== undefined;
     if (hasConverter) {
       this._store.setMessages?.(
         messages.flatMap(getExternalStoreMessage).filter((m) => m != null),
       );
     } else {
-      this._store.setMessages?.(messages);
+      // TODO mark this as readonly in v0.8.0
+      this._store.setMessages?.(messages as ThreadMessage[]);
     }
   };
 }

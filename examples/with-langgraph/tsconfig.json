@@ -14,7 +14,6 @@
       "@assistant-ui/react/*": ["../../packages/react/src/*"]
     },
     "allowJs": true,
-    "strictNullChecks": true,
     "jsx": "preserve"
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

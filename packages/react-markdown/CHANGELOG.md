@@ -1,5 +1,172 @@
 # @assistant-ui/react-markdown
 
+## 0.7.20
+
+### Patch Changes
+
+- 87fa024: fix: remove tailwind from peerdeps
+- Updated dependencies [87fa024]
+  - @assistant-ui/react@0.7.75
+
+## 0.7.19
+
+### Patch Changes
+
+- df35010: feat: use aui-md and data-status for dot animation
+- Updated dependencies [61f278b]
+  - @assistant-ui/react@0.7.74
+
+## 0.7.18
+
+### Patch Changes
+
+- 72e66db: chore: update dependencies
+- Updated dependencies [72e66db]
+  - @assistant-ui/react@0.7.71
+
+## 0.7.17
+
+### Patch Changes
+
+- d35e72a: fix: missing "use client" directives
+
+## 0.7.16
+
+### Patch Changes
+
+- 6703842: feat: codemod to migrate to @assistant-ui/react-ui
+- Updated dependencies [6703842]
+- Updated dependencies [79f7120]
+  - @assistant-ui/react@0.7.64
+
+## 0.7.15
+
+### Patch Changes
+
+- 7e5f127: fix: useSmooth unnecessary re-renders
+- Updated dependencies [7e5f127]
+  - @assistant-ui/react@0.7.62
+
+## 0.7.14
+
+### Patch Changes
+
+- 4506653: feat: memoizeMarkdownComponents
+
+## 0.7.13
+
+### Patch Changes
+
+- 90f6fee: fix: styles/dot.css import support
+
+## 0.7.12
+
+### Patch Changes
+
+- 7345713: feat: add /styles/dot.css
+- Updated dependencies [bd78a70]
+- Updated dependencies [9ea8100]
+  - @assistant-ui/react@0.7.61
+
+## 0.7.11
+
+### Patch Changes
+
+- 22272e6: chore: update dependencies
+- Updated dependencies [0979334]
+- Updated dependencies [22272e6]
+  - @assistant-ui/react@0.7.39
+
+## 0.7.10
+
+### Patch Changes
+
+- 345f3d5: chore: update dependencies
+- Updated dependencies [345f3d5]
+- Updated dependencies [345f3d5]
+- Updated dependencies [2846559]
+  - @assistant-ui/react@0.7.35
+
+## 0.7.9
+
+### Patch Changes
+
+- 4c2bf58: chore: update dependencies
+- Updated dependencies [9a3dc93]
+- Updated dependencies [4c2bf58]
+  - @assistant-ui/react@0.7.34
+
+## 0.7.8
+
+### Patch Changes
+
+- 982a6a2: chore: update dependencies
+- Updated dependencies [982a6a2]
+  - @assistant-ui/react@0.7.30
+
+## 0.7.7
+
+### Patch Changes
+
+- ec3b8cc: chore: update dependencies
+- Updated dependencies [ec3b8cc]
+  - @assistant-ui/react@0.7.19
+
+## 0.7.6
+
+### Patch Changes
+
+- ee77267: fix: react warning about unsupported prop
+- 3214b18: fix: MarkdownText smooth prop not working
+- Updated dependencies [1b16dce]
+- Updated dependencies [b0f309a]
+  - @assistant-ui/react@0.7.18
+
+## 0.7.5
+
+### Patch Changes
+
+- 4c54273: chore: update dependencies
+- 4c54273: refactor: rename components.by_language to componentsByLanguage for react 19 types compat
+- Updated dependencies [4c54273]
+- Updated dependencies [4c54273]
+  - @assistant-ui/react@0.7.12
+
+## 0.7.4
+
+### Patch Changes
+
+- 2276e57: fix: cjs builds
+- Updated dependencies [2276e57]
+- Updated dependencies [e8752ac]
+  - @assistant-ui/react@0.7.9
+
+## 0.7.3
+
+### Patch Changes
+
+- 2112ce8: chore: update dependencies
+- Updated dependencies [589d37b]
+- Updated dependencies [2112ce8]
+  - @assistant-ui/react@0.7.8
+
+## 0.7.2
+
+### Patch Changes
+
+- 933b8c0: chore: update deps
+- Updated dependencies [933b8c0]
+- Updated dependencies [09a2a38]
+  - @assistant-ui/react@0.7.6
+
+## 0.7.1
+
+### Patch Changes
+
+- c59d8b5: chore: update dependencies
+- Updated dependencies [c59d8b5]
+  - @assistant-ui/react@0.7.5
+
 ## 0.7.0
 
 ### Patch Changes

@@ -1,5 +1,103 @@
 # @assistant-ui/react-syntax-highlighter
 
+## 0.7.10
+
+### Patch Changes
+
+- 72e66db: chore: update dependencies
+- Updated dependencies [72e66db]
+  - @assistant-ui/react-markdown@0.7.18
+  - @assistant-ui/react@0.7.71
+
+## 0.7.9
+
+### Patch Changes
+
+- 22272e6: chore: update dependencies
+- Updated dependencies [0979334]
+- Updated dependencies [22272e6]
+  - @assistant-ui/react@0.7.39
+  - @assistant-ui/react-markdown@0.7.11
+
+## 0.7.8
+
+### Patch Changes
+
+- 345f3d5: chore: update dependencies
+- Updated dependencies [345f3d5]
+- Updated dependencies [345f3d5]
+- Updated dependencies [2846559]
+  - @assistant-ui/react-markdown@0.7.10
+  - @assistant-ui/react@0.7.35
+
+## 0.7.7
+
+### Patch Changes
+
+- 4c2bf58: chore: update dependencies
+- Updated dependencies [9a3dc93]
+- Updated dependencies [4c2bf58]
+  - @assistant-ui/react@0.7.34
+  - @assistant-ui/react-markdown@0.7.9
+
+## 0.7.6
+
+### Patch Changes
+
+- 982a6a2: chore: update dependencies
+- Updated dependencies [982a6a2]
+  - @assistant-ui/react-markdown@0.7.8
+  - @assistant-ui/react@0.7.30
+
+## 0.7.5
+
+### Patch Changes
+
+- ec3b8cc: chore: update dependencies
+- Updated dependencies [ec3b8cc]
+  - @assistant-ui/react-markdown@0.7.7
+  - @assistant-ui/react@0.7.19
+
+## 0.7.4
+
+### Patch Changes
+
+- 4c54273: chore: update dependencies
+- Updated dependencies [4c54273]
+- Updated dependencies [4c54273]
+- Updated dependencies [4c54273]
+  - @assistant-ui/react-markdown@0.7.5
+  - @assistant-ui/react@0.7.12
+
+## 0.7.3
+
+### Patch Changes
+
+- 2112ce8: chore: update dependencies
+- Updated dependencies [589d37b]
+- Updated dependencies [2112ce8]
+  - @assistant-ui/react@0.7.8
+  - @assistant-ui/react-markdown@0.7.3
+
+## 0.7.2
+
+### Patch Changes
+
+- 933b8c0: chore: update deps
+- Updated dependencies [933b8c0]
+- Updated dependencies [09a2a38]
+  - @assistant-ui/react-markdown@0.7.2
+  - @assistant-ui/react@0.7.6
+
+## 0.7.1
+
+### Patch Changes
+
+- c59d8b5: chore: update dependencies
+- Updated dependencies [c59d8b5]
+  - @assistant-ui/react-markdown@0.7.1
+  - @assistant-ui/react@0.7.5
+
 ## 0.7.0
 
 ### Patch Changes

@@ -7,11 +7,12 @@
     "ci:publish": "turbo build --filter=\"./packages/*\" && changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.9",
-    "eslint": "^9",
-    "prettier": "^3.3.3",
-    "prettier-plugin-tailwindcss": "^0.6.8",
-    "turbo": "^2.3.0"
+    "@changesets/cli": "^2.27.12",
+    "eslint": "^9.20.0",
+    "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "0.6.10",
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.3"
   },
   "prettier": {
     "trailingComma": "all",
@@ -19,8 +20,9 @@
       "prettier-plugin-tailwindcss"
     ]
   },
-  "packageManager": "pnpm@9.13.2",
+  "packageManager": "pnpm@10.2.1",
   "resolutions": {
-    "trieve-ts-sdk": "0.0.30"
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
   }
 }

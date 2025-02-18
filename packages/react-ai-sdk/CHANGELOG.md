@@ -1,5 +1,139 @@
 # @assistant-ui/react-ai-sdk
 
+## 0.7.15
+
+### Patch Changes
+
+- 72e66db: chore: update dependencies
+- Updated dependencies [72e66db]
+  - @assistant-ui/react@0.7.71
+
+## 0.7.14
+
+### Patch Changes
+
+- 483c360: feat: useChatRuntime
+- Updated dependencies [f4d71da]
+- Updated dependencies [16cd124]
+  - @assistant-ui/react@0.7.66
+
+## 0.7.13
+
+### Patch Changes
+
+- dba4dde: feat(ai-sdk): message.metadata.annotations
+- efd60fe: fix(ai-sdk): onSwitchToThread
+- Updated dependencies [dba4dde]
+- Updated dependencies [efd60fe]
+  - @assistant-ui/react@0.7.56
+
+## 0.7.12
+
+### Patch Changes
+
+- 7f8c27e: fix: useInputSync IME composition support
+- Updated dependencies [0bf5082]
+  - @assistant-ui/react@0.7.55
+
+## 0.7.11
+
+### Patch Changes
+
+- 22272e6: chore: update dependencies
+- Updated dependencies [0979334]
+- Updated dependencies [22272e6]
+  - @assistant-ui/react@0.7.39
+
+## 0.7.10
+
+### Patch Changes
+
+- e8eedae: feat: RSCDisplay
+- Updated dependencies [5794b1b]
+  - @assistant-ui/react@0.7.38
+
+## 0.7.9
+
+### Patch Changes
+
+- 9e1ce3b: refactor: deprecate getVercelRSCMessage
+- Updated dependencies [34d2915]
+- Updated dependencies [4f3834a]
+- Updated dependencies [b8b11d3]
+- Updated dependencies [889a55e]
+- Updated dependencies [a7d9e41]
+  - @assistant-ui/react@0.7.36
+
+## 0.7.8
+
+### Patch Changes
+
+- 345f3d5: chore: update dependencies
+- Updated dependencies [345f3d5]
+- Updated dependencies [345f3d5]
+- Updated dependencies [2846559]
+  - @assistant-ui/react@0.7.35
+
+## 0.7.7
+
+### Patch Changes
+
+- 4c2bf58: chore: update dependencies
+- Updated dependencies [9a3dc93]
+- Updated dependencies [4c2bf58]
+  - @assistant-ui/react@0.7.34
+
+## 0.7.6
+
+### Patch Changes
+
+- 982a6a2: chore: update dependencies
+- Updated dependencies [982a6a2]
+  - @assistant-ui/react@0.7.30
+
+## 0.7.5
+
+### Patch Changes
+
+- ec3b8cc: chore: update dependencies
+- Updated dependencies [ec3b8cc]
+  - @assistant-ui/react@0.7.19
+
+## 0.7.4
+
+### Patch Changes
+
+- 4c54273: chore: update dependencies
+- Updated dependencies [4c54273]
+- Updated dependencies [4c54273]
+  - @assistant-ui/react@0.7.12
+
+## 0.7.3
+
+### Patch Changes
+
+- 2112ce8: chore: update dependencies
+- Updated dependencies [589d37b]
+- Updated dependencies [2112ce8]
+  - @assistant-ui/react@0.7.8
+
+## 0.7.2
+
+### Patch Changes
+
+- 933b8c0: chore: update deps
+- Updated dependencies [933b8c0]
+- Updated dependencies [09a2a38]
+  - @assistant-ui/react@0.7.6
+
+## 0.7.1
+
+### Patch Changes
+
+- c59d8b5: chore: update dependencies
+- Updated dependencies [c59d8b5]
+  - @assistant-ui/react@0.7.5
+
 ## 0.7.0
 
 ### Patch Changes

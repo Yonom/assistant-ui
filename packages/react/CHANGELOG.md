@@ -1,5 +1,519 @@
 # @assistant-ui/react
 
+## 0.7.82
+
+### Patch Changes
+
+- 934ee4b: feat: anonymous login and auto-config for cloud
+
+## 0.7.81
+
+### Patch Changes
+
+- 7f7ab5e: refactor: assitant-stream API
+- Updated dependencies [7f7ab5e]
+  - assistant-stream@0.0.20
+
+## 0.7.80
+
+### Patch Changes
+
+- fix: relax ReadonlyJSONObject requirement on tool/toolUI
+
+## 0.7.79
+
+### Patch Changes
+
+- fix: argsText parsing
+
+## 0.7.78
+
+### Patch Changes
+
+- fix: result sometimes set to undefined
+
+## 0.7.77
+
+### Patch Changes
+
+- f2a1e86: feat: unstable_humanToolNames
+
+## 0.7.76
+
+### Patch Changes
+
+- fix: README
+
+## 0.7.75
+
+### Patch Changes
+
+- 87fa024: fix: remove tailwind from peerdeps
+
+## 0.7.74
+
+### Patch Changes
+
+- 61f278b: fix: drop tailwind peer dependency
+
+## 0.7.73
+
+### Patch Changes
+
+- fix: return from createMessageConverter
+- 86ba433: fix: ToolContentPart.args should never be null
+
+## 0.7.72
+
+### Patch Changes
+
+- 797ce9c: fix: ToolContentPart.args should never be null
+
+## 0.7.71
+
+### Patch Changes
+
+- 72e66db: chore: update dependencies
+- Updated dependencies [72e66db]
+  - assistant-stream@0.0.19
+
+## 0.7.70
+
+### Patch Changes
+
+- 55a9cb2: fix: runConfig for reload / edits
+- 2bc6781: feat: send toolCallId to the exeucte callback
+- 2bc6781: feat: Tool.experimental_onSchemaValidationError
+- 9fefc9d: feat: ThreadViewportContext & multiple renders of the same thread support
+
+## 0.7.69
+
+### Patch Changes
+
+- a7a871e: feat: make ThreadPrimitive.Suggestion method optional
+- a7a871e: fix: ThreadPrimitive.Suggestion no longer clears the composer
+- a7a871e: feat: expose the useThreadViewportAutoScroll in the API
+
+## 0.7.68
+
+### Patch Changes
+
+- eb4e13c: feat: useExternalMessageConverter megeConfig.joinStrategy
+
+## 0.7.67
+
+### Patch Changes
+
+- ddf468e: fix: import path
+
+## 0.7.66
+
+### Patch Changes
+
+- f4d71da: feat: Edge Runtime onResponse/onError/onfinish, sendExtraMessageFields, unstable_AISDKInterop=v2 support
+- 16cd124: feat(local-runtime): native support for AssistantCloud
+
+## 0.7.65
+
+### Patch Changes
+
+- a07d8c1: fix: thread auto-scroll reliability
+
+## 0.7.64
+
+### Patch Changes
+
+- 6703842: feat: codemod to migrate to @assistant-ui/react-ui
+- 79f7120: feat: createMessageConverter API
+
+## 0.7.63
+
+### Patch Changes
+
+- 843047d: feat(thread-list): forward model context to thread runtimes
+
+## 0.7.62
+
+### Patch Changes
+
+- 7e5f127: fix: useSmooth unnecessary re-renders
+
+## 0.7.61
+
+### Patch Changes
+
+- bd78a70: feat: ThreadListPrimitive.Root
+- 9ea8100: feat: ThreadMessageLike optional toolCallId + args
+
+## 0.7.60
+
+### Patch Changes
+
+- 246ce4e: fix: export getExternalStoreMessages
+
+## 0.7.59
+
+### Patch Changes
+
+- 8ec1f07: feat: AssistantCloudThreadHistoryAdapter
+- 4f5d77f: feat: ToolCallContentPart.args should be JSONObject
+- 8ec1f07: feat: auto-inject history adapter in local runtime
+
+## 0.7.58
+
+### Patch Changes
+
+- 02996f9: fix: support AISDKInterop + sendMessageId for human+system messages
+
+## 0.7.57
+
+### Patch Changes
+
+- 103efee: fix: mark ChatAdapter types as readonly
+- 60bb6ff: fix: memoize MessageRepository.getMessages()
+
+## 0.7.56
+
+### Patch Changes
+
+- dba4dde: feat(ai-sdk): message.metadata.annotations
+- efd60fe: fix(ai-sdk): onSwitchToThread
+
+## 0.7.55
+
+### Patch Changes
+
+- 0bf5082: fix: tailwindcss plugin crashes without config
+
+## 0.7.54
+
+### Patch Changes
+
+- 6cb7d10: refactor: rename ModelConfig to ModelContext
+- c302933: feat: convertExternalMessages
+
+## 0.7.53
+
+### Patch Changes
+
+- 7618bf3: feat: AI SDK DataStream ReasoningDelta, StartStep support
+
+## 0.7.52
+
+### Patch Changes
+
+- fix: excessive number of classes included via tailwindcss plugin
+
+## 0.7.51
+
+### Patch Changes
+
+- fix: crash when content part is empty
+
+## 0.7.50
+
+### Patch Changes
+
+- fix: properly forward unstable_shouldContinueIgnoreToolNames
+
+## 0.7.49
+
+### Patch Changes
+
+- feat(local-runtime): add temporary shouldContinueIgnoreToolNames override
+
+## 0.7.48
+
+### Patch Changes
+
+- fix: crash
+
+## 0.7.47
+
+### Patch Changes
+
+- a3c6c1a: feat: ensure runtime methods are bound to the object
+- a76ea0e: feat: AttachmentAdapter file upload progress update support via generator add callback
+- a3c6c1a: feat: useRuntimeState API
+
+## 0.7.46
+
+### Patch Changes
+
+- fix: improved interrupt+Command support
+- feat: MessagesFooter UI
+- 2713487: feat: styled UI assistant message footer
+
+## 0.7.45
+
+### Patch Changes
+
+- 9934aef: feat(cloud-threadlist): auto initialize threads
+- 3a8b55a: feat: styled UI assistant message footer
+
+## 0.7.44
+
+### Patch Changes
+
+- 2f44e9e: refactor: move switchToThread / switchToNewThread to runtime.threads
+- 2f44e9e: refactor: rename runtime.threadList to runtime.threads
+- 2f44e9e: refactor: drop CloudThreadListItemRuntime
+- 2f44e9e: feat: add threads.getById and threads.main
+- 2f44e9e: feat: ThreadListItemRuntime.initialize()
+
+## 0.7.43
+
+### Patch Changes
+
+- feat: reverse order of threads in useRemoteThreadListRuntime
+
+## 0.7.42
+
+### Patch Changes
+
+- 9c3961d: fix: event subscriptions triggering on threadList changes
+
+## 0.7.41
+
+### Patch Changes
+
+- 08de9c9: fix: RemoteThreadList should not return an iterator
+
+## 0.7.40
+
+### Patch Changes
+
+- feat: export useRemoteThreadListRuntime
+
+## 0.7.39
+
+### Patch Changes
+
+- 0979334: feat(local-runtime): New ThreadList items should appear at the top of the list
+- 22272e6: chore: update dependencies
+- Updated dependencies [b44a7ad]
+- Updated dependencies [22272e6]
+  - assistant-stream@0.0.18
+
+## 0.7.38
+
+### Patch Changes
+
+- 5794b1b: feat: CreateStartRunConfig
+
+## 0.7.37
+
+### Patch Changes
+
+- 799dc79: feat: AppendMessage.sourceId
+- 799dc79: feat: StartRunConfig.sourceId
+
+## 0.7.36
+
+### Patch Changes
+
+- 34d2915: feat: widen initialMessages type to ThreadMessageLike
+- 4f3834a: refactor: deprecate UIContentPart
+- b8b11d3: feat: FileContentPart
+- 889a55e: fix: attachment filename should never overflow
+- a7d9e41: feat: ComposerRuntime.unstable_on("attachment_add", ...)
+
+## 0.7.35
+
+### Patch Changes
+
+- 345f3d5: chore: update dependencies
+- 345f3d5: fix: import errors in react server environments
+- 2846559: feat: allow selecting multiple files as attachments
+
+## 0.7.34
+
+### Patch Changes
+
+- 9a3dc93: fix(external-store): metadata & attachments support
+- 4c2bf58: chore: update dependencies
+
+## 0.7.33
+
+### Patch Changes
+
+- bb47b90: fix: invalid JSON in argsText should be gracefully handled
+
+## 0.7.32
+
+### Patch Changes
+
+- feat: MessagePrimitive.tools.Override
+
+## 0.7.31
+
+### Patch Changes
+
+- fix: data results should be forwarded via LocalThreadRuntime
+
+## 0.7.30
+
+### Patch Changes
+
+- 982a6a2: chore: update dependencies
+
+## 0.7.29
+
+### Patch Changes
+
+- 75a274f: feat: AssistantRuntimeCore.RenderComponent
+- dcf51cb: fix: do not throw on AI SDK annotation packets
+- 9ad9e75: fix: mark arrays in message types as readonly
+- 75a274f: refactor: drop AssistantRuntimeCore.Provider due to causing app rerenders on runtime switch
+- 65de5d6: feat: message.metadata.unstable_data
+
+## 0.7.28
+
+### Patch Changes
+
+- a8ac203: feat: export useThreadListItemRuntime
+
+## 0.7.27
+
+### Patch Changes
+
+- 528cfd3: feat: ExternalStoreAdapter.unstable_Provider
+- 3c70ea1: feat: allow customizing thread max width
+
+## 0.7.26
+
+### Patch Changes
+
+- 6a17ec2: feat: useAssistantInstructions disable support
+
+## 0.7.25
+
+### Patch Changes
+
+- 798e9f3: fix: AttachmentRemove should not trigger AttachmentPreviewDialog
+- 37e1abc: feat: ComposerRuntime.clearAttachments
+- d6b3b79: feat: useRemoteThreadListRuntime
+
+## 0.7.24
+
+### Patch Changes
+
+- fix: ComposerRuntime.send() should not reset role or runConfig
+
+## 0.7.23
+
+### Patch Changes
+
+- feat(edge-runtime): pass RunConfig to backend
+
+## 0.7.22
+
+### Patch Changes
+
+- feat: RunConfig
+
+## 0.7.21
+
+### Patch Changes
+
+- feat: Composer.unstable_on("send", callback)
+
+## 0.7.20
+
+### Patch Changes
+
+- 2c7dec0: feat: useAssistantTool allow disabling tools
+
+## 0.7.19
+
+### Patch Changes
+
+- ec3b8cc: chore: update dependencies
+
+## 0.7.18
+
+### Patch Changes
+
+- 1b16dce: fix: thread initialization
+- b0f309a: feat: allow specifying Empty component in thread-config
+
+## 0.7.17
+
+### Patch Changes
+
+- fix: toLanguageModelMessages should include attachments
+
+## 0.7.16
+
+### Patch Changes
+
+- fix: ensure message status is set on runResultStream flush
+
+## 0.7.15
+
+### Patch Changes
+
+- fix: toolResultStream should support JSONSchema params
+
+## 0.7.14
+
+### Patch Changes
+
+- fix: assistantDecoderStream should end current tool call on flush
+
+## 0.7.12
+
+### Patch Changes
+
+- 4c54273: chore: update dependencies
+- 4c54273: fix: initialize thread on import
+
+## 0.7.11
+
+### Patch Changes
+
+- 0f88efb: fix: external store thread list should not crash
+
+## 0.7.10
+
+### Patch Changes
+
+- 1eab7b4: refactor: ThreadList
+
+## 0.7.9
+
+### Patch Changes
+
+- 2276e57: fix: cjs builds
+- e8752ac: fix: ThreadList a11y improvements
+
+## 0.7.8
+
+### Patch Changes
+
+- 589d37b: feat: ThreadList / ThreadListItem UI
+- 2112ce8: chore: update dependencies
+
+## 0.7.7
+
+### Patch Changes
+
+- 10d70db: fix: remove console.log
+- c3027a0: fix: disallow nested ThreadConfigs
+
+## 0.7.6
+
+### Patch Changes
+
+- 933b8c0: chore: update deps
+- 09a2a38: fix: TextContentPartProvider should support contentPartRuntime.getState()
+
+## 0.7.5
+
+### Patch Changes
+
+- c59d8b5: chore: update dependencies
+
 ## 0.7.4
 
 ### Patch Changes

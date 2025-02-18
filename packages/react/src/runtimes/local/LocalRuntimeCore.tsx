@@ -2,14 +2,20 @@ import type { CoreMessage } from "../../types/AssistantTypes";
 import { BaseAssistantRuntimeCore } from "../core/BaseAssistantRuntimeCore";
 import { LocalThreadRuntimeCore } from "./LocalThreadRuntimeCore";
 import { LocalRuntimeOptionsBase } from "./LocalRuntimeOptions";
-import { fromCoreMessages } from "../edge/converters/fromCoreMessage";
 import { LocalThreadListRuntimeCore } from "./LocalThreadListRuntimeCore";
 import { ExportedMessageRepository } from "../utils/MessageRepository";
+import { ThreadMessageLike } from "../external-store";
+import { fromThreadMessageLike } from "../external-store/ThreadMessageLike";
+import { generateId } from "../../internal";
+import { getAutoStatus } from "../external-store/auto-status";
 
 const getExportFromInitialMessages = (
-  initialMessages: readonly CoreMessage[],
+  initialMessages: readonly ThreadMessageLike[],
 ): ExportedMessageRepository => {
-  const messages = fromCoreMessages(initialMessages);
+  const messages = initialMessages.map((i, idx) => {
+    const isLast = idx === initialMessages.length - 1;
+    return fromThreadMessageLike(i, generateId(), getAutoStatus(isLast, false));
+  });
   return {
     messages: messages.map((m, idx) => ({
       parentId: messages[idx - 1]?.id ?? null,
@@ -19,39 +25,28 @@ const getExportFromInitialMessages = (
 };
 
 export class LocalRuntimeCore extends BaseAssistantRuntimeCore {
-  public readonly threadList;
+  public readonly threads;
+  public readonly Provider = undefined;
 
   private _options: LocalRuntimeOptionsBase;
 
   constructor(
     options: LocalRuntimeOptionsBase,
-    initialMessages: readonly CoreMessage[] | undefined,
+    initialMessages: readonly ThreadMessageLike[] | undefined,
   ) {
     super();
 
     this._options = options;
 
-    this.threadList = new LocalThreadListRuntimeCore((threadId, data) => {
-      const thread = new LocalThreadRuntimeCore(
-        this._proxyConfigProvider,
-        threadId,
-        this._options,
-      );
-      thread.import(data);
-      return thread;
+    this.threads = new LocalThreadListRuntimeCore(() => {
+      return new LocalThreadRuntimeCore(this._contextProvider, this._options);
     });
 
     if (initialMessages) {
-      this.threadList.mainThread.import(
-        getExportFromInitialMessages(initialMessages),
-      );
+      this.threads
+        .getMainThreadRuntimeCore()
+        .import(getExportFromInitialMessages(initialMessages));
     }
-  }
-
-  public setOptions(options: LocalRuntimeOptionsBase) {
-    this._options = options;
-
-    this.threadList.mainThread.setOptions(options);
   }
 
   public reset({
@@ -59,11 +54,11 @@ export class LocalRuntimeCore extends BaseAssistantRuntimeCore {
   }: {
     initialMessages?: readonly CoreMessage[] | undefined;
   } = {}) {
-    this.threadList.switchToNewThread();
+    this.threads.switchToNewThread();
     if (!initialMessages) return;
 
-    this.threadList.mainThread.import(
-      getExportFromInitialMessages(initialMessages),
-    );
+    this.threads
+      .getMainThreadRuntimeCore()
+      .import(getExportFromInitialMessages(initialMessages));
   }
 }

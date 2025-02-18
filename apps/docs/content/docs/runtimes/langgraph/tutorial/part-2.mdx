@@ -18,7 +18,7 @@ import price from "./images/acme-price.png";
 
 For reference, this the corresponding code in the backend:
 
-https://github.com/Yonom/assistant-ui-stockbroker/blob/main/backend/src/tools.ts#L193C1-L216C3
+https://github.com/assistant-ui/assistant-ui-stockbroker/blob/main/backend/src/tools.ts#L193C1-L216C3
 
 ```ts title="assistant-ui-stockbroker/backend/tools/PriceSnapshotTool.ts"
 export const priceSnapshotTool = tool(
@@ -120,7 +120,7 @@ Next, we will visualize the function's result.
 
 ### Install dependencies
 
-The tool result component relies on shadcn-ui's `Card` component. We will install it as a dependency.
+The tool result component relies on shadcn/ui's `Card` component. We will install it as a dependency.
 
 ```sh
 npx shadcn@latest add card
@@ -264,7 +264,7 @@ import price2 from "./images/tsla-price.png";
 
 Instead of defining a custom tool UI for every tool, we can also define a fallback UI for all tools that are not explicitly defined.
 
-This requires shadcn-ui's `Button` component. We will install it as a dependency.
+This requires shadcn/ui's `Button` component. We will install it as a dependency.
 
 ```sh
 npx shadcn@latest add button

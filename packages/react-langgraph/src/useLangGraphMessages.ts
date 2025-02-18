@@ -1,69 +1,97 @@
-import { useState, useCallback } from "react";
-import { INTERNAL } from "@assistant-ui/react";
+import { useState, useCallback, useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
 
-const { generateId } = INTERNAL;
+export type LangGraphCommand = {
+  resume: string;
+};
 
-export const useLangGraphMessages = <TMessage>({
+export type LangGraphSendMessageConfig = {
+  command?: LangGraphCommand;
+  runConfig?: unknown;
+};
+
+type LangGraphMessagesEvent<TMessage> = {
+  event:
+    | "messages/partial"
+    | "messages/complete"
+    | "metadata"
+    | "updates"
+    | string;
+  data: TMessage[] | any;
+};
+export type LangGraphStreamCallback<TMessage> = (
+  messages: TMessage[],
+  config: LangGraphSendMessageConfig & { abortSignal: AbortSignal },
+) =>
+  | Promise<AsyncGenerator<LangGraphMessagesEvent<TMessage>>>
+  | AsyncGenerator<LangGraphMessagesEvent<TMessage>>;
+
+export type LangGraphInterruptState = {
+  value: any;
+  resumable: boolean;
+  when: string;
+  ns?: string[];
+};
+
+export const useLangGraphMessages = <TMessage extends { id?: string }>({
   stream,
 }: {
-  stream: (messages: TMessage[]) => Promise<
-    AsyncGenerator<{
-      event: string;
-      data: any;
-    }>
-  >;
+  stream: LangGraphStreamCallback<TMessage>;
 }) => {
+  const [interrupt, setInterrupt] = useState<
+    LangGraphInterruptState | undefined
+  >();
   const [messages, setMessages] = useState<TMessage[]>([]);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const sendMessage = useCallback(
-    async (newMessages: TMessage[]) => {
-      const optimisticMessages = [...messages, ...newMessages];
-      if (newMessages.length > 0) {
-        setMessages(optimisticMessages);
-      }
+    async (newMessages: TMessage[], config: LangGraphSendMessageConfig) => {
+      // ensure all messages have an ID
+      newMessages = newMessages.map((m) => (m.id ? m : { ...m, id: uuidv4() }));
 
-      const response = await stream(newMessages);
-
-      const completeMessages: TMessage[] = [];
-      let partialMessages: Map<string, TMessage> = new Map();
-      for await (const chunk of response) {
-        if (chunk.event === "messages/partial") {
-          // bug fix: messages/complete is not sent for some python langchain backends
-          if (completeMessages.length === 0) {
-            completeMessages.push(...optimisticMessages);
-          }
-
-          for (const message of chunk.data) {
-            if (!message.id) throw new Error("Partial message missing id");
-
-            partialMessages.set(message.id, message);
-          }
-        } else if (chunk.event === "messages/complete") {
-          for (const message of chunk.data) {
-            if (message.id) {
-              partialMessages.delete(message.id);
-            }
-
-            // bug fix: tool results can arrive before the message is complete ?
-            // if we have partial messages left, we add complete message to partial messages
-            if (partialMessages.size > 0) {
-              partialMessages.set(message.id ?? generateId(), message);
-            } else {
-              completeMessages.push(message);
-            }
-          }
-        } else {
-          continue;
+      const messagesMap = new Map<string, TMessage>();
+      const addMessages = (newMessages: TMessage[]) => {
+        if (newMessages.length === 0) return;
+        for (const message of newMessages) {
+          messagesMap.set(message.id ?? uuidv4(), message);
         }
+        setMessages([...messagesMap.values()]);
+      };
+      addMessages([...messages, ...newMessages]);
 
-        setMessages([...completeMessages, ...partialMessages.values()]);
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+      const response = await stream(newMessages, {
+        ...config,
+        abortSignal: abortController.signal,
+      });
+
+      for await (const chunk of response) {
+        if (
+          chunk.event === "messages/partial" ||
+          chunk.event === "messages/complete"
+        ) {
+          addMessages(chunk.data);
+        } else if (chunk.event === "updates") {
+          setInterrupt(chunk.data.__interrupt__?.[0]);
+        }
       }
-      // if (partialMessages.size > 0) {
-      //   throw new Error("A partial message was not marked as complete");
-      // }
     },
     [messages, stream],
   );
 
-  return { messages, sendMessage, setMessages };
+  const cancel = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+  }, [abortControllerRef]);
+
+  return {
+    interrupt,
+    messages,
+    sendMessage,
+    cancel,
+    setInterrupt,
+    setMessages,
+  };
 };

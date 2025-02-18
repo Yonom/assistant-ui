@@ -1,4 +1,5 @@
 import {
+  LanguageModelV1FilePart,
   LanguageModelV1ImagePart,
   LanguageModelV1Message,
   LanguageModelV1TextPart,
@@ -57,8 +58,11 @@ const assistantMessageSplitter = () => {
         type: "tool-result",
         toolCallId: part.toolCallId,
         toolName: part.toolName,
-        result: part.result ?? "<no result>",
-        isError: part.isError ?? false,
+        result:
+          part.result === undefined
+            ? "Error: tool is has no configured code to run"
+            : part.result,
+        isError: part.isError ?? part.result === undefined,
       });
     },
     getMessages: () => {
@@ -73,19 +77,40 @@ const assistantMessageSplitter = () => {
 
 export function toLanguageModelMessages(
   message: readonly CoreMessage[] | readonly ThreadMessage[],
+  options: { unstable_includeId?: boolean | undefined } = {},
 ): LanguageModelV1Message[] {
+  const includeId = options.unstable_includeId ?? false;
   return message.flatMap((message) => {
     const role = message.role;
     switch (role) {
       case "system": {
-        return [{ role: "system", content: message.content[0].text }];
+        return [
+          {
+            ...(includeId
+              ? { unstable_id: (message as ThreadMessage).id }
+              : {}),
+            role: "system",
+            content: message.content[0].text,
+          },
+        ];
       }
 
       case "user": {
+        const attachments = "attachments" in message ? message.attachments : [];
+        const content = [
+          ...message.content,
+          ...attachments.map((a) => a.content).flat(),
+        ];
         const msg: LanguageModelV1Message = {
+          ...(includeId ? { unstable_id: (message as ThreadMessage).id } : {}),
           role: "user",
-          content: message.content.map(
-            (part): LanguageModelV1TextPart | LanguageModelV1ImagePart => {
+          content: content.map(
+            (
+              part,
+            ):
+              | LanguageModelV1TextPart
+              | LanguageModelV1ImagePart
+              | LanguageModelV1FilePart => {
               const type = part.type;
               switch (type) {
                 case "text": {
@@ -96,6 +121,14 @@ export function toLanguageModelMessages(
                   return {
                     type: "image",
                     image: new URL(part.image),
+                  };
+                }
+
+                case "file": {
+                  return {
+                    type: "file",
+                    data: new URL(part.data),
+                    mimeType: part.mimeType,
                   };
                 }
 
@@ -117,6 +150,10 @@ export function toLanguageModelMessages(
         for (const part of message.content) {
           const type = part.type;
           switch (type) {
+            case "reasoning": {
+              break; // reasoning parts are omitted
+            }
+
             case "text": {
               splitter.addTextContentPart(part);
               break;

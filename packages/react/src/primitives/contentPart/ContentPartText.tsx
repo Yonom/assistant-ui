@@ -2,16 +2,16 @@
 
 import { Primitive } from "@radix-ui/react-primitive";
 import {
-  type ElementRef,
+  type ComponentRef,
   forwardRef,
   ComponentPropsWithoutRef,
   ElementType,
 } from "react";
-import { useContentPartText } from "../../primitive-hooks/contentPart/useContentPartText";
+import { useContentPartText } from "./useContentPartText";
 import { useSmooth } from "../../utils/smooth/useSmooth";
 
 export namespace ContentPartPrimitiveText {
-  export type Element = ElementRef<typeof Primitive.span>;
+  export type Element = ComponentRef<typeof Primitive.span>;
   export type Props = Omit<
     ComponentPropsWithoutRef<typeof Primitive.span>,
     "children" | "asChild"

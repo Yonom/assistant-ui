@@ -8,9 +8,10 @@
     "noEmit": true,
     "resolveJsonModule": true,
     "jsx": "react-jsx",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "ES2022"],
     "paths": {
-      "@assistant-ui/*": ["../../packages/*/src"]
+      "@assistant-ui/*": ["../../packages/*/src"],
+      "assistant-stream": ["../../packages/assistant-stream/src"],
     }
   }
 }

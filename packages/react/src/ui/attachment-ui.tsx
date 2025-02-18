@@ -10,10 +10,7 @@ import {
 import { CircleXIcon, FileIcon } from "lucide-react";
 import { withDefaults } from "./utils/withDefaults";
 import { useThreadConfig } from "./thread-config";
-import {
-  TooltipIconButton,
-  TooltipIconButtonProps,
-} from "./base/tooltip-icon-button";
+import { TooltipIconButton } from "./base/tooltip-icon-button";
 import { AttachmentPrimitive } from "../primitives";
 import { useAttachment } from "../context/react/AttachmentContext";
 import {
@@ -30,6 +27,10 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 
 const AttachmentRoot = withDefaults(AttachmentPrimitive.Root, {
   className: "aui-attachment-root",
+});
+
+const AttachmentContent = withDefaults("div", {
+  className: "aui-attachment-content",
 });
 
 AttachmentRoot.displayName = "AttachmentRoot";
@@ -144,20 +145,22 @@ const AttachmentUI: FC = () => {
   });
   return (
     <Tooltip>
-      <AttachmentPreviewDialog>
-        <TooltipTrigger asChild>
-          <AttachmentRoot>
-            <AttachmentThumb />
-            <div className="aui-attachment-text">
-              <p className="aui-attachment-name">
-                <AttachmentPrimitive.Name />
-              </p>
-              <p className="aui-attachment-type">{typeLabel}</p>
-            </div>
-            {canRemove && <AttachmentRemove />}
-          </AttachmentRoot>
-        </TooltipTrigger>
-      </AttachmentPreviewDialog>
+      <AttachmentRoot>
+        <AttachmentPreviewDialog>
+          <TooltipTrigger asChild>
+            <AttachmentContent>
+              <AttachmentThumb />
+              <div className="aui-attachment-text">
+                <p className="aui-attachment-name">
+                  <AttachmentPrimitive.Name />
+                </p>
+                <p className="aui-attachment-type">{typeLabel}</p>
+              </div>
+            </AttachmentContent>
+          </TooltipTrigger>
+        </AttachmentPreviewDialog>
+        {canRemove && <AttachmentRemove />}
+      </AttachmentRoot>
       <TooltipContent side="top">
         <AttachmentPrimitive.Name />
       </TooltipContent>
@@ -169,7 +172,7 @@ AttachmentUI.displayName = "Attachment";
 
 namespace AttachmentRemove {
   export type Element = HTMLButtonElement;
-  export type Props = Partial<TooltipIconButtonProps>;
+  export type Props = Partial<TooltipIconButton.Props>;
 }
 
 const AttachmentRemove = forwardRef<

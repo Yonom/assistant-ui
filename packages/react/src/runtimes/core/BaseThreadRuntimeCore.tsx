@@ -1,8 +1,4 @@
-import type {
-  ModelConfigProvider,
-  AppendMessage,
-  Unsubscribe,
-} from "../../types";
+import type { AppendMessage, Unsubscribe } from "../../types";
 import {
   ExportedMessageRepository,
   MessageRepository,
@@ -17,13 +13,14 @@ import {
   RuntimeCapabilities,
   SubmittedFeedback,
   ThreadRuntimeEventType,
-  ThreadMetadataRuntimeCore,
+  StartRunConfig,
 } from "../core/ThreadRuntimeCore";
 import { DefaultEditComposerRuntimeCore } from "../composer/DefaultEditComposerRuntimeCore";
-import { SpeechSynthesisAdapter } from "../speech/SpeechAdapterTypes";
-import { FeedbackAdapter } from "../feedback/FeedbackAdapter";
-import { AttachmentAdapter } from "../attachment";
+import { SpeechSynthesisAdapter } from "../adapters/speech/SpeechAdapterTypes";
+import { FeedbackAdapter } from "../adapters/feedback/FeedbackAdapter";
+import { AttachmentAdapter } from "../adapters/attachment";
 import { getThreadMessageText } from "../../utils/getThreadMessageText";
+import { ModelContextProvider } from "../../model-context";
 
 type BaseThreadAdapters = {
   speech?: SpeechSynthesisAdapter | undefined;
@@ -33,6 +30,7 @@ type BaseThreadAdapters = {
 
 export abstract class BaseThreadRuntimeCore implements ThreadRuntimeCore {
   private _subscriptions = new Set<() => void>();
+  private _isInitialized = false;
 
   protected readonly repository = new MessageRepository();
   public abstract get adapters(): BaseThreadAdapters | undefined;
@@ -42,13 +40,9 @@ export abstract class BaseThreadRuntimeCore implements ThreadRuntimeCore {
 
   public abstract get capabilities(): RuntimeCapabilities;
   public abstract append(message: AppendMessage): void;
-  public abstract startRun(parentId: string | null): void;
+  public abstract startRun(config: StartRunConfig): void;
   public abstract addToolResult(options: AddToolResultOptions): void;
   public abstract cancelRun(): void;
-
-  public get metadata() {
-    return this._metadata;
-  }
 
   public get messages() {
     return this.repository.getMessages();
@@ -56,13 +50,10 @@ export abstract class BaseThreadRuntimeCore implements ThreadRuntimeCore {
 
   public readonly composer = new DefaultThreadComposerRuntimeCore(this);
 
-  constructor(
-    private readonly _configProvider: ModelConfigProvider,
-    private readonly _metadata: ThreadMetadataRuntimeCore,
-  ) {}
+  constructor(private readonly _contextProvider: ModelContextProvider) {}
 
-  public getModelConfig() {
-    return this._configProvider.getModelConfig();
+  public getModelContext() {
+    return this._contextProvider.getModelContext();
   }
 
   private _editComposers = new Map<string, DefaultEditComposerRuntimeCore>();
@@ -169,20 +160,32 @@ export abstract class BaseThreadRuntimeCore implements ThreadRuntimeCore {
     this._notifySubscribers();
   }
 
+  protected ensureInitialized() {
+    if (!this._isInitialized) {
+      this._isInitialized = true;
+      this._notifyEventSubscribers("initialize");
+    }
+  }
+
   public export() {
     return this.repository.export();
   }
 
   public import(data: ExportedMessageRepository) {
+    this.ensureInitialized();
+
     this.repository.import(data);
     this._notifySubscribers();
   }
 
-  private _eventSubscribers = new Map<string, Set<() => void>>();
+  private _eventSubscribers = new Map<
+    ThreadRuntimeEventType,
+    Set<() => void>
+  >();
 
   public unstable_on(event: ThreadRuntimeEventType, callback: () => void) {
-    if (event === "model-config-update") {
-      return this._configProvider.subscribe?.(callback) ?? (() => {});
+    if (event === "model-context-update") {
+      return this._contextProvider.subscribe?.(callback) ?? (() => {});
     }
 
     const subscribers = this._eventSubscribers.get(event);

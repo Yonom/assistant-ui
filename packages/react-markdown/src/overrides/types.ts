@@ -1,10 +1,11 @@
-import { Options } from "react-markdown";
+import { Element } from "hast";
+import { ComponentPropsWithoutRef, ComponentType } from "react";
 
-export type PreComponent = NonNullable<
-  NonNullable<Options["components"]>["pre"]
+export type PreComponent = ComponentType<
+  ComponentPropsWithoutRef<"pre"> & { node?: Element | undefined }
 >;
-export type CodeComponent = NonNullable<
-  NonNullable<Options["components"]>["code"]
+export type CodeComponent = ComponentType<
+  ComponentPropsWithoutRef<"code"> & { node?: Element | undefined }
 >;
 
 export type CodeHeaderProps = {

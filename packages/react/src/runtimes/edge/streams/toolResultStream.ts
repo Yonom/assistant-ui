@@ -1,10 +1,19 @@
-import { Tool } from "../../../types/ModelConfigTypes";
+import { Tool } from "../../../model-context/ModelContextTypes";
 import { LanguageModelV1StreamPart } from "@ai-sdk/provider";
 import { z } from "zod";
 import sjson from "secure-json-parse";
+import { ReadonlyJSONValue } from "../../../utils/json/json-value";
 
 export type ToolResultStreamPart =
   | LanguageModelV1StreamPart
+  | {
+      type: "annotations";
+      annotations: ReadonlyJSONValue[];
+    }
+  | {
+      type: "data";
+      data: ReadonlyJSONValue[];
+    }
   | {
       type: "tool-result";
       toolCallType: "function";
@@ -31,7 +40,7 @@ export type ToolResultStreamPart =
     };
 
 export function toolResultStream(
-  tools: Record<string, Tool> | undefined,
+  tools: Record<string, Tool<any, any>> | undefined,
   abortSignal: AbortSignal,
 ) {
   const toolCallExecutions = new Map<string, Promise<any>>();
@@ -49,64 +58,85 @@ export function toolResultStream(
           const tool = tools?.[toolName];
           if (!tool || !tool.execute) return;
 
-          const args = sjson.parse(argsText);
-          if (tool.parameters instanceof z.ZodType) {
-            const result = tool.parameters.safeParse(args);
-            if (!result.success) {
-              controller.enqueue({
-                type: "tool-result",
-                toolCallType,
-                toolCallId,
-                toolName,
-                result:
-                  "Function parameter validation failed. " +
-                  JSON.stringify(result.error.issues),
-                isError: true,
-              });
-              return;
-            } else {
-              toolCallExecutions.set(
-                toolCallId,
-                (async () => {
-                  if (!tool.execute) return;
-
-                  try {
-                    const result = await tool.execute(args, { abortSignal });
-
-                    controller.enqueue({
-                      type: "tool-result",
-                      toolCallType,
-                      toolCallId,
-                      toolName,
-                      result,
-                    });
-                  } catch (error) {
-                    controller.enqueue({
-                      type: "tool-result",
-                      toolCallType,
-                      toolCallId,
-                      toolName,
-                      result: "Error: " + error,
-                      isError: true,
-                    });
-                  } finally {
-                    toolCallExecutions.delete(toolCallId);
-                  }
-                })(),
-              );
-            }
+          let args;
+          try {
+            args = sjson.parse(argsText);
+          } catch (e) {
+            controller.enqueue({
+              type: "tool-result",
+              toolCallType,
+              toolCallId,
+              toolName,
+              result:
+                "Function parameter parsing failed. " +
+                JSON.stringify((e as Error).message),
+              isError: true,
+            });
+            return;
           }
+
+          toolCallExecutions.set(
+            toolCallId,
+            (async () => {
+              if (!tool.execute) return;
+
+              let executeFn = tool.execute;
+
+              if (tool.parameters instanceof z.ZodType) {
+                const result = tool.parameters.safeParse(args);
+                if (!result.success) {
+                  executeFn =
+                    tool.experimental_onSchemaValidationError ??
+                    (() => {
+                      throw (
+                        "Function parameter validation failed. " +
+                        JSON.stringify(result.error.issues)
+                      );
+                    });
+                }
+              }
+
+              try {
+                const result = await executeFn(args, {
+                  toolCallId,
+                  abortSignal,
+                });
+
+                controller.enqueue({
+                  type: "tool-result",
+                  toolCallType,
+                  toolCallId,
+                  toolName,
+                  result: result === undefined ? "<no result>" : result,
+                });
+              } catch (error) {
+                controller.enqueue({
+                  type: "tool-result",
+                  toolCallType,
+                  toolCallId,
+                  toolName,
+                  result: "Error: " + error,
+                  isError: true,
+                });
+              } finally {
+                toolCallExecutions.delete(toolCallId);
+              }
+            })(),
+          );
           break;
         }
 
         // ignore other parts
         case "text-delta":
+        case "reasoning":
         case "tool-call-delta":
         case "tool-result":
         case "step-finish":
         case "finish":
         case "error":
         case "response-metadata":
+        case "annotations":
+        case "data":
           break;
 
         default: {

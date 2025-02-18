@@ -25,30 +25,31 @@ class ToolCallController:
         self.loop = asyncio.get_event_loop()
 
         begin_chunk = ToolCallBeginChunk(
-            type="tool-call-begin",
             tool_call_id=self.tool_call_id,
             tool_name=self.tool_name,
         )
         self.queue.put_nowait(begin_chunk)
 
-    def append_args_text(self, args_text_delta: str):
+    def append_args_text(self, args_text_delta: str) -> None:
         """Append an args text delta to the stream."""
         chunk = ToolCallDeltaChunk(
-            type="tool-call-delta",
             tool_call_id=self.tool_call_id,
             args_text_delta=args_text_delta,
         )
         self.loop.call_soon_threadsafe(self.queue.put_nowait, chunk)
 
-    def set_result(self, result: Any):
+    def set_result(self, result: Any) -> None:
         """Set the result of the tool call."""
 
         chunk = ToolResultChunk(
-            type="tool-result",
             tool_call_id=self.tool_call_id,
             result=result,
         )
         self.loop.call_soon_threadsafe(self.queue.put_nowait, chunk)
+        self.close()
+
+    def close(self) -> None:
+        """Close the stream."""
         self.loop.call_soon_threadsafe(self.queue.put_nowait, None)
 
 

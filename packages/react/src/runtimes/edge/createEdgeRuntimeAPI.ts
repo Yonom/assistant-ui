@@ -5,15 +5,10 @@ import {
   LanguageModelV1Prompt,
   LanguageModelV1CallOptions,
 } from "@ai-sdk/provider";
-import {
-  CoreMessage,
-  ThreadMessage,
-  ThreadStep,
-} from "../../types/AssistantTypes";
+import { CoreMessage, ThreadMessage, ThreadStep } from "../../types/AssistantTypes";
 import { assistantEncoderStream } from "./streams/assistantEncoderStream";
 import { EdgeRuntimeRequestOptionsSchema } from "./EdgeRuntimeRequestOptions";
 import { toLanguageModelMessages } from "./converters/toLanguageModelMessages";
-import { Tool } from "../../types";
 import { toLanguageModelTools } from "./converters/toLanguageModelTools";
 import {
   toolResultStream,
@@ -24,16 +19,16 @@ import {
   LanguageModelConfig,
   LanguageModelV1CallSettings,
   LanguageModelV1CallSettingsSchema,
-} from "../../types/ModelConfigTypes";
-import { ChatModelRunResult } from "../local/ChatModelAdapter";
-import { toCoreMessage } from "./converters/toCoreMessages";
+  Tool,
+} from "../../model-context/ModelContextTypes";
+import { CoreChatModelRunResult } from "../local/ChatModelAdapter";
 import { streamPartEncoderStream } from "./streams/utils/streamPartEncoderStream";
 import { z } from "zod";
 
 type FinishResult = {
-  messages: CoreMessage[];
+  messages: readonly (CoreMessage | ThreadMessage)[];
   metadata: {
-    steps: ThreadStep[];
+    steps: readonly ThreadStep[];
   };
 };
 
@@ -135,7 +130,7 @@ export const getEdgeRuntimeStream = async ({
     let serverStream = tees[1];
 
     if (onFinish) {
-      let lastChunk: ChatModelRunResult;
+      let lastChunk: CoreChatModelRunResult | undefined;
       serverStream = serverStream.pipeThrough(runResultStream()).pipeThrough(
         new TransformStream({
           transform(chunk) {
@@ -147,10 +142,19 @@ export const getEdgeRuntimeStream = async ({
 
             const resultingMessages = [
               ...messages,
-              toCoreMessage({
+              {
+                id: "DEFAULT",
+                createdAt: new Date(),
                 role: "assistant",
                 content: lastChunk.content,
-              } as ThreadMessage),
+                status: lastChunk.status,
+                metadata: {
+                  unstable_data: lastChunk.metadata?.unstable_data ?? [],
+                  unstable_annotations: lastChunk.metadata?.unstable_annotations ?? [],
+                  steps: lastChunk.metadata?.steps ?? [],
+                  custom: lastChunk.metadata?.custom ?? {},
+                }
+              } satisfies ThreadMessage,
             ];
             onFinish({
               messages: resultingMessages,
@@ -206,7 +210,7 @@ export const createEdgeRuntimeAPI = (options: CreateEdgeRuntimeAPIOptions) => ({
 type StreamMessageOptions = LanguageModelV1CallSettings & {
   model: LanguageModelV1;
   system?: string;
-  messages: CoreMessage[];
+  messages: readonly CoreMessage[];
   tools?: LanguageModelV1FunctionTool[];
   toolChoice?: LanguageModelV1ToolChoice;
   abortSignal: AbortSignal;
@@ -234,7 +238,7 @@ async function streamMessage({
 
 export function convertToLanguageModelPrompt(
   system: string | undefined,
-  messages: CoreMessage[],
+  messages: readonly CoreMessage[],
 ): LanguageModelV1Prompt {
   const languageModelMessages: LanguageModelV1Prompt = [];
 

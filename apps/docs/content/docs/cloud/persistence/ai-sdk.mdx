@@ -1,0 +1,40 @@
+---
+title: Chat History for AI SDK
+---
+
+## Overview
+
+With the help of assistant-cloud, you can add thread management and thread history capabilities to assistant-ui.  
+This guide will walk you through the process of integrating assistant-cloud with the AI SDK by Vercel.
+
+### Prerequisites
+
+You need an assistant-cloud account to follow this guide.  
+You can sign up here: https://cloud.assistant-ui.com/
+
+### Setting up an assistant-cloud project
+
+To get started, follow the steps below:
+
+- Create a new project on the assistant-cloud dashboard.
+- Navigate to the "Settings" tab and copy the Frontend API URL.
+- Add this URL to your .env file
+
+```bash
+NEXT_PUBLIC_ASSISTANT_BASE_URL=https://<your-frontend-api-url>
+```
+
+### Displaying a ThreadList component
+
+Now, you can add a ThreadList component to your application. This component will display a list of threads and allow users to switch between them.
+
+```sh
+npx shadcn@latest add "https://r.assistant-ui.com/thread-list"
+```
+
+```tsx
+<div className="grid grid-cols-[250px_1fr]">
+  <ThreadList />
+  <Thread />
+</div>
+```

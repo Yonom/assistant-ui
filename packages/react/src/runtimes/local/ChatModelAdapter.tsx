@@ -1,37 +1,53 @@
-"use client";
-
 import type {
   MessageStatus,
+  ReasoningContentPart,
+  RunConfig,
+  TextContentPart,
   ThreadAssistantContentPart,
   ThreadMessage,
   ThreadStep,
+  ToolCallContentPart,
 } from "../../types/AssistantTypes";
-import type { ModelConfig } from "../../types/ModelConfigTypes";
+import type { ModelContext } from "../../model-context/ModelContextTypes";
+import { ReadonlyJSONValue } from "../../utils/json/json-value";
 
 export type ChatModelRunUpdate = {
-  content: ThreadAssistantContentPart[];
-  metadata?: Record<string, unknown>;
+  readonly content: readonly ThreadAssistantContentPart[];
+  readonly metadata?: Record<string, unknown>;
 };
 
 export type ChatModelRunResult = {
-  content?: ThreadAssistantContentPart[] | undefined;
-  status?: MessageStatus | undefined;
-  metadata?: {
-    steps?: ThreadStep[] | undefined;
-    custom?: Record<string, unknown> | undefined;
+  readonly content?: readonly ThreadAssistantContentPart[] | undefined;
+  readonly status?: MessageStatus | undefined;
+  readonly metadata?: {
+    readonly unstable_annotations?: readonly ReadonlyJSONValue[] | undefined;
+    readonly unstable_data?: readonly ReadonlyJSONValue[] | undefined;
+    readonly steps?: readonly ThreadStep[] | undefined;
+    readonly custom?: Record<string, unknown> | undefined;
   };
 };
 
-export type ChatModelRunOptions = {
-  messages: ThreadMessage[];
-  abortSignal: AbortSignal;
-  config: ModelConfig;
+export type CoreChatModelRunResult = Omit<ChatModelRunResult, "content"> & {
+  readonly content: readonly (TextContentPart | ReasoningContentPart | ToolCallContentPart)[];
+};
 
-  unstable_assistantMessageId?: string;
+export type ChatModelRunOptions = {
+  readonly messages: readonly ThreadMessage[];
+  readonly runConfig: RunConfig;
+  readonly abortSignal: AbortSignal;
+  readonly context: ModelContext;
+
+  /**
+   * @deprecated This field was renamed to `context`.
+   */
+  readonly config: ModelContext;
+
+  readonly unstable_assistantMessageId?: string;
+  unstable_getMessage(): ThreadMessage;
 };
 
 export type ChatModelAdapter = {
-  run: (
+  run(
     options: ChatModelRunOptions,
-  ) => Promise<ChatModelRunResult> | AsyncGenerator<ChatModelRunResult, void>;
+  ): Promise<ChatModelRunResult> | AsyncGenerator<ChatModelRunResult, void>;
 };

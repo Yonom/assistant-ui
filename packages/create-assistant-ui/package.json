@@ -1,0 +1,40 @@
+{
+  "name": "create-assistant-ui",
+  "version": "0.0.12",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "cosmiconfig": "^9.0.0",
+    "cross-spawn": "^7.0.6",
+    "tsconfig-paths": "^4.2.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@assistant-ui/tsbuildutils": "workspace:^",
+    "@assistant-ui/tsconfig": "workspace:*",
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "^22.13.1",
+    "tsx": "^4.19.2"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "bin": "./dist/index.mjs",
+  "scripts": {
+    "build": "tsx scripts/build.mts"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "homepage": "https://www.assistant-ui.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/assistant-ui/assistant-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/assistant-ui/assistant-ui/issues"
+  }
+}

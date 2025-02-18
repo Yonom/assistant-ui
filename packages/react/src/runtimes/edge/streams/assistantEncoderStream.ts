@@ -14,6 +14,14 @@ export function assistantEncoderStream() {
     transform(chunk, controller) {
       const chunkType = chunk.type;
       switch (chunkType) {
+        case "reasoning": {
+          controller.enqueue({
+            type: AssistantStreamChunkType.ReasoningDelta,
+            value: chunk.textDelta,
+          });
+          break;
+        }
+
         case "text-delta": {
           if (!chunk.textDelta) break; // ignore empty text deltas
           controller.enqueue({
@@ -44,6 +52,22 @@ export function assistantEncoderStream() {
           break;
         }
 
+        case "annotations": {
+          controller.enqueue({
+            type: AssistantStreamChunkType.Annotation,
+            value: chunk.annotations,
+          });
+          break;
+        }
+
+        case "data": {
+          controller.enqueue({
+            type: AssistantStreamChunkType.Data,
+            value: chunk.data,
+          });
+          break;
+        }
+
         // ignore
         case "tool-call":
         case "response-metadata":
@@ -63,7 +87,7 @@ export function assistantEncoderStream() {
         case "step-finish": {
           const { type, ...rest } = chunk;
           controller.enqueue({
-            type: AssistantStreamChunkType.StepFinish,
+            type: AssistantStreamChunkType.FinishStep,
             value: rest,
           });
           break;
@@ -72,7 +96,7 @@ export function assistantEncoderStream() {
         case "finish": {
           const { type, ...rest } = chunk;
           controller.enqueue({
-            type: AssistantStreamChunkType.Finish,
+            type: AssistantStreamChunkType.FinishMessage,
             value: rest,
           });
           break;

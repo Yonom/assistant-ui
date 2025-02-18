@@ -44,8 +44,14 @@ const transpileTypescript = async () => {
     sourcemap: true,
     splitting: false,
     silent: true,
-
-    esbuildPlugins: [esbuildPluginFilePathExtensions()],
+    esbuildOptions: (config) => {
+      config.dropLabels = ["DEV"];
+    },
+    esbuildPlugins: [
+      esbuildPluginFilePathExtensions({
+        cjsExtension: "js",
+      }),
+    ],
   });
 };
 

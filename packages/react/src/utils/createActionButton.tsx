@@ -1,17 +1,22 @@
-"use client";
-
-import { ElementRef, forwardRef, ComponentPropsWithoutRef } from "react";
+import {
+  ComponentRef,
+  forwardRef,
+  ComponentPropsWithoutRef,
+  MouseEventHandler,
+} from "react";
 import { Primitive } from "@radix-ui/react-primitive";
 import { composeEventHandlers } from "@radix-ui/primitive";
 
-type ActionButtonCallback<TProps> = (props: TProps) => null | (() => void);
+type ActionButtonCallback<TProps> = (
+  props: TProps,
+) => MouseEventHandler<HTMLButtonElement> | null;
 
 type PrimitiveButtonProps = ComponentPropsWithoutRef<typeof Primitive.button>;
 
 export type ActionButtonProps<THook> = PrimitiveButtonProps &
   (THook extends (props: infer TProps) => unknown ? TProps : never);
 
-export type ActionButtonElement = ElementRef<typeof Primitive.button>;
+export type ActionButtonElement = ComponentRef<typeof Primitive.button>;
 
 export const createActionButton = <TProps,>(
   displayName: string,
@@ -33,16 +38,14 @@ export const createActionButton = <TProps,>(
       }
     });
 
-    const callback = useActionButton(forwardedProps as TProps);
+    const callback = useActionButton(forwardedProps as TProps) ?? undefined;
     return (
       <Primitive.button
         type="button"
         {...primitiveProps}
         ref={forwardedRef}
         disabled={primitiveProps.disabled || !callback}
-        onClick={composeEventHandlers(primitiveProps.onClick, () => {
-          callback?.();
-        })}
+        onClick={composeEventHandlers(primitiveProps.onClick, callback)}
       />
     );
   });

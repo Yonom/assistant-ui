@@ -1,0 +1,112 @@
+---
+title: ExternalStoreRuntime
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Overview
+
+<Callout emoji="💡">
+If you need full control over the state of the messages on the frontend, use ExternalStoreRuntime.
+
+With LocalRuntime, the chat history state is managed by assistant-ui. This
+gives you built-in support for thread management, message editing, reloading
+and branch switching.
+
+</Callout>
+
+Use the `ExternalStoreRuntime` if you want to manage the message state yourself via any react state management library.
+
+This runtime requires a `ExternalStoreAdapter<TMessage>` handles communication between `assistant-ui`and your state.
+Unless you are storing messages as `ThreadMessage`, you need to define a `convertMessage` function to convert your messages to `ThreadMessage`.
+
+```tsx twoslash title="@/app/MyRuntimeProvider.tsx"
+type MyMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+const backendApi = async (input: string): Promise<MyMessage> => {
+  return { role: "assistant", content: "Hello, world!" };
+};
+
+// ---cut---
+import { useState, ReactNode } from "react";
+import {
+  useExternalStoreRuntime,
+  ThreadMessageLike,
+  AppendMessage,
+  AssistantRuntimeProvider,
+} from "@assistant-ui/react";
+
+const convertMessage = (message: MyMessage): ThreadMessageLike => {
+  return {
+    role: message.role,
+    content: [{ type: "text", text: message.content }],
+  };
+};
+
+export function MyRuntimeProvider({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
+  const [isRunning, setIsRunning] = useState(false);
+  const [messages, setMessages] = useState<MyMessage[]>([]);
+
+  const onNew = async (message: AppendMessage) => {
+    if (message.content[0]?.type !== "text")
+      throw new Error("Only text messages are supported");
+
+    const input = message.content[0].text;
+    setMessages((currentConversation) => [
+      ...currentConversation,
+      { role: "user", content: input },
+    ]);
+
+    setIsRunning(true);
+    const assistantMessage = await backendApi(input);
+    setMessages((currentConversation) => [
+      ...currentConversation,
+      assistantMessage,
+    ]);
+    setIsRunning(false);
+  };
+
+  const runtime = useExternalStoreRuntime({
+    isRunning,
+    messages,
+    convertMessage,
+    onNew,
+  });
+
+  return (
+    <AssistantRuntimeProvider runtime={runtime}>
+      {children}
+    </AssistantRuntimeProvider>
+  );
+}
+```
+
+## Accessing External Store Messages
+
+You can use the `getExternalStoreMessages` utility to convert `ThreadMessage`s back to your own message type.
+
+```tsx
+const MyAssistantMessage = () => {
+  const myMessages = useMessage((m) => getExternalStoreMessages(m));
+  // ...
+};
+```
+
+Keep in mind that `getExternalStoreMessages` may return multiple messages. This is because assistant-ui merges adjacent assistant and tool messages into a single assistant message.
+
+You can do the same operation for individual content parts as well:
+
+```tsx
+const WeatherToolUI = makeAssistantToolUI({
+  render: () => {
+    const myMessages = useContentPart((p) => getExternalStoreMessages(p));
+    // ...
+  },
+});
+```

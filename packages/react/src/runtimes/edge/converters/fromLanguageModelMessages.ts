@@ -1,6 +1,7 @@
 import { LanguageModelV1Message } from "@ai-sdk/provider";
 import { CoreMessage, ToolCallContentPart } from "../../../types";
 import { Writable } from "stream";
+import { ReadonlyJSONObject } from "../../../utils/json/json-value";
 
 type fromLanguageModelMessagesOptions = {
   mergeSteps: boolean;
@@ -49,9 +50,16 @@ export const fromLanguageModelMessages = (
                 throw new Error("Only images with URL data are supported");
               }
               case "file": {
-                // TODO
-                throw new Error("File content parts are not supported");
+                if (part.data instanceof URL) {
+                  return {
+                    type: "file",
+                    data: part.data.href,
+                    mimeType: part.mimeType,
+                  };
+                }
+                throw new Error("Only files with URL data are supported");
               }
+
               default: {
                 const unhandledType: never = type;
                 throw new Error(`Unknown content part type: ${unhandledType}`);
@@ -69,7 +77,7 @@ export const fromLanguageModelMessages = (
               toolCallId: part.toolCallId,
               toolName: part.toolName,
               argsText: JSON.stringify(part.args),
-              args: part.args as Record<string, unknown>,
+              args: part.args as ReadonlyJSONObject,
             } satisfies ToolCallContentPart;
           }
           return part;
@@ -78,7 +86,10 @@ export const fromLanguageModelMessages = (
         if (mergeSteps) {
           const previousMessage = messages[messages.length - 1];
           if (previousMessage?.role === "assistant") {
-            previousMessage.content.push(...newContent);
+            previousMessage.content = [
+              ...previousMessage.content,
+              ...newContent,
+            ];
             break;
           }
         }

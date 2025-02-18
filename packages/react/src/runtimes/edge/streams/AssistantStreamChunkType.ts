@@ -1,20 +1,25 @@
 import { LanguageModelV1StreamPart } from "@ai-sdk/provider";
+import { ReadonlyJSONValue } from "../../../utils/json/json-value";
 
 export enum AssistantStreamChunkType {
   TextDelta = "0",
   Data = "2",
   Error = "3",
+  Annotation = "8",
   ToolCall = "9",
   ToolCallResult = "a",
   ToolCallBegin = "b",
   ToolCallDelta = "c",
-  Finish = "d",
-  StepFinish = "e",
+  FinishMessage = "d",
+  FinishStep = "e",
+  StartStep = "f",
+  ReasoningDelta = "g",
 }
 
 export type AssistantStreamChunk = {
   [AssistantStreamChunkType.TextDelta]: string;
-  [AssistantStreamChunkType.Data]: unknown;
+  [AssistantStreamChunkType.Data]: ReadonlyJSONValue[];
+  [AssistantStreamChunkType.Annotation]: ReadonlyJSONValue[];
   [AssistantStreamChunkType.ToolCall]: {
     toolCallId: string;
     toolName: string;
@@ -33,7 +38,7 @@ export type AssistantStreamChunk = {
     result: any;
   };
   [AssistantStreamChunkType.Error]: unknown;
-  [AssistantStreamChunkType.StepFinish]: {
+  [AssistantStreamChunkType.FinishStep]: {
     finishReason:
       | "stop"
       | "length"
@@ -48,11 +53,14 @@ export type AssistantStreamChunk = {
     };
     isContinued: boolean;
   };
-  [AssistantStreamChunkType.Finish]: Omit<
+  [AssistantStreamChunkType.FinishMessage]: Omit<
     LanguageModelV1StreamPart & {
       type: "finish";
     },
     "type"
   >;
+  [AssistantStreamChunkType.StartStep]: {
+    id: string;
+  };
+  [AssistantStreamChunkType.ReasoningDelta]: string;
 };
- 

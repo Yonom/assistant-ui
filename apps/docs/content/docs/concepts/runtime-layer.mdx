@@ -24,12 +24,11 @@ If you have a stateful API to integrate, use `useExternalStoreRuntime`, if you h
 
 For many services and APIs, assistant-ui provides deeper integrations. These are built with the two low-level runtimes mentioned above.
 
-- `useEdgeRuntime`: Connect to Vercel AI SDK backends or Edge Runtime backends
+- `useChatRuntime`: Connect to Vercel AI SDK backends
 - `useVercelUseChatRuntime`: Integrate with Vercel AI SDK's `useChat` hook
 - `useVercelUseAssistantRuntime`: Integrate with Vercel AI SDK's `useAssistant` hook (OpenAI Assistants API)
 - `useVercelRSCRuntime`: Integrate with Vercel AI SDK React Server Components
 - `useLangGraphRuntime`: Connect to LangGraph Cloud
-- `useTrieveRuntime`: Connect to Trieve.ai
 - ...
 
 ### Runtime Providers
@@ -66,7 +65,7 @@ import { File, Folder, Files } from "fumadocs-ui/components/files";
       <Folder name="ThreadRuntime" defaultOpen>
         <Folder name="MessageRuntime" defaultOpen>
           <Folder
-            name="ContentPartRuntime (Text / Image / Audio / Tool-Call / UI)"
+            name="ContentPartRuntime (Text / Reasoning / Image / Audio / Tool-Call / UI)"
             defaultOpen
           ></Folder>
           <Folder name="MessageAttachmentRuntime" defaultOpen></Folder>
@@ -96,7 +95,7 @@ The following components provide the runtime APIs:
 <ThreadPrimitive.Messages components={{ Message, ... }} />
 
 // renders every content part, provides ContentPartRuntime
-<MessagePrimitive.Content components={{ Text, Image, Audio, UI, tools }} />
+<MessagePrimitive.Content components={{ Text, Reasoning, Image, Audio, UI, tools }} />
 
 // renders every attachment, provides AttachmentRuntime (Thread or EditComposer)
 <ComposerPrimitive.Attachments components={{ Attachment, ... }} />
@@ -119,7 +118,7 @@ const messageRuntime = useMessageRuntime();
 const contentPartRuntime = useContentPartRuntime();
 
 // thread manager has no separate hook (1:1 relationship with assistant runtime)
-const ThreadListRuntime = useAssistantRuntime().threadList;
+const ThreadListRuntime = useAssistantRuntime().threads;
 
 // composer runtime is multi-use
 const composerRuntime = useComposerRuntime(); // refers to edit composer if available, otherwise thread composer

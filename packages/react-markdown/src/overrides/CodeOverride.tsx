@@ -1,5 +1,11 @@
-import { ComponentPropsWithoutRef, ComponentType, FC, useContext } from "react";
-import { PreContext } from "./PreOverride";
+import {
+  ComponentPropsWithoutRef,
+  ComponentType,
+  FC,
+  memo,
+  useContext,
+} from "react";
+import { PreContext, useIsMarkdownCodeBlock } from "./PreOverride";
 import {
   CodeComponent,
   CodeHeaderProps,
@@ -10,6 +16,7 @@ import { DefaultCodeBlock } from "./CodeBlock";
 import { useCallbackRef } from "@radix-ui/react-use-callback-ref";
 import { withDefaultProps } from "./withDefaults";
 import { DefaultCodeBlockContent } from "./defaultComponents";
+import { memoCompareNodes } from "../memoization";
 
 const CodeBlockOverride: FC<CodeOverrideProps> = ({
   components: {
@@ -17,8 +24,8 @@ const CodeBlockOverride: FC<CodeOverrideProps> = ({
     Code,
     SyntaxHighlighter: FallbackSyntaxHighlighter,
     CodeHeader: FallbackCodeHeader,
-    by_language = {},
   },
+  componentsByLanguage = {},
   children,
   ...codeProps
 }) => {
@@ -46,10 +53,11 @@ const CodeBlockOverride: FC<CodeOverrideProps> = ({
   }
 
   const SyntaxHighlighter: ComponentType<SyntaxHighlighterProps> =
-    by_language[language]?.SyntaxHighlighter ?? FallbackSyntaxHighlighter;
+    componentsByLanguage[language]?.SyntaxHighlighter ??
+    FallbackSyntaxHighlighter;
 
   const CodeHeader: ComponentType<CodeHeaderProps> =
-    by_language[language]?.CodeHeader ?? FallbackCodeHeader;
+    componentsByLanguage[language]?.CodeHeader ?? FallbackCodeHeader;
 
   return (
     <DefaultCodeBlock
@@ -71,21 +79,38 @@ export type CodeOverrideProps = ComponentPropsWithoutRef<CodeComponent> & {
     Code: CodeComponent;
     CodeHeader: ComponentType<CodeHeaderProps>;
     SyntaxHighlighter: ComponentType<SyntaxHighlighterProps>;
-    by_language?: Record<
-      string,
-      {
-        CodeHeader?: ComponentType<CodeHeaderProps>;
-        SyntaxHighlighter?: ComponentType<SyntaxHighlighterProps>;
-      }
-    >;
   };
+  componentsByLanguage?:
+    | Record<
+        string,
+        {
+          CodeHeader?: ComponentType<CodeHeaderProps>;
+          SyntaxHighlighter?: ComponentType<SyntaxHighlighterProps>;
+        }
+      >
+    | undefined;
 };
 
-export const CodeOverride: FC<CodeOverrideProps> = ({
+const CodeOverrideImpl: FC<CodeOverrideProps> = ({
   components,
+  componentsByLanguage,
   ...props
 }) => {
-  const preProps = useContext(PreContext);
-  if (!preProps) return <components.Code {...(props as any)} />;
-  return <CodeBlockOverride components={components} {...props} />;
+  const isCodeBlock = useIsMarkdownCodeBlock();
+  if (!isCodeBlock) return <components.Code {...props} />;
+  return (
+    <CodeBlockOverride
+      components={components}
+      componentsByLanguage={componentsByLanguage}
+      {...props}
+    />
+  );
 };
+
+export const CodeOverride = memo(CodeOverrideImpl, (prev, next) => {
+  const isEqual =
+    prev.components === next.components &&
+    prev.componentsByLanguage === next.componentsByLanguage &&
+    memoCompareNodes(prev, next);
+  return isEqual;
+});

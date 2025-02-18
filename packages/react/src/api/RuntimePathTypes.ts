@@ -9,7 +9,12 @@ export type ThreadListItemRuntimePath = {
 
 export type ThreadRuntimePath = {
   readonly ref: string;
-  readonly threadSelector: { type: "main" };
+  readonly threadSelector:
+    | { readonly type: "main" }
+    | {
+        readonly type: "threadId";
+        readonly threadId: string;
+      };
 };
 
 export type MessageRuntimePath = ThreadRuntimePath & {

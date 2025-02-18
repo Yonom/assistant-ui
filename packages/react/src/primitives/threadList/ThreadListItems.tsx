@@ -4,7 +4,7 @@ import { ComponentType, FC, memo, useMemo } from "react";
 import { ThreadListItemRuntimeProvider } from "../../context/providers/ThreadListItemRuntimeProvider";
 import { useAssistantRuntime, useThreadList } from "../../context";
 
-export namespace MessagePrimitiveContent {
+export namespace ThreadListPrimitiveItems {
   export type Props = {
     archived?: boolean | undefined;
     components: {
@@ -16,7 +16,7 @@ export namespace MessagePrimitiveContent {
 type ThreadListItemProps = {
   partIndex: number;
   archived: boolean;
-  components: MessagePrimitiveContent.Props["components"];
+  components: ThreadListPrimitiveItems.Props["components"];
 };
 
 const ThreadListItemImpl: FC<ThreadListItemProps> = ({
@@ -28,11 +28,9 @@ const ThreadListItemImpl: FC<ThreadListItemProps> = ({
   const runtime = useMemo(
     () =>
       archived
-        ? assistantRuntime.threadList.getThreadListArchivedItemByIndex(
-            partIndex,
-          )
-        : assistantRuntime.threadList.getThreadListItemByIndex(partIndex),
-    [assistantRuntime, partIndex],
+        ? assistantRuntime.threads.getArchivedItemByIndex(partIndex)
+        : assistantRuntime.threads.getItemByIndex(partIndex),
+    [assistantRuntime, partIndex, archived],
   );
 
   const ThreadListItemComponent = components.ThreadListItem;
@@ -52,7 +50,7 @@ const ThreadListItem = memo(
     prev.components.ThreadListItem === next.components.ThreadListItem,
 );
 
-export const ThreadListPrimitiveItems: FC<MessagePrimitiveContent.Props> = ({
+export const ThreadListPrimitiveItems: FC<ThreadListPrimitiveItems.Props> = ({
   archived = false,
   components,
 }) => {

@@ -1,6 +1,8 @@
-import { AppendMessage, ModelConfig, ThreadMessage } from "../../types";
+import { ModelContext } from "../../model-context";
+import { AppendMessage, ThreadMessage } from "../../types";
+import { RunConfig } from "../../types/AssistantTypes";
 import type { Unsubscribe } from "../../types/Unsubscribe";
-import { SpeechSynthesisAdapter } from "../speech/SpeechAdapterTypes";
+import { SpeechSynthesisAdapter } from "../adapters/speech/SpeechAdapterTypes";
 import { ExportedMessageRepository } from "../utils/MessageRepository";
 import {
   ComposerRuntimeCore,
@@ -43,30 +45,19 @@ export type SubmittedFeedback = {
   readonly type: "negative" | "positive";
 };
 
-export type ThreadMetadata = Readonly<{
-  readonly threadId: string;
-  readonly state: "archived" | "regular" | "new" | "deleted";
-  readonly title?: string | undefined;
-}>;
-
 export type ThreadRuntimeEventType =
-  | "switched-to"
-  | "switched-away"
   | "run-start"
-  | "model-config-update";
+  | "run-end"
+  | "initialize"
+  | "model-context-update";
 
-export type ThreadMetadataRuntimeCore = ThreadMetadata & {
-  create(title?: string): Promise<void>;
-  rename(newTitle: string): Promise<void>;
-  archive(): Promise<void>;
-  unarchive(): Promise<void>;
-  delete(): Promise<void>;
-  subscribe(callback: () => void): Unsubscribe;
+export type StartRunConfig = {
+  parentId: string | null;
+  sourceId: string | null;
+  runConfig: RunConfig;
 };
 
 export type ThreadRuntimeCore = Readonly<{
-  metadata: ThreadMetadataRuntimeCore;
-
   getMessageById: (messageId: string) =>
     | {
         parentId: string | null;
@@ -78,7 +69,7 @@ export type ThreadRuntimeCore = Readonly<{
   switchToBranch: (branchId: string) => void;
 
   append: (message: AppendMessage) => void;
-  startRun: (parentId: string | null) => void;
+  startRun: (config: StartRunConfig) => void;
   cancelRun: () => void;
 
   addToolResult: (options: AddToolResultOptions) => void;
@@ -89,7 +80,7 @@ export type ThreadRuntimeCore = Readonly<{
   getSubmittedFeedback: (messageId: string) => SubmittedFeedback | undefined;
   submitFeedback: (feedback: SubmitFeedbackOptions) => void;
 
-  getModelConfig: () => ModelConfig;
+  getModelContext: () => ModelContext;
 
   composer: ThreadComposerRuntimeCore;
   getEditComposer: (messageId: string) => ComposerRuntimeCore | undefined;
@@ -101,6 +92,12 @@ export type ThreadRuntimeCore = Readonly<{
   isDisabled: boolean;
   messages: readonly ThreadMessage[];
   suggestions: readonly ThreadSuggestion[];
+
+  // TODO deprecate for a more elegant solution
+  // /**
+  //  * @deprecated This field is deprecated and will be removed in 0.8.0.
+  //  * Please migrate to using `AssistantRuntimeCore.Provider` instead.
+  //  */
   extras: unknown;
 
   subscribe: (callback: () => void) => Unsubscribe;

@@ -8,3 +8,9 @@ export * as MessagePrimitive from "./message";
 export * as ThreadPrimitive from "./thread";
 export * as ThreadListPrimitive from "./threadList";
 export * as ThreadListItemPrimitive from "./threadListItem";
+
+export { useContentPartDisplay } from "./contentPart/useContentPartDisplay";
+export { useContentPartImage } from "./contentPart/useContentPartImage";
+export { useContentPartText } from "./contentPart/useContentPartText";
+export { useContentPartReasoning } from "./contentPart/useContentPartReasoning";
+export { useThreadViewportAutoScroll } from "./thread/useThreadViewportAutoScroll";

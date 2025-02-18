@@ -2,20 +2,23 @@
 
 import { FC } from "react";
 import {
-  AssistantModal,
   AssistantModalPrimitive,
   ChatModelAdapter,
   useLocalRuntime,
 } from "@assistant-ui/react";
-import { makeMarkdownText } from "@assistant-ui/react-markdown";
 import { makePrismAsyncSyntaxHighlighter } from "@assistant-ui/react-syntax-highlighter";
 import { coldarkDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkGfm from "remark-gfm";
-import { Thread, type ThreadConfig } from "@assistant-ui/react";
-import entelligenceLogoLight from "./entelligence-light.png";
-import entelligenceLogoDark from "./entelligence-dark.png";
+import {
+  Thread,
+  type ThreadConfig,
+  Composer,
+  ThreadWelcome,
+  AssistantModal,
+  makeMarkdownText,
+} from "@assistant-ui/react-ui";
+import entelligenceLogo from "@/app/(home)/logos/cust/entelligence.svg";
 import Image from "next/image";
-import { Composer, ThreadWelcome } from "@assistant-ui/react";
 
 function asAsyncIterable<T>(source: ReadableStream<T>): AsyncIterable<T> {
   return {
@@ -61,6 +64,18 @@ const MyCustomAdapter: ChatModelAdapter = {
       text += chunk;
       yield { content: [{ type: "text", text }] };
     }
+
+    void fetch("/api/entelligence-history", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        question: messagesToSend.at(-1)?.content,
+        answer: text,
+        previousQuestion: messagesToSend.at(-3)?.content,
+      }),
+    });
   },
 };
 
@@ -128,23 +143,15 @@ const MyThread: FC = () => {
       </Thread.Viewport>
 
       <a
-        href="https://entelligence.ai/Yonom&assistant-ui"
-        className="text-muted-foreground flex w-full items-center justify-center gap-2 border-t py-2 text-xs"
+        href="https://entelligence.ai/assistant-ui&assistant-ui?ref=assistant-ui"
+        className="opacity-40 flex w-full items-center justify-center gap-1 border-t py-2 text-xs"
       >
         In partnership with{" "}
         <Image
-          src={entelligenceLogoLight}
-          className="dark:hidden"
+          src={entelligenceLogo}
+          className="pt-0.5 invert dark:invert-0"
           alt="Entelligence Logo"
-          height={14}
-          width={113}
-        />
-        <Image
-          src={entelligenceLogoDark}
-          className="hidden dark:block"
-          alt="Entelligence Logo"
-          height={14}
-          width={113}
+          width={70}
         />
       </a>
     </Thread.Root>

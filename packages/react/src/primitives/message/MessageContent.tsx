@@ -2,6 +2,7 @@
 
 import { type ComponentType, type FC, memo, useMemo } from "react";
 import {
+  TextContentPartProvider,
   useContentPart,
   useContentPartRuntime,
   useToolUIs,
@@ -22,17 +23,21 @@ import type {
   ToolCallContentPartComponent,
   ToolCallContentPartProps,
   UIContentPartComponent,
+  FileContentPartComponent,
+  ReasoningContentPartComponent,
 } from "../../types/ContentPartComponentTypes";
 import { ContentPartPrimitiveInProgress } from "../contentPart/ContentPartInProgress";
-import { EMPTY_CONTENT_SYMBOL } from "../../api/MessageRuntime";
+import { ContentPartStatus } from "../../types/AssistantTypes";
 
 export namespace MessagePrimitiveContent {
   export type Props = {
     components?:
       | {
           Empty?: EmptyContentPartComponent | undefined;
+          Reasoning?: ReasoningContentPartComponent | undefined;
           Text?: TextContentPartComponent | undefined;
           Image?: ImageContentPartComponent | undefined;
+          File?: FileContentPartComponent | undefined;
           Unstable_Audio?: Unstable_AudioContentPartComponent | undefined;
           UI?: UIContentPartComponent | undefined;
           tools?:
@@ -42,6 +47,9 @@ export namespace MessagePrimitiveContent {
                   | undefined;
                 Fallback?: ComponentType<ToolCallContentPartProps> | undefined;
               }
+            | {
+                Override: ComponentType<ToolCallContentPartProps>;
+              }
             | undefined;
         }
       | undefined;
@@ -49,12 +57,12 @@ export namespace MessagePrimitiveContent {
 }
 
 const ToolUIDisplay = ({
-  UI,
+  Fallback,
   ...props
 }: {
-  UI: ToolCallContentPartComponent | undefined;
+  Fallback: ToolCallContentPartComponent | undefined;
 } & ToolCallContentPartProps) => {
-  const Render = useToolUIs((s) => s.getToolUI(props.toolName)) ?? UI;
+  const Render = useToolUIs((s) => s.getToolUI(props.toolName)) ?? Fallback;
   if (!Render) return null;
   return <Render {...props} />;
 };
@@ -68,7 +76,9 @@ const defaultComponents = {
       </ContentPartPrimitiveInProgress>
     </p>
   ),
+  Reasoning: () => null,
   Image: () => <ContentPartPrimitiveImage />,
+  File: () => null,
   Unstable_Audio: () => null,
   UI: () => <ContentPartPrimitiveDisplay />,
 } satisfies MessagePrimitiveContent.Props["components"];
@@ -80,11 +90,12 @@ type MessageContentPartComponentProps = {
 const MessageContentPartComponent: FC<MessageContentPartComponentProps> = ({
   components: {
     Text = defaultComponents.Text,
-    Empty,
+    Reasoning = defaultComponents.Reasoning,
     Image = defaultComponents.Image,
-    UI = defaultComponents.UI,
+    File = defaultComponents.File,
     Unstable_Audio: Audio = defaultComponents.Unstable_Audio,
-    tools: { by_name = {}, Fallback = undefined } = {},
+    UI = defaultComponents.UI,
+    tools = {},
   } = {},
 }) => {
   const contentPartRuntime = useContentPartRuntime();
@@ -93,9 +104,11 @@ const MessageContentPartComponent: FC<MessageContentPartComponentProps> = ({
 
   const type = part.type;
   if (type === "tool-call") {
-    const Tool = by_name[part.toolName] || Fallback;
     const addResult = (result: any) => contentPartRuntime.addToolResult(result);
-    return <ToolUIDisplay {...part} UI={Tool} addResult={addResult} />;
+    if ("Override" in tools)
+      return <tools.Override {...part} addResult={addResult} />;
+    const Tool = tools.by_name?.[part.toolName] ?? tools.Fallback;
+    return <ToolUIDisplay {...part} Fallback={Tool} addResult={addResult} />;
   }
 
   if (part.status.type === "requires-action")
@@ -103,15 +116,17 @@ const MessageContentPartComponent: FC<MessageContentPartComponentProps> = ({
 
   switch (type) {
     case "text":
-      if ((part as any)[EMPTY_CONTENT_SYMBOL] && !!Empty) {
-        return <Empty status={part.status} />;
-      }
-
       return <Text {...part} />;
+
+    case "reasoning":
+      return <Reasoning {...part} />;
 
     case "image":
       // eslint-disable-next-line jsx-a11y/alt-text
       return <Image {...part} />;
+
+    case "file":
+      return <File {...part} />;
 
     case "audio":
       return <Audio {...part} />;
@@ -152,16 +167,60 @@ const MessageContentPart = memo(
   (prev, next) =>
     prev.partIndex === next.partIndex &&
     prev.components?.Text === next.components?.Text &&
+    prev.components?.Reasoning === next.components?.Reasoning &&
     prev.components?.Image === next.components?.Image &&
+    prev.components?.File === next.components?.File &&
     prev.components?.Unstable_Audio === next.components?.Unstable_Audio &&
     prev.components?.UI === next.components?.UI &&
     prev.components?.tools === next.components?.tools,
 );
 
+const COMPLETE_STATUS: ContentPartStatus = Object.freeze({
+  type: "complete",
+});
+
+const EmptyContentFallback: FC<{
+  status: ContentPartStatus;
+  component: TextContentPartComponent;
+}> = ({ status, component: Component }) => {
+  return (
+    <TextContentPartProvider text="" isRunning={status.type === "running"}>
+      <Component type="text" text="" status={status} />
+    </TextContentPartProvider>
+  );
+};
+
+const EmptyContentImpl: FC<MessageContentPartComponentProps> = ({
+  components,
+}) => {
+  const status =
+    useMessage((s) => s.status as ContentPartStatus) ?? COMPLETE_STATUS;
+
+  if (components?.Empty) return <components.Empty status={status} />;
+
+  return (
+    <EmptyContentFallback
+      status={status}
+      component={components?.Text ?? defaultComponents.Text}
+    />
+  );
+};
+
+const EmptyContent = memo(
+  EmptyContentImpl,
+  (prev, next) =>
+    prev.components?.Empty === next.components?.Empty &&
+    prev.components?.Text === next.components?.Text,
+);
+
 export const MessagePrimitiveContent: FC<MessagePrimitiveContent.Props> = ({
   components,
 }) => {
-  const contentLength = useMessage((s) => s.content.length) || 1;
+  const contentLength = useMessage((s) => s.content.length);
+
+  if (contentLength === 0) {
+    return <EmptyContent components={components} />;
+  }
 
   return Array.from({ length: contentLength }, (_, index) => (
     <MessageContentPart key={index} partIndex={index} components={components} />

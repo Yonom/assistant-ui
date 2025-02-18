@@ -1,15 +1,12 @@
 "use client";
 
-import { forwardRef, type FC } from "react";
+import { ComponentType, forwardRef, type FC } from "react";
 import { ArrowDownIcon } from "lucide-react";
 
 import { withDefaults } from "./utils/withDefaults";
 import Composer from "./composer";
 import ThreadWelcome from "./thread-welcome";
-import {
-  TooltipIconButton,
-  TooltipIconButtonProps,
-} from "./base/tooltip-icon-button";
+import { TooltipIconButton } from "./base/tooltip-icon-button";
 import AssistantMessage from "./assistant-message";
 import UserMessage from "./user-message";
 import EditComposer from "./edit-composer";
@@ -27,6 +24,7 @@ const Thread: FC<ThreadConfig> = (config) => {
     components: {
       Composer: ComposerComponent = Composer,
       ThreadWelcome: ThreadWelcomeComponent = ThreadWelcome,
+      MessagesFooter,
       ...messageComponents
     } = {},
   } = config;
@@ -34,7 +32,10 @@ const Thread: FC<ThreadConfig> = (config) => {
     <ThreadRoot config={config}>
       <ThreadViewport>
         <ThreadWelcomeComponent />
-        <ThreadMessages components={messageComponents} />
+        <ThreadMessages
+          MessagesFooter={MessagesFooter}
+          components={messageComponents}
+        />
         <ThreadFollowupSuggestions />
         <ThreadViewportFooter>
           <ThreadScrollToBottom />
@@ -81,7 +82,13 @@ ThreadViewportFooter.displayName = "ThreadViewportFooter";
 const ThreadMessages: FC<{
   unstable_flexGrowDiv?: boolean;
   components?: Partial<ThreadPrimitive.Messages.Props["components"]>;
-}> = ({ components, unstable_flexGrowDiv: flexGrowDiv = true, ...rest }) => {
+  MessagesFooter?: ComponentType | undefined;
+}> = ({
+  components,
+  MessagesFooter,
+  unstable_flexGrowDiv: flexGrowDiv = true,
+  ...rest
+}) => {
   return (
     <>
       <ThreadPrimitive.Messages
@@ -93,6 +100,7 @@ const ThreadMessages: FC<{
         }}
         {...rest}
       />
+      {MessagesFooter && <MessagesFooter />}
       {flexGrowDiv && (
         <ThreadPrimitive.If empty={false}>
           <div style={{ flexGrow: 1 }} />
@@ -133,7 +141,7 @@ const ThreadScrollToBottomIconButton = withDefaults(TooltipIconButton, {
 
 namespace ThreadScrollToBottom {
   export type Element = HTMLButtonElement;
-  export type Props = Partial<TooltipIconButtonProps>;
+  export type Props = Partial<TooltipIconButton.Props>;
 }
 
 const ThreadScrollToBottom = forwardRef<

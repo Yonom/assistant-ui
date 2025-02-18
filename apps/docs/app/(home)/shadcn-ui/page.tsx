@@ -3,15 +3,16 @@
 import { Shadcn } from "@/components/shadcn/Shadcn";
 import { Button } from "@/components/ui/button";
 import { useChat } from "ai/react";
-import { AssistantRuntimeProvider, useEdgeRuntime } from "@assistant-ui/react";
+import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import Link from "next/link";
+import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
 
 export default function HomePage() {
   return (
     <main className="container mx-auto flex flex-col gap-6 self-stretch py-4">
       <div className="mt-12 flex flex-col gap-4 self-center">
         <h1 className="text-center text-4xl font-extrabold">
-          shadcn-ui for AI chatbots
+          shadcn/ui for AI chat
         </h1>
       </div>
 
@@ -36,7 +37,7 @@ export type AssistantProps = {
 };
 
 const MyRuntimeProvider = ({ children }: { children: React.ReactNode }) => {
-  const runtime = useEdgeRuntime({ api: "/api/chat" });
+  const runtime = useChatRuntime({ api: "/api/chat" });
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       {children}

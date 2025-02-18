@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
 import { CompleteAttachment } from "./AttachmentTypes";
+import {
+  ReadonlyJSONObject,
+  ReadonlyJSONValue,
+} from "../utils/json/json-value";
 
 export type MessageRole = "user" | "assistant" | "system";
 
@@ -8,9 +12,20 @@ export type TextContentPart = {
   readonly text: string;
 };
 
+export type ReasoningContentPart = {
+  readonly type: "reasoning";
+  readonly text: string;
+};
+
 export type ImageContentPart = {
   readonly type: "image";
   readonly image: string;
+};
+
+export type FileContentPart = {
+  readonly type: "file";
+  readonly data: string;
+  readonly mimeType: string;
 };
 
 export type Unstable_AudioContentPart = {
@@ -21,13 +36,50 @@ export type Unstable_AudioContentPart = {
   };
 };
 
+/**
+ * @deprecated UI content parts are deprecated and will be removed in v0.8.0.
+ * Migration guide for external-store users using UI content parts:
+ * If you must, store UI elements on your external store messages, update your
+ * external store converter:
+ * ```ts
+ * const UI_PLACEHOLDER = Object.freeze({ type: "text", text: "UI content placeholder" });
+ * const convertMessage = (message: TMessage): ThreadMessageLike => ({
+ *   content: [
+ *     // other content parts,
+ *     UI_PLACEHOLDER
+ *   ],
+ * });
+ * ```
+ *
+ * Then, define a custom `TextContentPartComponent`:
+ *
+ * ```tsx
+ * const MyText: FC = () => {
+ *   const isUIPlaceholder = useContentPart(p => p === UI_PLACEHOLDER);
+ *
+ *   // this assumes that you have a `display` field on your original message objects before conversion.
+ *   const ui = useMessage(m => isUIPlaceholder ? getExternalStoreMessage(m).display : undefined);
+ *   if (ui) {
+ *     return ui;
+ *   }
+ *
+ *   return <MarkdownText />; // your default text component
+ * }
+ * ```
+ *
+ *  Pass this component to your Thread:
+ *
+ * ```tsx
+ * <Thread assistantMessage={{ components: { Text: MyText } }} userMessage={{ components: { Text: MyText } }} />
+ * ```
+ */
 export type UIContentPart = {
   readonly type: "ui";
   readonly display: ReactNode;
 };
 
 export type CoreToolCallContentPart<
-  TArgs extends Record<string, unknown> = Record<string | number, unknown>,
+  TArgs = ReadonlyJSONObject,
   TResult = unknown,
 > = {
   readonly type: "tool-call";
@@ -39,7 +91,7 @@ export type CoreToolCallContentPart<
 };
 
 export type ToolCallContentPart<
-  TArgs extends Record<string, unknown> = Record<string | number, unknown>,
+  TArgs = ReadonlyJSONObject,
   TResult = unknown,
 > = CoreToolCallContentPart<TArgs, TResult> & {
   readonly argsText: string;
@@ -48,11 +100,13 @@ export type ToolCallContentPart<
 export type ThreadUserContentPart =
   | TextContentPart
   | ImageContentPart
+  | FileContentPart
   | Unstable_AudioContentPart
   | UIContentPart;
 
 export type ThreadAssistantContentPart =
   | TextContentPart
+  | ReasoningContentPart
   | ToolCallContentPart
   | UIContentPart;
 
@@ -116,12 +170,12 @@ export type MessageStatus =
         | "content-filter"
         | "other"
         | "error";
-      readonly error?: unknown;
+      readonly error?: ReadonlyJSONValue;
     };
 
 export type ThreadSystemMessage = MessageCommonProps & {
   readonly role: "system";
-  readonly content: [TextContentPart];
+  readonly content: readonly [TextContentPart];
   readonly metadata: {
     readonly custom: Record<string, unknown>;
   };
@@ -129,7 +183,7 @@ export type ThreadSystemMessage = MessageCommonProps & {
 
 export type ThreadUserMessage = MessageCommonProps & {
   readonly role: "user";
-  readonly content: ThreadUserContentPart[];
+  readonly content: readonly ThreadUserContentPart[];
   readonly attachments: readonly CompleteAttachment[];
   readonly metadata: {
     readonly custom: Record<string, unknown>;
@@ -138,16 +192,28 @@ export type ThreadUserMessage = MessageCommonProps & {
 
 export type ThreadAssistantMessage = MessageCommonProps & {
   readonly role: "assistant";
-  readonly content: ThreadAssistantContentPart[];
+  readonly content: readonly ThreadAssistantContentPart[];
   readonly status: MessageStatus;
   readonly metadata: {
-    readonly steps: ThreadStep[];
+    readonly unstable_annotations: readonly ReadonlyJSONValue[];
+    readonly unstable_data: readonly ReadonlyJSONValue[];
+    readonly steps: readonly ThreadStep[];
     readonly custom: Record<string, unknown>;
   };
 };
 
+export type RunConfig = {
+  // TODO allow user customization via global type overrides
+  readonly custom?: Record<string, unknown>;
+};
+
 export type AppendMessage = CoreMessage & {
   parentId: string | null;
+
+  /** The ID of the message that was edited or undefined. */
+  sourceId: string | null;
+  runConfig: RunConfig | undefined;
+
   attachments: readonly CompleteAttachment[];
   startRun?: boolean | undefined;
 };
@@ -155,7 +221,9 @@ export type AppendMessage = CoreMessage & {
 type BaseThreadMessage = {
   readonly status?: ThreadAssistantMessage["status"];
   readonly metadata: {
-    readonly steps?: ThreadStep[];
+    readonly unstable_annotations?: readonly ReadonlyJSONValue[];
+    readonly unstable_data?: readonly ReadonlyJSONValue[];
+    readonly steps?: readonly ThreadStep[];
     readonly custom: Record<string, unknown>;
   };
   readonly attachments?: ThreadUserMessage["attachments"];
@@ -169,6 +237,7 @@ export type ThreadMessage = BaseThreadMessage &
 export type CoreUserContentPart =
   | TextContentPart
   | ImageContentPart
+  | FileContentPart
   | Unstable_AudioContentPart;
 export type CoreAssistantContentPart =
   | TextContentPart
@@ -176,17 +245,17 @@ export type CoreAssistantContentPart =
 
 export type CoreSystemMessage = {
   role: "system";
-  content: [TextContentPart];
+  content: readonly [TextContentPart];
 };
 
 export type CoreUserMessage = {
   role: "user";
-  content: CoreUserContentPart[];
+  content: readonly CoreUserContentPart[];
 };
 
 export type CoreAssistantMessage = {
   role: "assistant";
-  content: CoreAssistantContentPart[];
+  content: readonly CoreAssistantContentPart[];
 };
 
 export type CoreMessage =

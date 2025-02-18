@@ -1,7 +1,9 @@
+"use client";
+
 import { useMemo } from "react";
 import { ThreadMessageConverter } from "./ThreadMessageConverter";
 import {
-  getExternalStoreMessage,
+  getExternalStoreMessages,
   symbolInnerMessage,
 } from "./getExternalStoreMessage";
 import { fromThreadMessageLike, ThreadMessageLike } from "./ThreadMessageLike";
@@ -10,7 +12,11 @@ import { ToolCallContentPart } from "../../types";
 
 export namespace useExternalMessageConverter {
   export type Message =
-    | ThreadMessageLike
+    | (ThreadMessageLike & {
+        readonly convertConfig?: {
+          readonly joinStrategy?: "concat-content" | "none";
+        };
+      })
     | {
         role: "tool";
         toolCallId: string;
@@ -31,10 +37,17 @@ type ChunkResult<T> = {
   outputs: useExternalMessageConverter.Message[];
 };
 
+type Mutable<T> = {
+  -readonly [P in keyof T]: T[P];
+};
+
 const joinExternalMessages = (
-  messages: useExternalMessageConverter.Message[],
+  messages: readonly useExternalMessageConverter.Message[],
 ): ThreadMessageLike => {
-  const assistantMessage: ThreadMessageLike & { content: any[] } = {
+  const assistantMessage: Mutable<Omit<ThreadMessageLike, "metadata">> & {
+    content: Exclude<ThreadMessageLike["content"][0], string>[];
+    metadata?: Mutable<ThreadMessageLike["metadata"]>;
+  } = {
     role: "assistant",
     content: [],
   };
@@ -55,6 +68,12 @@ const joinExternalMessages = (
         }
         assistantMessage.content[toolCallIdx] = {
           ...toolCall,
+          ...{
+            [symbolInnerMessage]: [
+              ...((toolCall as any)[symbolInnerMessage] ?? []),
+              output,
+            ],
+          },
           result: output.result,
         };
       } else {
@@ -64,18 +83,65 @@ const joinExternalMessages = (
       }
     } else {
       const role = output.role;
+      const content = (
+        typeof output.content === "string"
+          ? [{ type: "text" as const, text: output.content }]
+          : output.content
+      ).map((c) => ({
+        ...c,
+        ...{ [symbolInnerMessage]: [output] },
+      }));
       switch (role) {
         case "system":
         case "user":
-          return output;
+          return {
+            ...output,
+            content,
+          };
         case "assistant":
           if (assistantMessage.content.length === 0) {
             assistantMessage.id = output.id;
             assistantMessage.createdAt ??= output.createdAt;
             assistantMessage.status ??= output.status;
+
+            if (output.attachments) {
+              assistantMessage.attachments = [
+                ...(assistantMessage.attachments ?? []),
+                ...output.attachments,
+              ];
+            }
+
+            if (output.metadata) {
+              assistantMessage.metadata ??= {};
+              if (output.metadata.unstable_annotations) {
+                assistantMessage.metadata.unstable_annotations = [
+                  ...(assistantMessage.metadata.unstable_annotations ?? []),
+                  ...output.metadata.unstable_annotations,
+                ];
+              }
+              if (output.metadata.unstable_data) {
+                assistantMessage.metadata.unstable_data = [
+                  ...(assistantMessage.metadata.unstable_data ?? []),
+                  ...output.metadata.unstable_data,
+                ];
+              }
+              if (output.metadata.steps) {
+                assistantMessage.metadata.steps = [
+                  ...(assistantMessage.metadata.steps ?? []),
+                  ...output.metadata.steps,
+                ];
+              }
+              if (output.metadata.custom) {
+                assistantMessage.metadata.custom = {
+                  ...(assistantMessage.metadata.custom ?? {}),
+                  ...output.metadata.custom,
+                };
+              }
+            }
             // TODO keep this in sync
           }
-          assistantMessage.content.push(...output.content);
+
+          assistantMessage.content.push(...content);
           break;
         default: {
           const unsupportedRole: never = role;
@@ -87,9 +153,13 @@ const joinExternalMessages = (
   return assistantMessage;
 };
 
-const chunkExternalMessages = <T,>(callbackResults: CallbackResult<T>[]) => {
+const chunkExternalMessages = <T,>(
+  callbackResults: CallbackResult<T>[],
+  joinStrategy?: "concat-content" | "none",
+) => {
   const results: ChunkResult<T>[] = [];
   let isAssistant = false;
+  let pendingNone = false; // true if the previous assistant message had joinStrategy "none"
   let inputs: T[] = [];
   let outputs: useExternalMessageConverter.Message[] = [];
 
@@ -102,11 +172,18 @@ const chunkExternalMessages = <T,>(callbackResults: CallbackResult<T>[]) => {
     }
     inputs = [];
     outputs = [];
+    isAssistant = false;
+    pendingNone = false;
   };
 
   for (const callbackResult of callbackResults) {
     for (const output of callbackResult.outputs) {
-      if (!isAssistant || output.role === "user" || output.role === "system") {
+      if (
+        (pendingNone && output.role !== "tool") ||
+        !isAssistant ||
+        output.role === "user" ||
+        output.role === "system"
+      ) {
         flush();
       }
       isAssistant = output.role === "assistant" || output.role === "tool";
@@ -115,20 +192,58 @@ const chunkExternalMessages = <T,>(callbackResults: CallbackResult<T>[]) => {
         inputs.push(callbackResult.input);
       }
       outputs.push(output);
+
+      if (
+        output.role === "assistant" &&
+        (output.convertConfig?.joinStrategy === "none" ||
+          joinStrategy === "none")
+      ) {
+        pendingNone = true;
+      }
     }
   }
   flush();
   return results;
 };
 
+export const convertExternalMessages = <T extends WeakKey>(
+  messages: T[],
+  callback: useExternalMessageConverter.Callback<T>,
+  isRunning: boolean,
+) => {
+  const callbackResults: CallbackResult<T>[] = [];
+  for (const message of messages) {
+    const output = callback(message);
+    const outputs = Array.isArray(output) ? output : [output];
+    const result = { input: message, outputs };
+    callbackResults.push(result);
+  }
+
+  const chunks = chunkExternalMessages(callbackResults);
+
+  return chunks.map((message, idx) => {
+    const isLast = idx === chunks.length - 1;
+    const autoStatus = getAutoStatus(isLast, isRunning);
+    const newMessage = fromThreadMessageLike(
+      joinExternalMessages(message.outputs),
+      idx.toString(),
+      autoStatus,
+    );
+    (newMessage as any)[symbolInnerMessage] = message.inputs;
+    return newMessage;
+  });
+};
+
 export const useExternalMessageConverter = <T extends WeakKey>({
   callback,
   messages,
   isRunning,
+  joinStrategy,
 }: {
   callback: useExternalMessageConverter.Callback<T>;
   messages: T[];
   isRunning: boolean;
+  joinStrategy?: "concat-content" | "none";
 }) => {
   const state = useMemo(
     () => ({
@@ -156,17 +271,20 @@ export const useExternalMessageConverter = <T extends WeakKey>({
       callbackResults.push(result);
     }
 
-    const chunks = chunkExternalMessages(callbackResults).map((m) => {
-      const key = m.outputs[0];
-      if (!key) return m;
+    const chunks = chunkExternalMessages(callbackResults, joinStrategy).map(
+      (m) => {
+        const key = m.outputs[0];
+        if (!key) return m;
 
-      const cached = state.chunkCache.get(key);
-      if (cached && shallowArrayEqual(cached.outputs, m.outputs)) return cached;
-      state.chunkCache.set(key, m);
-      return m;
-    });
+        const cached = state.chunkCache.get(key);
+        if (cached && shallowArrayEqual(cached.outputs, m.outputs))
+          return cached;
+        state.chunkCache.set(key, m);
+        return m;
+      },
+    );
 
-    return state.converterCache.convertMessages(
+    const threadMessages = state.converterCache.convertMessages(
       chunks,
       (cache, message, idx) => {
         const isLast = idx === chunks.length - 1;
@@ -178,7 +296,7 @@ export const useExternalMessageConverter = <T extends WeakKey>({
             !isAutoStatus(cache.status) ||
             cache.status === autoStatus)
         ) {
-          const inputs = getExternalStoreMessage(cache) as T[];
+          const inputs = getExternalStoreMessages<T>(cache);
           if (shallowArrayEqual(inputs, message.inputs)) {
             return cache;
           }
@@ -193,6 +311,12 @@ export const useExternalMessageConverter = <T extends WeakKey>({
         return newMessage;
       },
     );
+
+    (threadMessages as unknown as { [symbolInnerMessage]: T[] })[
+      symbolInnerMessage
+    ] = messages;
+
+    return threadMessages;
   }, [state, messages, isRunning]);
 };
 

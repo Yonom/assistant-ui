@@ -1,6 +1,6 @@
 {
   "name": "@assistant-ui/react-syntax-highlighter",
-  "version": "0.7.0",
+  "version": "0.7.10",
   "license": "MIT",
   "exports": {
     ".": {
@@ -27,8 +27,8 @@
     "build": "tsup src/index.ts --format cjs,esm --dts --sourcemap --clean"
   },
   "peerDependencies": {
-    "@assistant-ui/react": "^0.7.4",
-    "@assistant-ui/react-markdown": "^0.7.0",
+    "@assistant-ui/react": "^0.7.82",
+    "@assistant-ui/react-markdown": "^0.7.20",
     "@types/react": "*",
     "@types/react-syntax-highlighter": "*",
     "react": "^18 || ^19 || ^19.0.0-rc",
@@ -46,19 +46,19 @@
     "@assistant-ui/react": "workspace:*",
     "@assistant-ui/react-markdown": "workspace:*",
     "@assistant-ui/tsconfig": "workspace:*",
-    "eslint-config-next": "15.0.3",
-    "tsup": "8.3.5"
+    "eslint-config-next": "15.1.6",
+    "tsup": "8.3.6"
   },
   "publishConfig": {
     "access": "public",
     "provenance": true
   },
-  "homepage": "https://assistant-ui.com/",
+  "homepage": "https://www.assistant-ui.com/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Yonom/assistant-ui.git"
+    "url": "git+https://github.com/assistant-ui/assistant-ui.git"
   },
   "bugs": {
-    "url": "https://github.com/Yonom/assistant-ui/issues"
+    "url": "https://github.com/assistant-ui/assistant-ui/issues"
   }
 }

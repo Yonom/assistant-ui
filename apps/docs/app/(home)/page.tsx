@@ -1,105 +1,54 @@
 "use client";
 
-import { Claude } from "@/components/claude/Claude";
 import { Shadcn } from "@/components/shadcn/Shadcn";
-import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { useChat } from "ai/react";
-import {
-  AssistantRuntimeProvider,
-  CompositeAttachmentAdapter,
-  SimpleImageAttachmentAdapter,
-  SimpleTextAttachmentAdapter,
-  useEdgeRuntime,
-} from "@assistant-ui/react";
 import Link from "next/link";
-import { useState } from "react";
-import { ChatGPT } from "../../components/chatgpt/ChatGPT";
-import { GenUI } from "../../components/genui/GenUI";
-import { Artifacts } from "../../components/artifacts/Artifacts";
-import { ModalChat } from "../../components/modal/ModalChat";
 import { TESTIMONIALS } from "@/components/testimonials/testimonials";
 import { ChatBubbleIcon } from "@radix-ui/react-icons";
 import { TestimonialContainer } from "../../components/testimonials/TestimonialContainer";
+import { cn } from "@/lib/utils";
 
-const supportedModels = [
-  {
-    name: "Standalone",
-    component: Shadcn,
-  },
-  {
-    name: "Modal",
-    component: ModalChat,
-  },
-  {
-    name: "Tool UI",
-    component: GenUI,
-  },
-  {
-    name: "Artifacts",
-    component: Artifacts,
-  },
-  {
-    name: "ChatGPT Theme",
-    component: ChatGPT,
-  },
-  {
-    name: "Claude Theme",
-    component: Claude,
-  },
-];
+import athenaintel from "./logos/cust/athenaintel.png";
+import browseruse from "./logos/cust/browseruse.svg";
+import entelligence from "./logos/cust/entelligence.svg";
+import langchain from "./logos/cust/langchain.svg";
+import stack from "./logos/cust/stack.svg";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
+import { MyRuntimeProvider } from "./MyRuntimeProvider";
+import { Marquee } from "@/components/magicui/marquee";
+import { useMediaQuery } from "@/lib/useMediaQuery";
+import { YCPill } from "./home/YCPill";
 
 export default function HomePage() {
-  const [selectedModel, setSelectedModel] = useState(supportedModels[0]!);
-  const ChatComponent = selectedModel.component;
-
   return (
-    <main className="container mx-auto flex flex-col gap-6 self-stretch p-4">
-      <div className="mt-12 flex flex-col gap-4 self-center">
-        <h1 className="text-center text-4xl font-extrabold">
-          Build in-app AI chatbots
-          <br />
-          in days, not weeks.
-        </h1>
-        <p className="text-foreground/85 text-center text-xl">
-          assistant-ui is a chatbot UI for your React app
-        </p>
+    <main className="container relative z-[2] max-w-[1100px] px-2 py-16 lg:py-16">
+      <YCPill />
+      <Hero />
+      <div className="mx-auto mt-6 flex h-[650px] w-full max-w-screen-xl flex-col overflow-hidden rounded-lg border shadow">
+        <MyRuntimeProvider>
+          <Shadcn />
+        </MyRuntimeProvider>
       </div>
 
-      <div className="mb-8 flex justify-center gap-2">
-        <Button asChild>
-          <Link href="/docs/getting-started">Get Started</Link>
-        </Button>
+      <Button variant="outline" className="mx-auto mt-6 flex" asChild>
+        <Link href="/examples">
+          View our other examples <ArrowRight />
+        </Link>
+      </Button>
+
+      <div className="mt-20 flex flex-col items-center gap-4">
+        <h1 className="text-2xl font-medium">
+          Trusted by fast-growing companies
+        </h1>
+        <Logos />
       </div>
-      <div className="mx-auto flex w-full max-w-screen-xl flex-col">
-        <p className="font-bold">Examples:</p>
-        <div className="mt-2 flex overflow-x-auto">
-          <div className="flex flex-grow gap-3">
-            {supportedModels.map((model) => (
-              <Badge
-                key={model.name}
-                onClick={() => setSelectedModel(model)}
-                className="shrink-0 cursor-pointer px-4 py-2"
-                variant={
-                  selectedModel.name === model.name ? "default" : "secondary"
-                }
-              >
-                {model.name}
-              </Badge>
-            ))}
-          </div>
-        </div>
-        <div className="mt-4 h-[650px] overflow-hidden rounded-lg border shadow">
-          <MyRuntimeProvider>
-            <ChatComponent />
-          </MyRuntimeProvider>
-        </div>
-      </div>
+
       <div className="my-20 flex flex-col gap-6">
         <div className="flex flex-col items-center gap-3 self-center">
           <h1 className="text-2xl font-medium">Be part of the community</h1>
           <p>
-            400+ developers are building with assistant-ui, you&apos;re in good
+            500+ developers are building with assistant-ui, you&apos;re in good
             company!
           </p>
 
@@ -112,7 +61,7 @@ export default function HomePage() {
             </a>
             <a
               className={buttonVariants({ variant: "outline" })}
-              href="https://github.com/Yonom/assistant-ui"
+              href="https://github.com/assistant-ui/assistant-ui"
             >
               🌟 Star us on Github
             </a>
@@ -126,33 +75,113 @@ export default function HomePage() {
           />
           <div className="from-background via-background pointer-events-none absolute -bottom-8 left-0 z-10 h-[120px] w-full bg-gradient-to-t" />
         </div>
+
+        <div>
+          <div className="relative flex h-32 w-full items-center justify-between rounded-3xl border px-16">
+            <p className="text-2xl font-bold">
+              Build conversational AI interfaces
+            </p>
+            <Button asChild>
+              <Link href="/docs/getting-started">Get Started</Link>
+            </Button>
+          </div>
+        </div>
       </div>
     </main>
   );
 }
 
-export type AssistantProps = {
-  chat: ReturnType<typeof useChat>;
-};
-
-const MyRuntimeProvider = ({ children }: { children: React.ReactNode }) => {
-  const runtime = useEdgeRuntime({
-    api: "/api/chat",
-    adapters: {
-      attachments: new CompositeAttachmentAdapter([
-        new SimpleImageAttachmentAdapter(),
-        new SimpleTextAttachmentAdapter(),
-      ]),
-      feedback: {
-        submit: ({ message, type }) => {
-          console.log({ message, type });
-        },
-      },
-    },
-  });
+function Hero() {
   return (
-    <AssistantRuntimeProvider runtime={runtime}>
-      {children}
-    </AssistantRuntimeProvider>
+    <div className="relative z-[2] flex flex-col overflow-hidden px-6 py-12 max-md:text-center md:pt-16">
+      <h1 className="mb-8 text-4xl font-medium md:hidden">
+        Typescript/React library for AI Chat
+      </h1>
+      <h1 className="mb-8 max-w-[600px] text-4xl font-medium max-md:hidden">
+        Build conversational AI interfaces
+      </h1>
+      <p className="text-muted-foreground mb-8 md:max-w-[80%] md:text-xl">
+        assistant-ui is the Typescript/React library for{" "}
+        <span className="text-foreground">AI Chat</span>.<br />
+        Open Source. Built on <span className="text-foreground">
+          shadcn/ui
+        </span>{" "}
+        and <span className="text-foreground">Tailwind</span>.
+      </p>
+      <div className="inline-flex items-center gap-3 max-md:mx-auto">
+        <Link
+          href="/docs/getting-started"
+          className={cn(
+            buttonVariants({ size: "lg", className: "rounded-full" }),
+          )}
+        >
+          Getting Started
+        </Link>
+        <a
+          href="/examples"
+          className={cn(
+            buttonVariants({
+              size: "lg",
+              variant: "outline",
+              className: "bg-background rounded-full",
+            }),
+          )}
+        >
+          View Examples
+        </a>
+      </div>
+      {/* <Image
+        // src={Img}
+        alt="preview"
+        className="animate-in fade-in slide-in-from-bottom-12 mb-[-250px] mt-12 min-w-[800px] select-none duration-1000 md:mb-[-340px] md:min-w-[1100px]"
+        priority
+      /> */}
+    </div>
   );
+}
+
+const Logos = () => {
+  const isMobile = useMediaQuery("(max-width: 1080px)");
+
+  const content = (
+    <div className="flex w-full items-center justify-around rounded pt-6">
+      <Image
+        src={langchain}
+        alt="Langchain"
+        className="inline-block h-[28px] w-auto opacity-50 invert transition-opacity hover:opacity-100 dark:invert-0"
+      />
+      <Image
+        src={athenaintel}
+        alt="Athena Intelligence"
+        className="inline-block h-11 w-auto opacity-50 invert transition-opacity hover:opacity-100 dark:invert-0"
+      />
+      <Image
+        src={browseruse}
+        alt="Browseruse"
+        className="inline-block h-[26px] w-auto opacity-50 invert transition-opacity hover:opacity-100 dark:invert-0"
+      />
+      <Image
+        src={entelligence}
+        alt="Entelligence"
+        className="mt-1 inline-block h-[22px] w-auto opacity-50 invert transition-opacity hover:opacity-100 dark:invert-0"
+      />
+      <Image
+        src={stack}
+        alt="Stack"
+        className="mt-0.5 inline-block h-[22px] w-auto opacity-50 invert transition-opacity hover:opacity-100 dark:invert-0"
+      />
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <div className="w-full overflow-clip">
+        <Marquee repeat={4}>
+          <div className="flex w-[1000px]">{content}</div>
+        </Marquee>
+      </div>
+    );
+  }
+
+  return content;
 };

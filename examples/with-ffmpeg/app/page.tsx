@@ -101,7 +101,9 @@ const FfmpegTool: FC<{ file: File }> = ({ file }) => {
     }) {
       const handleDownload = async () => {
         const ffmpeg = ffmpegRef.current;
-        const data = (await ffmpeg.readFile(outputFileName)) as Uint8Array;
+        const data = (await ffmpeg.readFile(
+          outputFileName,
+        )) as Uint8Array<ArrayBuffer>;
         window.open(
           URL.createObjectURL(
             new Blob([data.buffer], { type: outputMimeType }),
@@ -163,7 +165,10 @@ export default function Home() {
       <div className="border-b">
         <p className="my-4 ml-8 text-xl font-bold">
           ConvertGPT (built with{" "}
-          <a href="https://github.com/Yonom/assistant-ui" className="underline">
+          <a
+            href="https://github.com/assistant-ui/assistant-ui"
+            className="underline"
+          >
             assistant-ui
           </a>
           )

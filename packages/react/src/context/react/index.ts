@@ -1,3 +1,7 @@
+"use client";
+// TODO createContextStoreHook does not work well with server-side nextjs bundler
+// use client necessary here for now
+
 export {
   useAssistantRuntime,
   useThreadList,
@@ -9,10 +13,23 @@ export {
   useThreadRuntime,
   useThread,
   useThreadComposer,
-  useThreadModelConfig,
+  useThreadModelContext,
+  /**
+   * @deprecated This method was renamed to `useThreadModelContext`.
+   */
+  useThreadModelContext as useThreadModelConfig,
+} from "./ThreadContext";
+
+export {
   useThreadViewport,
   useThreadViewportStore,
-} from "./ThreadContext";
+} from "./ThreadViewportContext";
+
+export {
+  useThreadListItemRuntime,
+  useThreadListItem,
+} from "./ThreadListItemContext";
+
 export {
   useMessageRuntime,
   useMessage,
@@ -35,3 +52,5 @@ export {
   // useThreadComposerAttachment,
   // useThreadComposerAttachmentRuntime,
 } from "./AttachmentContext";
+
+export { useRuntimeState } from "./utils/useRuntimeState";

@@ -1,8 +1,9 @@
-"use client";
 import type { ComponentType } from "react";
 import type {
   ContentPartStatus,
+  FileContentPart,
   ImageContentPart,
+  ReasoningContentPart,
   TextContentPart,
   ToolCallContentPart,
   UIContentPart,
@@ -18,8 +19,15 @@ export type EmptyContentPartComponent = ComponentType<EmptyContentPartProps>;
 export type TextContentPartProps = ContentPartState & TextContentPart;
 export type TextContentPartComponent = ComponentType<TextContentPartProps>;
 
+export type ReasoningContentPartProps = ContentPartState & ReasoningContentPart;
+export type ReasoningContentPartComponent =
+  ComponentType<ReasoningContentPartProps>;
+
 export type ImageContentPartProps = ContentPartState & ImageContentPart;
 export type ImageContentPartComponent = ComponentType<ImageContentPartProps>;
+
+export type FileContentPartProps = ContentPartState & FileContentPart;
+export type FileContentPartComponent = ComponentType<FileContentPartProps>;
 
 export type Unstable_AudioContentPartProps = ContentPartState &
   Unstable_AudioContentPart;
@@ -30,7 +38,7 @@ export type UIContentPartProps = ContentPartState & UIContentPart;
 export type UIContentPartComponent = ComponentType<UIContentPartProps>;
 
 export type ToolCallContentPartProps<
-  TArgs extends Record<string, unknown> = any,
+  TArgs = any,
   TResult = unknown,
 > = ContentPartState &
   ToolCallContentPart<TArgs, TResult> & {
@@ -38,6 +46,6 @@ export type ToolCallContentPartProps<
   };
 
 export type ToolCallContentPartComponent<
-  TArgs extends Record<string, unknown> = any,
+  TArgs = any,
   TResult = any,
 > = ComponentType<ToolCallContentPartProps<TArgs, TResult>>;
