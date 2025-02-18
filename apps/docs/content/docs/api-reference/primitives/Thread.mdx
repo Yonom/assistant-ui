@@ -26,7 +26,7 @@ const Thread = () => (
 
 ### Root
 
-Containts all parts of the thread.
+Contains all parts of the thread.
 
 This primitive renders a `<div>` element unless `asChild` is set.
 
@@ -56,7 +56,7 @@ This primitive renders a `<div>` element unless `asChild` is set.
       type: "boolean",
       default: "true",
       description:
-        "Whether to automatically scroll to the bottom of the viewport when new messages are added while the viewport is was previously scrolled to the bottom.",
+        "Whether to automatically scroll to the bottom of the viewport when new messages are added while the viewport was previously scrolled to the bottom.",
     },
   ]}
 />
@@ -96,6 +96,11 @@ Renders all messages. This primitive renders a separate component for each messa
               name: "AssistantMessage",
               type: "ComponentType",
               description: "The component to render for assistant messages.",
+            },
+            {
+              name: "DataMessage",
+              type: "ComponentType",
+              description: "The component to render for data messages.",
             },
           ],
         },
