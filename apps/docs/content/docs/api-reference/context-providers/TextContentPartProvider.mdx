@@ -24,3 +24,13 @@ const MyApp = () => {
 #### Properties
 
 <ParametersTable {...AssistantRuntimeProvider} />
+
+#### Code changes
+
+The code changes include modifications to the `TextContentPart` type, which may affect how text content parts are provided or represented in the system. The `role` property of `ThreadMessageLike` type has been updated to include a new role "data". The `MessageRole` type in `AssistantTypes.ts` has also been updated to include this new role. 
+
+The order of import statements in `ThreadMessageLike.tsx` has been rearranged, but this does not affect the functionality of the code. 
+
+In `AssistantTypes.ts`, the `CoreToolCallContentPart` and `ToolCallContentPart` types have been updated to extend `ReadonlyJSONObject` instead of being equal to it. This change provides more flexibility in the type of arguments (`TArgs`) that can be passed to these types.
+
+Please note that these changes may require updates to any components or systems that interact with these types.
