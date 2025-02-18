@@ -24,3 +24,11 @@ const MyApp = () => {
 #### Properties
 
 <ParametersTable {...AssistantRuntimeProvider} />
+
+The `ThreadMessageLike` type now includes a new role: "data". This role can be used to represent data-related messages in the thread.
+
+The `MessageRole` type has also been updated to include the "data" role.
+
+The `CoreToolCallContentPart` and `ToolCallContentPart` types now have a generic parameter `TArgs` that extends `ReadonlyJSONObject` by default. This change allows for more flexibility when defining the arguments for a tool call.
+
+Please note that these changes may require updates to your existing code if you are using these types.
