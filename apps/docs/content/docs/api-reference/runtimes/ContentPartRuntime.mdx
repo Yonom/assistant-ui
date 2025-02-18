@@ -20,3 +20,17 @@ const statusAgain = useContentPart.getState().status;
 ```
 
 <ParametersTable {...ContentPartState} />
+
+The `useContentPart` function allows you to access the state of the content part. The state can be accessed directly or through a callback function. The callback function receives the state as an argument and should return the part of the state that you are interested in.
+
+The `useContentPart.getState()` function returns the current state of the content part. This state can be used to access specific properties, such as the status of the content part.
+
+The `useContentPart` function can also be used with a callback function to access specific properties of the state. The callback function receives the state as an argument and should return the property of the state that you are interested in.
+
+The `ThreadMessageLike` type has been updated to include a new role: "data". This role can be used to represent messages that contain data, such as results from a tool call.
+
+The `MessageRole` type has also been updated to include the "data" role. This role can be used to represent messages that contain data, such as results from a tool call.
+
+The `CoreToolCallContentPart` and `ToolCallContentPart` types have been updated to allow the `TArgs` type parameter to extend `ReadonlyJSONObject`. This change allows you to use more specific types for the arguments of a tool call.
+
+The order of imports in `ThreadMessageLike.tsx` and `AssistantTypes.ts` has been changed. This change does not affect the behavior of the code, but it may affect the order in which types and functions are listed in the documentation.
