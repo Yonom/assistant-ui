@@ -48,7 +48,6 @@
     "ts-jest": "^29.2.5",
     "tsup": "8.3.6",
     "tsx": "^4.19.2",
-    "web-streams-polyfill": "^3.2.1"
   },
   "publishConfig": {
     "access": "public"
