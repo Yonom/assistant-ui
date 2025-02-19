@@ -133,6 +133,6 @@
     "url": "https://github.com/assistant-ui/assistant-ui/issues"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20.10.0"
   }
 }
