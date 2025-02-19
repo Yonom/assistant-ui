@@ -31,17 +31,22 @@ const getFieldStatus = (
   partialCount: number,
 ): ContentPartStatus => {
   if (fieldPath.length === 0) return lastState;
-  if (partialCount === 1) return COMPLETE_STATUS;
   if (typeof args !== "object" || args === null) return COMPLETE_STATUS;
 
   const path = fieldPath.at(-1)!;
+
+  // If the expected property does not exist, mark as incomplete
+  if (!Object.prototype.hasOwnProperty.call(args, path)) {
+    return lastState;
+  }
+
   const argsKeys = Object.keys(args);
-  const isLast = argsKeys.indexOf(path) === argsKeys.length - 1;
+  const isLast = argsKeys[argsKeys.length - 1] === path;
   if (!isLast) return COMPLETE_STATUS;
 
   return getFieldStatus(
     lastState,
-    args[path as keyof typeof args],
+    (args as Record<string, unknown>)[path],
     fieldPath.slice(0, -1),
     partialCount - 1,
   );
