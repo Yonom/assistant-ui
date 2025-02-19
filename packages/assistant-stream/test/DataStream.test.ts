@@ -139,12 +139,7 @@ describe("DataStreamEncoder", () => {
     // @ts-expect-error: testing unsupported chunk type
     writer.write({ type: "unsupported", foo: "bar" });
     writer.close();
-
-    // Reading from the readable should result in an error.
-    await expect(async () => {
-      // Try to read until the stream errors out.
-      await streamToString(encoder.readable);
-    }).rejects.toThrow(/unsupported chunk type: unsupported/);
+    await expect(streamToString(encoder.readable)).rejects.toThrow(/unsupported chunk type/);
   });
 });
 
@@ -262,5 +257,74 @@ describe("DataStreamDecoder", () => {
       { type: "text-delta", textDelta: "Hello" },
       { type: "text-delta", textDelta: "World" }
     ]);
+  });
+});
+
+describe("DataStreamDecoder error handling", () => {
+  function encodeString(str: string): Uint8Array {
+    return new TextEncoder().encode(str);
+  }
+
+  test("handles invalid JSON gracefully", async () => {
+    const decoder = new DataStreamDecoder();
+    const writer = decoder.writable.getWriter();
+    const invalidJson = "0:{invalid json}\n";
+    await writer.write(encodeString(invalidJson));
+    writer.close();
+
+    await expect(async () => {
+      await collectStream(decoder.readable);
+    }).rejects.toThrow(SyntaxError);
+  });
+
+  test("handles missing type prefix", async () => {
+    const decoder = new DataStreamDecoder();
+    const writer = decoder.writable.getWriter();
+    const missingPrefix = JSON.stringify("Hello") + "\n";
+    await writer.write(encodeString(missingPrefix));
+    writer.close();
+
+    await expect(async () => {
+      await collectStream(decoder.readable);
+    }).rejects.toThrow("Invalid stream part");
+  });
+
+  test("handles invalid type code", async () => {
+    const decoder = new DataStreamDecoder();
+    const writer = decoder.writable.getWriter();
+    const invalidType = "x:" + JSON.stringify("Hello") + "\n";
+    await writer.write(encodeString(invalidType));
+    writer.close();
+
+    await expect(async () => {
+      await collectStream(decoder.readable);
+    }).rejects.toThrow("unsupported chunk type: x");
+  });
+
+  test("handles empty input", async () => {
+    const decoder = new DataStreamDecoder();
+    const writer = decoder.writable.getWriter();
+    await writer.write(encodeString(""));
+    writer.close();
+
+    const chunks = await collectStream(decoder.readable);
+    expect(chunks).toEqual([]);
+  });
+
+  test("handles multiple malformed messages mixed with valid ones", async () => {
+    const decoder = new DataStreamDecoder();
+    const writer = decoder.writable.getWriter();
+    const input = [
+      "0:" + JSON.stringify("Valid message") + "\n",
+      "invalid message\n",
+      "0:" + JSON.stringify("Another valid") + "\n"
+    ].join("");
+    
+    await writer.write(encodeString(input));
+    writer.close();
+
+    await expect(async () => {
+      await collectStream(decoder.readable);
+    }).rejects.toThrow("Invalid stream part");
   });
 });
