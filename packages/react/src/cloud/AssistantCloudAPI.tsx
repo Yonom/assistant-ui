@@ -2,17 +2,22 @@ import {
   AssistantCloudAuthStrategy,
   AssistantCloudJWTAuthStrategy,
   AssistantCloudAPIKeyAuthStrategy,
+  AssistantCloudAnonymousAuthStrategy,
 } from "./AssistantCloudAuthStrategy";
 
 export type AssistantCloudConfig =
   | {
       baseUrl: string;
-      authToken: (() => Promise<string | null>) | undefined;
+      authToken: () => Promise<string | null>;
     }
   | {
       apiKey: string;
       userId: string;
       workspaceId: string;
+    }
+  | {
+      baseUrl: string;
+      anonymous: true;
     };
 
 class CloudAPIError extends Error {
@@ -37,12 +42,19 @@ export class AssistantCloudAPI {
     if ("authToken" in config) {
       this._baseUrl = config.baseUrl;
       this._auth = new AssistantCloudJWTAuthStrategy(config.authToken);
-    } else {
+    } else if ("apiKey" in config) {
       this._baseUrl = "https://backend.assistant-api.com";
       this._auth = new AssistantCloudAPIKeyAuthStrategy(
         config.apiKey,
         config.userId,
         config.workspaceId,
+      );
+    } else if ("anonymous" in config) {
+      this._baseUrl = config.baseUrl;
+      this._auth = new AssistantCloudAnonymousAuthStrategy(config.baseUrl);
+    } else {
+      throw new Error(
+        "Invalid configuration: Must provide authToken, apiKey, or anonymous configuration",
       );
     }
   }

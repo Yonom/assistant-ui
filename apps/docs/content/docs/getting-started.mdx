@@ -12,13 +12,13 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 <Steps>
   <Step>
 
-### Create a new project
+### Initialize assistant-ui in your project
 
-Create a new project with `assistant-ui` pre-configured:
+Step 1: Run `assistant-ui init` to install assistant-ui in a new or existing React.js project:
 
 ```sh
-npx create-assistant-ui@latest my-app
-cd my-app
+npx assistant-ui@latest create # new project
+npx assistant-ui@latest init # existing project
 ```
 
   </Step>
@@ -30,6 +30,9 @@ Add a new `.env` file to your project with your OpenAI API key:
 
 ```
 OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# chat history -- sign up for free on https://cloud.assistant-ui.com
+# NEXT_PUBLIC_ASSISTANT_BASE_URL="https://..."
 ```
 
   </Step>
@@ -122,7 +125,7 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   const { messages } = await req.json();
   const result = streamText({
-    model: openai("gpt-4o"),
+    model: openai("gpt-4o-mini"),
     messages,
   });
   return result.toDataStreamResponse();
@@ -186,7 +189,7 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   const { messages } = await req.json();
   const result = streamText({
-    model: google("gemini-1.5-flash"),
+    model: google("gemini-2.0-flash"),
     messages,
   });
   return result.toDataStreamResponse();
@@ -369,6 +372,7 @@ If you aren't using Next.js, you can also deploy this endpoint to Cloudflare Wor
 ```tsx title="/app/page.tsx" tab="Thread"
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
+import { ThreadList } from "@/components/assistant-ui/thread-list";
 import { Thread } from "@/components/assistant-ui/thread";
 
 const MyApp = () => {
@@ -378,7 +382,8 @@ const MyApp = () => {
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <div className="h-full">
+      <div className="grid h-dvh grid-cols-[200px_1fr] gap-x-2 px-4 py-4">
+        <ThreadList />
         <Thread />
       </div>
     </AssistantRuntimeProvider>

@@ -18,10 +18,12 @@ import { ArrowRight } from "lucide-react";
 import { MyRuntimeProvider } from "./MyRuntimeProvider";
 import { Marquee } from "@/components/magicui/marquee";
 import { useMediaQuery } from "@/lib/useMediaQuery";
+import { YCPill } from "./home/YCPill";
 
 export default function HomePage() {
   return (
     <main className="container relative z-[2] max-w-[1100px] px-2 py-16 lg:py-16">
+      <YCPill />
       <Hero />
       <div className="mx-auto mt-6 flex h-[650px] w-full max-w-screen-xl flex-col overflow-hidden rounded-lg border shadow">
         <MyRuntimeProvider>
@@ -29,8 +31,10 @@ export default function HomePage() {
         </MyRuntimeProvider>
       </div>
 
-      <Button variant="outline" className="mx-auto mt-6 flex">
-        View our other examples <ArrowRight />
+      <Button variant="outline" className="mx-auto mt-6 flex" asChild>
+        <Link href="/examples">
+          View our other examples <ArrowRight />
+        </Link>
       </Button>
 
       <div className="mt-20 flex flex-col items-center gap-4">
@@ -137,7 +141,7 @@ function Hero() {
 }
 
 const Logos = () => {
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useMediaQuery("(max-width: 1080px)");
 
   const content = (
     <div className="flex w-full items-center justify-around rounded pt-6">
@@ -171,9 +175,11 @@ const Logos = () => {
 
   if (isMobile) {
     return (
-      <Marquee repeat={4}>
-        <div className="flex w-[1000px]">{content}</div>
-      </Marquee>
+      <div className="w-full overflow-clip">
+        <Marquee repeat={4}>
+          <div className="flex w-[1000px]">{content}</div>
+        </Marquee>
+      </div>
     );
   }
 

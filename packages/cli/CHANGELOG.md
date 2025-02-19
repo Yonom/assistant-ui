@@ -1,5 +1,17 @@
 # assistant-ui
 
+## 0.0.39
+
+### Patch Changes
+
+- 1d56298: fix: make CLI's add command work w new templates
+
+## 0.0.38
+
+### Patch Changes
+
+- 65a2c7c: feat: assistant-ui init CLI
+
 ## 0.0.37
 
 ### Patch Changes

@@ -1,16 +1,16 @@
 import { pageTree } from "@/app/source";
 import {
   BookIcon,
+  CloudIcon,
   NewspaperIcon,
   ProjectorIcon,
   SparklesIcon,
+  WalletIcon,
 } from "lucide-react";
 import icon from "@/public/favicon/icon.svg";
 import Image from "next/image";
 import { DocsLayoutProps } from "fumadocs-ui/layouts/docs";
 import { HomeLayoutProps } from "fumadocs-ui/layouts/home";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 const DiscordIcon = () => {
   return (
@@ -66,13 +66,14 @@ export const baseOptions: HomeLayoutProps = {
       icon: <NewspaperIcon />,
     },
     {
-      type: "custom",
-      children: (
-        <Button className="mr-2 rounded-full" asChild>
-          <Link href="https://dash.assistant-ui.com/">Dashboard</Link>
-        </Button>
-      ),
-      secondary: true,
+      text: "Cloud Dashboard",
+      url: "https://cloud.assistant-ui.com/",
+      icon: <CloudIcon />,
+    },
+    {
+      text: "Pricing",
+      url: "/pricing",
+      icon: <WalletIcon />,
     },
     {
       type: "icon",

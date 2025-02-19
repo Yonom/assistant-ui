@@ -2,6 +2,39 @@ import { RegistryItem } from "./schema";
 
 export const registry: RegistryItem[] = [
   {
+    name: "chat/b/ai-sdk-quick-start/json",
+    type: "registry:page",
+    files: [
+      {
+        type: "registry:page",
+        path: "app/ai-sdk/assistant.tsx",
+        target: "app/assistant.tsx",
+      },
+    ],
+    registryDependencies: [
+      "https://r.assistant-ui.com/ai-sdk-backend",
+      "https://r.assistant-ui.com/thread",
+      "https://r.assistant-ui.com/thread-list",
+    ],
+    meta: {
+      importSpecifier: "Assistant",
+      moduleSpecifier: "@/app/assistant",
+      nextVersion: "15.1.6",
+    },
+  },
+  {
+    name: "ai-sdk-backend",
+    type: "registry:page",
+    files: [
+      {
+        type: "registry:page",
+        path: "app/api/chat/route.ts",
+        target: "app/api/chat/route.ts",
+      },
+    ],
+    dependencies: ["@assistant-ui/react-ai-sdk", "ai", "@ai-sdk/openai"],
+  },
+  {
     name: "thread",
     type: "registry:component",
     files: [

@@ -60,7 +60,7 @@ export const AssistantRuntimeProviderImpl = <T extends AssistantRuntime>({
       {RenderComponent && <RenderComponent />}
       <ThreadRuntimeProvider
         runtime={runtime.thread}
-        listItemRuntime={runtime.threadList.mainItem}
+        listItemRuntime={runtime.threads.mainItem}
       >
         {children}
       </ThreadRuntimeProvider>

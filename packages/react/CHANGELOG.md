@@ -1,5 +1,69 @@
 # @assistant-ui/react
 
+## 0.7.85
+
+### Patch Changes
+
+- 3454871: fix: Vite bundler compat
+
+## 0.7.84
+
+### Patch Changes
+
+- fix: pin nanoid version for CJS compat
+- Updated dependencies
+  - assistant-stream@0.0.21
+
+## 0.7.83
+
+### Patch Changes
+
+- 54b631c: chore: update README
+
+## 0.7.82
+
+### Patch Changes
+
+- 934ee4b: feat: anonymous login and auto-config for cloud
+
+## 0.7.81
+
+### Patch Changes
+
+- 7f7ab5e: refactor: assitant-stream API
+- Updated dependencies [7f7ab5e]
+  - assistant-stream@0.0.20
+
+## 0.7.80
+
+### Patch Changes
+
+- fix: relax ReadonlyJSONObject requirement on tool/toolUI
+
+## 0.7.79
+
+### Patch Changes
+
+- fix: argsText parsing
+
+## 0.7.78
+
+### Patch Changes
+
+- fix: result sometimes set to undefined
+
+## 0.7.77
+
+### Patch Changes
+
+- f2a1e86: feat: unstable_humanToolNames
+
+## 0.7.76
+
+### Patch Changes
+
+- fix: README
+
 ## 0.7.75
 
 ### Patch Changes
