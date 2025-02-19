@@ -5,7 +5,6 @@ import {
   ToolCallContentPartStatus,
 } from "../../types/AssistantTypes";
 import { useContentPart } from "../../context";
-import { useEffect } from "react";
 
 const PARTIAL_JSON_COUNT_SYMBOL = Symbol("partial-json-count");
 export const parsePartialJson = (json: string) => {
