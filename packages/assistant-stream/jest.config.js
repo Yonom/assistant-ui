@@ -5,5 +5,5 @@ module.exports = {
     '^.+\\.(ts|tsx)$': 'ts-jest'
   },
   moduleFileExtensions: ["ts", "js"],
-  testPathIgnorePatterns: ['/src/core/test.ts']
+  testPathIgnorePatterns: ['<rootDir>/src/core/test.ts']
 }; 
