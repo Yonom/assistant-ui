@@ -35,8 +35,12 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsx scripts/build.mts",
-    "test": "jest"
+   "scripts": {
+     "build": "tsx scripts/build.mts",
+     "test": "jest",
+     "test:watch": "jest --watch",
+     "test:coverage": "jest --coverage"
+   },
   },
   "devDependencies": {
     "@assistant-ui/tsconfig": "workspace:*",
