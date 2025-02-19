@@ -7,6 +7,6 @@ export * from "./runtimes";
 export * from "./types";
 export * from "./ui";
 
-export { getToolArgsFieldStatus as unstable_getToolArgsFieldStatus } from "./utils/json/parse-partial-json";
+export { useToolArgsFieldStatus as unstable_useToolArgsFieldStatus } from "./utils/json/parse-partial-json";
 
 export * as INTERNAL from "./internal";
