@@ -1,13 +1,16 @@
 name: TestDriver.ai
 
 on:
-  push:
-    branches: ["main"]
-  pull_request:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Changesets"]
+    types:
+      - completed
+    branches:
+      - main
 
 jobs:
   test:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: "TestDriver"
     runs-on: ubuntu-latest
     steps:

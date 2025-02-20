@@ -1,5 +1,31 @@
 # @assistant-ui/react
 
+## 0.7.86
+
+### Patch Changes
+
+- 4685652: feat: useToolArgsFieldStatus
+
+## 0.7.85
+
+### Patch Changes
+
+- 3454871: fix: Vite bundler compat
+
+## 0.7.84
+
+### Patch Changes
+
+- fix: pin nanoid version for CJS compat
+- Updated dependencies
+  - assistant-stream@0.0.21
+
+## 0.7.83
+
+### Patch Changes
+
+- 54b631c: chore: update README
+
 ## 0.7.82
 
 ### Patch Changes
