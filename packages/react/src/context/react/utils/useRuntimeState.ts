@@ -33,7 +33,7 @@ export function useRuntimeStateInternal<TState, TSelected>(
   // TODO move to useRuntimeState
   ensureBinding(runtime);
 
-  const lastSnapshot = useRef<TSelected | TState>(null);
+  const lastSnapshot = useRef<TSelected | TState>(undefined);
 
   const getSnapshot = useCallback(() => {
     const newSnapshot = selector(runtime.getState());
