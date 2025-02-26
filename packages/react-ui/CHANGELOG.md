@@ -1,6 +1,6 @@
 # @assistant-ui/react-ui
 
-## Patch changes
+## Patch Changes
 
 - 7df4eef: fix: import in code headers
 
