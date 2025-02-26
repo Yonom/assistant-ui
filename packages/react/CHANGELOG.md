@@ -7,6 +7,7 @@
 - pre-styled UI components have moved to `@assistant-ui/react-ui`
 - run `npx assistant-ui upgrade` to update your codebase
 - manual upgrade: change styled component imports from `@assistant-ui/react` to `@assistant-ui/react-ui` (and same with markdown)
++ manual upgrade: change styled component imports from `@assistant-ui/react` to `@assistant-ui/react-ui` (and same with Markdown)
 
 ## 0.7.91
 
